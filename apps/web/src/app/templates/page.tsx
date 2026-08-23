@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Download, Copy, Check } from "lucide-react";
-import { exportTemplateToDXF } from "@rdcad-express/dxf-exporter";
+import { exportTemplateToDXF } from "@vastumandal/dxf-exporter";
 import { useAppStore } from "@/store/useStore";
 import DXFPreview from "@/components/DXFPreview";
 

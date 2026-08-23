@@ -3,15 +3,15 @@ import Link from "next/link";
 import { ArrowLeft, PlayCircle, Settings, Copy, Code } from "lucide-react";
 import { PwaInstallButton } from "@/components/PwaInstallButton";
 export const metadata = {
-  title: "Startup Guide - RDCAD Express",
-  description: "Learn how to use RDCAD Express to automate structural detailing.",
+  title: "Startup Guide - Vastumandal",
+  description: "Learn how to use Vastumandal to automate structural detailing.",
 };
 
 const features = [
   {
     icon: <PlayCircle className="w-8 h-8 text-primary" />,
     title: "Module Selection",
-    description: "Start by choosing a structural element from the dashboard. RDCAD Express supports Beams, Columns, Slabs, Foundations, Stairs, and Tanks. Each module provides specialized parametric controls tailored for that specific structural component."
+    description: "Start by choosing a structural element from the dashboard. Vastumandal supports Beams, Columns, Slabs, Foundations, Stairs, and Tanks. Each module provides specialized parametric controls tailored for that specific structural component."
   },
   {
     icon: <Settings className="w-8 h-8 text-amber-500" />,
@@ -63,7 +63,7 @@ export default function GuidePage() {
             Startup <span className="bg-gradient-to-r from-blue-500 to-indigo-400 bg-clip-text text-transparent">Guide</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Explore the RDCAD Express core features and flexible workflows to drastically reduce your drafting time.
+            Explore the Vastumandal core features and flexible workflows to drastically reduce your drafting time.
           </p>
         </div>
 
@@ -96,7 +96,7 @@ export default function GuidePage() {
           </div>
           <div className="p-8 bg-card border border-border rounded-2xl">
             <h4 className="text-xl font-bold mb-2">Install App (Optional)</h4>
-            <p className="text-muted-foreground mb-6">You can install RDCAD Express as a Progressive Web App (PWA) using your browser&apos;s install button.</p>
+            <p className="text-muted-foreground mb-6">You can install Vastumandal as a Progressive Web App (PWA) using your browser&apos;s install button.</p>
             <div className="w-full flex justify-center [&>*]:w-full [&>*]:justify-center">
               <PwaInstallButton />
             </div>

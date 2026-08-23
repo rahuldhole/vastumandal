@@ -9,9 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@rdcad-express/core-math": "workspace:*",
-    "@rdcad-express/dwg-schemas": "workspace:*",
-    "@rdcad-express/dxf-exporter": "workspace:*",
+    "@vastumandal/core-math": "workspace:*",
+    "@vastumandal/dwg-schemas": "workspace:*",
+    "@vastumandal/dxf-exporter": "workspace:*",
     "@serwist/next": "^9.5.12",
     "dxf-viewer": "^1.0.48",
     "jszip": "^3.10.1",

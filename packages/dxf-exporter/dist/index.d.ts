@@ -1,4 +1,4 @@
-import type { BeamScheduleRow, ColumnScheduleRow, SlabScheduleRow, FoundationScheduleRow, TankScheduleRow, StairsScheduleRow, TitleBlockRow } from '@rdcad-express/dwg-schemas';
+import type { BeamScheduleRow, ColumnScheduleRow, SlabScheduleRow, FoundationScheduleRow, TankScheduleRow, StairsScheduleRow, TitleBlockRow } from '@vastumandal/dwg-schemas';
 export declare class ScriptWriter {
     commands: string[];
     addLayer(name: string, color: number, lineType: string): void;

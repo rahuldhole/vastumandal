@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Download, Copy, Check, Save } from "lucide-react";
-import {  exportFoundationSectionToDXF, exportFoundationSectionToScript  } from "@rdcad-express/dxf-exporter";
+import {  exportFoundationSectionToDXF, exportFoundationSectionToScript  } from "@vastumandal/dxf-exporter";
 import { useAppStore } from "@/store/useStore";
 import DXFPreview from "@/components/DXFPreview";
 import ExampleSelector, { Example } from "@/components/ExampleSelector";
-import type { FoundationScheduleRow } from "@rdcad-express/dwg-schemas";
+import type { FoundationScheduleRow } from "@vastumandal/dwg-schemas";
 
 const foundationExamples: Example<FoundationScheduleRow>[] = [
  { name: "Small Isolated", data: { footingId: "F1", lx: 1500, ly: 1500, depth: 350, meshBarDiaX: 10, meshBarSpacingX: 150, meshBarDiaY: 10, meshBarSpacingY: 150 } },

@@ -1,4 +1,4 @@
-import type { BeamScheduleRow, ColumnScheduleRow, SlabScheduleRow, FoundationScheduleRow, TankScheduleRow, StairsScheduleRow, TitleBlockRow } from '@rdcad-express/dwg-schemas';
+import type { BeamScheduleRow, ColumnScheduleRow, SlabScheduleRow, FoundationScheduleRow, TankScheduleRow, StairsScheduleRow, TitleBlockRow } from '@vastumandal/dwg-schemas';
 export declare function exportBeamSectionToDXF(data: BeamScheduleRow): string;
 export declare function exportColumnSectionToDXF(data: ColumnScheduleRow): string;
 export declare function exportTextNodesToDXF(nodes: {

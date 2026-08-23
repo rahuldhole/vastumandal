@@ -15,7 +15,7 @@ export default function MarketingPage() {
  <section className="relative pt-32 pb-20 px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/80 /80 border border-slate-400 dark:border-slate-200 text-sm font-medium text-primary dark:text-primary mb-8 backdrop-blur-sm transition-colors">
  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
- RDCAD Express Open Source
+ Vastumandal Open Source
  </div>
  
  <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 bg-gradient-to-br from-slate-900 to-slate-600 dark:from-white dark:to-slate-200 bg-clip-text text-transparent transition-colors">
@@ -24,7 +24,7 @@ export default function MarketingPage() {
  </h1>
  
  <p className="text-lg md:text-xl text-muted-foreground dark:text-slate-300 max-w-3xl mb-12 transition-colors">
- An advanced suite of open-source engineering tools for generating accurate Bar Bending Schedules, DXF exports, and detailed structural designs instantly.
+ An advanced suite of engineering tools for generating accurate Bar Bending Schedules, DXF exports, and detailed structural designs instantly.
  </p>
  
  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 w-full max-w-3xl mx-auto">
@@ -35,15 +35,8 @@ export default function MarketingPage() {
  <div className="w-full sm:w-auto">
  <PwaInstallButton />
  </div>
- <a href="https://github.com/rahuldhole/rdcad-express" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-8 py-4 bg-background hover:bg-background dark:hover:bg-muted text-foreground rounded-full font-semibold transition-all border border-border hover:border-border dark:hover:border-border w-full sm:w-auto">
- <GitBranch className="w-5 h-5" />
- GitHub
- </a>
  </div>
  <div className="mt-8">
- <a href="https://github.com/rahuldhole/rdcad-express/issues" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-foreground transition flex items-center gap-2">
- Found a bug or have a suggestion? <span className="text-red-700 dark:text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-400 dark:hover:text-red-300 underline decoration-red-400/30 underline-offset-4">Report an Issue</span>
- </a>
  </div>
  </section>
 
@@ -56,7 +49,7 @@ export default function MarketingPage() {
  </div>
  <h2 className="text-3xl md:text-5xl font-bold">Seamless AutoCAD Integration</h2>
  <p className="text-lg text-muted-foreground leading-relaxed">
- Downloading DXF files is just the beginning. We provide a lightweight AutoLISP companion script that bridges the gap between RDCAD Express and your local AutoCAD environment.
+ Downloading DXF files is just the beginning. We provide a lightweight AutoLISP companion script that bridges the gap between Vastumandal and your local AutoCAD environment.
  </p>
  <ul className="space-y-4 text-foreground">
  <li className="flex items-center gap-3">
@@ -88,7 +81,7 @@ export default function MarketingPage() {
  <span className="ml-2">AutoCAD Command Line</span>
  </div>
  <div className="font-mono text-sm space-y-2">
- <div className="text-muted-foreground">Command: <span className="text-emerald-600 dark:text-emerald-400">RDCAD_IMPORT</span></div>
+ <div className="text-muted-foreground">Command: <span className="text-emerald-600 dark:text-emerald-400">Vastumandal_IMPORT</span></div>
  <div className="text-muted-foreground">Importing: C:\Users\Engineer\Downloads\Beam_B1_300x450.dxf</div>
  <div className="text-muted-foreground">Specify insertion point or [Basepoint/Scale/X/Y/Z/Rotate]:</div>
  <div className="text-primary flex items-center gap-2 mt-4 animate-pulse">
@@ -153,7 +146,7 @@ export default function MarketingPage() {
  </div>
  <h2 className="text-3xl md:text-5xl font-bold">Tested & Reliable Core</h2>
  <p className="text-lg text-muted-foreground leading-relaxed">
- We know that structural detailing requires absolute precision. That&apos;s why the core mathematical engine and DXF generator of RDCAD Express are backed by a comprehensive <span className="text-foreground font-medium">Vitest</span> test suite.
+ We know that structural detailing requires absolute precision. That&apos;s why the core mathematical engine and DXF generator of Vastumandal are backed by a comprehensive <span className="text-foreground font-medium">Vitest</span> test suite.
  </p>
  <ul className="space-y-4 text-foreground">
  <li className="flex items-center gap-3">
@@ -291,7 +284,7 @@ export default function MarketingPage() {
  </div>
  <h2 className="text-3xl md:text-5xl font-bold">Unified Project Reports</h2>
  <p className="text-lg text-muted-foreground leading-relaxed">
- Consolidate your structural designs into a single, cohesive project. RDCAD Express allows you to queue multiple elements—beams, columns, slabs—and generate a comprehensive engineering report.
+ Consolidate your structural designs into a single, cohesive project. Vastumandal allows you to queue multiple elements—beams, columns, slabs—and generate a comprehensive engineering report.
  </p>
  <ul className="space-y-4 text-foreground">
  <li className="flex items-center gap-3">
@@ -320,40 +313,10 @@ export default function MarketingPage() {
  {/* Reporting Issues Section */}
  <section className="py-24 px-8 border-t border-slate-900/50 bg-background relative z-10">
  <div className="max-w-4xl mx-auto text-center space-y-8">
- <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-card border border-border mb-4 shadow-xl">
- <GitBranch className="w-8 h-8 text-foreground" />
- </div>
- <h2 className="text-3xl md:text-5xl font-bold">Found a Bug? Have an Idea?</h2>
+ <h2 className="text-3xl md:text-5xl font-bold">Need Help?</h2>
  <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
- RDCAD Express is open-source, and we rely on community feedback to improve. If you encounter a bug or have a feature request, you can easily report it on our GitHub repository.
+ Vastumandal is an advanced structural engineering suite. If you need support or have a feature request, please reach out to us directly.
  </p>
- 
- <div className="grid md:grid-cols-3 gap-6 text-left mt-12">
- <div className="bg-card border border-border p-6 rounded-2xl relative overflow-hidden group hover:border-border transition-colors">
- <div className="text-4xl font-black text-muted-foreground/50 absolute -right-2 -bottom-4 group-hover:text-muted-foreground transition-colors">1</div>
- <h3 className="text-xl font-bold mb-3 relative z-10 text-foreground">Create an Account</h3>
- <p className="text-muted-foreground text-sm relative z-10">If you don&apos;t have one, sign up for a free account at GitHub.com.</p>
- </div>
- <div className="bg-card border border-border p-6 rounded-2xl relative overflow-hidden group hover:border-border transition-colors">
- <div className="text-4xl font-black text-muted-foreground/50 absolute -right-2 -bottom-4 group-hover:text-muted-foreground transition-colors">2</div>
- <h3 className="text-xl font-bold mb-3 relative z-10 text-foreground">Go to Issues</h3>
- <p className="text-muted-foreground text-sm relative z-10">Navigate to the &quot;Issues&quot; tab on our GitHub repository and click &quot;New Issue&quot;.</p>
- </div>
- <div className="bg-card border border-border p-6 rounded-2xl relative overflow-hidden group hover:border-border transition-colors">
- <div className="text-4xl font-black text-muted-foreground/50 absolute -right-2 -bottom-4 group-hover:text-muted-foreground transition-colors">3</div>
- <h3 className="text-xl font-bold mb-3 relative z-10 text-foreground">Provide Details</h3>
- <p className="text-muted-foreground text-sm relative z-10">Describe the problem clearly. Include screenshots or error messages if possible.</p>
- </div>
- </div>
- 
- <div className="pt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
- <a href="https://github.com/rahuldhole/rdcad-express/issues/new" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-8 py-4 bg-muted hover:bg-background text-foreground rounded-full font-bold transition-all shadow-lg hover:scale-105">
- Report an Issue Now
- </a>
- <a href="https://github.com/rahuldhole/rdcad-express" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-8 py-4 bg-transparent border border-border hover:border-slate-600 dark:hover:border-slate-400 text-foreground rounded-full font-bold transition-all hover:bg-muted">
- Explore Repository
- </a>
- </div>
  
  <div className="pt-6 text-muted-foreground text-sm">
  Need direct support? Email me at <ProtectedEmail />

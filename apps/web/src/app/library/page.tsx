@@ -9,7 +9,7 @@ import {
   exportDeskDXF, exportConferenceTableDXF, exportToiletDXF, exportSinkDXF,
   exportTreeDXF, exportShrubDXF, exportParkingBaysDXF, exportVehicleDXF,
   exportLightFixtureDXF, exportSocketSwitchDXF, exportDistributionBoardDXF, exportHVACVentDXF
-} from "@rdcad-express/dxf-exporter";
+} from "@vastumandal/dxf-exporter";
 import DXFPreview from "@/components/DXFPreview";
 
 const ASSETS = [

@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 
 export const metadata = {
-  title: "FAQ - RDCAD Express",
-  description: "Frequently asked questions about RDCAD Express",
+  title: "FAQ - Vastumandal",
+  description: "Frequently asked questions about Vastumandal",
 };
 
 const faqs = [
@@ -13,20 +13,20 @@ const faqs = [
     answer: "The 'Copy CAD Command' feature allows you to instantly generate structural detailing within your CAD software. Once you have configured your design in the web app, simply click the copy icon button. Then, switch to AutoCAD (or any compatible CAD software with LISP support), paste the copied text directly into the command line, and press Enter. The script will automatically draw the exact element."
   },
   {
-    question: "What is RDCAD Express?",
-    answer: "RDCAD Express is an open-source suite of engineering tools designed to automate structural detailing, generate Bar Bending Schedules (BBS), and export precise DXF drawings directly from your browser."
+    question: "What is Vastumandal?",
+    answer: "Vastumandal is a suite of engineering tools designed to automate structural detailing, generate Bar Bending Schedules (BBS), and export precise DXF drawings directly from your browser."
   },
   {
     question: "Can I export drawings as DXF files?",
     answer: "Yes! Every module (Beams, Columns, Slabs, etc.) includes an 'Export DXF' button. Clicking this will instantly download a .dxf file of your design, which you can open in any standard CAD software."
   },
   {
-    question: "Is RDCAD Express completely free and open-source?",
-    answer: "Absolutely. RDCAD Express is a community-driven, open-source project. You can use it for free, inspect the code, and even contribute to its development on GitHub."
+    question: "Is Vastumandal completely free?",
+    answer: "Absolutely. Vastumandal is a completely free project."
   },
   {
     question: "Does it work without an internet connection?",
-    answer: "Yes, RDCAD Express is a Progressive Web App (PWA). Once installed or loaded in your browser, the core mathematical engine and DXF generation work completely offline."
+    answer: "Yes, Vastumandal is a Progressive Web App (PWA). Once installed or loaded in your browser, the core mathematical engine and DXF generation work completely offline."
   }
 ];
 
@@ -64,7 +64,7 @@ export default function FAQPage() {
           Frequently Asked <span className="bg-gradient-to-r from-blue-500 to-emerald-400 bg-clip-text text-transparent">Questions</span>
         </h1>
         <p className="text-lg text-muted-foreground mb-12">
-          Everything you need to know about using RDCAD Express to its full potential.
+          Everything you need to know about using Vastumandal to its full potential.
         </p>
 
         <div className="space-y-4">

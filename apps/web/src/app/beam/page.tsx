@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Download, Copy, Check, Save } from "lucide-react";
-import {  exportBeamSectionToDXF, exportBeamSectionToScript  } from "@rdcad-express/dxf-exporter";
+import {  exportBeamSectionToDXF, exportBeamSectionToScript  } from "@vastumandal/dxf-exporter";
 import { useAppStore } from "@/store/useStore";
 import DXFPreview from "@/components/DXFPreview";
 import ExampleSelector, { Example } from "@/components/ExampleSelector";
-import type { BeamScheduleRow } from "@rdcad-express/dwg-schemas";
+import type { BeamScheduleRow } from "@vastumandal/dwg-schemas";
 
 const beamExamples: Example<BeamScheduleRow>[] = [
  { name: "Standard Plinth Beam", data: { elementId: "PB1", width: 230, depth: 300, bottomBarDia: 12, bottomBarCount: 3, topExtraLeft: 2, topExtraRight: 2, stirrupDia: 8, stirrupSpacing: 150 } },

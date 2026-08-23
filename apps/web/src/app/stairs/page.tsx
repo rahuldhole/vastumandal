@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Download, Copy, Check, Save } from "lucide-react";
-import {  exportStairsSectionToDXF, exportStairsSectionToScript  } from "@rdcad-express/dxf-exporter";
+import {  exportStairsSectionToDXF, exportStairsSectionToScript  } from "@vastumandal/dxf-exporter";
 import { useAppStore } from "@/store/useStore";
 import DXFPreview from "@/components/DXFPreview";
 import ExampleSelector, { Example } from "@/components/ExampleSelector";
-import type { StairsScheduleRow } from "@rdcad-express/dwg-schemas";
+import type { StairsScheduleRow } from "@vastumandal/dwg-schemas";
 
 const stairsExamples: Example<StairsScheduleRow>[] = [
  { name: "Standard Residential", data: { stairId: "ST1", tread: 250, rise: 150, numberOfSteps: 10, waistSlabThickness: 150, mainBarDia: 12, mainBarSpacing: 150, distBarDia: 8, distBarSpacing: 200 } },

@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Download, Copy, Check, Save } from "lucide-react";
-import {  exportTankSectionToDXF, exportTankSectionToScript  } from "@rdcad-express/dxf-exporter";
+import {  exportTankSectionToDXF, exportTankSectionToScript  } from "@vastumandal/dxf-exporter";
 import { useAppStore } from "@/store/useStore";
 import DXFPreview from "@/components/DXFPreview";
 import ExampleSelector, { Example } from "@/components/ExampleSelector";
-import type { TankScheduleRow } from "@rdcad-express/dwg-schemas";
+import type { TankScheduleRow } from "@vastumandal/dwg-schemas";
 
 const tankExamples: Example<TankScheduleRow>[] = [
  { name: "Small Underground", data: { tankId: "UGT1", type: "UNDERGROUND", capacity: 50000, width: 3000, length: 5000, height: 3500, wallThickness: 250, mainBarDia: 12, mainBarSpacing: 150 } },

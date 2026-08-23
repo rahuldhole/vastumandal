@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Download, Search } from "lucide-react";
-import { exportTextNodesToDXF } from "@rdcad-express/dxf-exporter";
+import { exportTextNodesToDXF } from "@vastumandal/dxf-exporter";
 import { useAppStore } from "@/store/useStore";
 import { useTheme } from "next-themes";
 

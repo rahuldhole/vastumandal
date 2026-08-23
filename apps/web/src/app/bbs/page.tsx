@@ -2,8 +2,8 @@
 
 import React, { useState, useMemo } from "react";
 import { Plus, Trash2, Download, Table2, FileSpreadsheet } from "lucide-react";
-import { calculateTotalWeight } from "@rdcad-express/core-math";
-import type { RebarElement } from "@rdcad-express/dwg-schemas";
+import { calculateTotalWeight } from "@vastumandal/core-math";
+import type { RebarElement } from "@vastumandal/dwg-schemas";
 import * as XLSX from "xlsx";
 
 export default function BBSGenerator() {

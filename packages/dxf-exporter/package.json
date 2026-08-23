@@ -1,5 +1,5 @@
 {
-  "name": "@rdcad-express/dxf-exporter",
+  "name": "@vastumandal/dxf-exporter",
   "version": "0.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,7 @@
     "vitest": "^4.1.10"
   },
   "dependencies": {
-    "@rdcad-express/dwg-schemas": "workspace:*",
+    "@vastumandal/dwg-schemas": "workspace:*",
     "dxf-viewer": "^1.0.48",
     "dxf-writer": "^1.18.4"
   }

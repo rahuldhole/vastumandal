@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Download, Copy, Check, Save } from "lucide-react";
-import {  exportSlabSectionToDXF, exportSlabSectionToScript  } from "@rdcad-express/dxf-exporter";
+import {  exportSlabSectionToDXF, exportSlabSectionToScript  } from "@vastumandal/dxf-exporter";
 import { useAppStore } from "@/store/useStore";
 import DXFPreview from "@/components/DXFPreview";
 import ExampleSelector, { Example } from "@/components/ExampleSelector";
-import type { SlabScheduleRow } from "@rdcad-express/dwg-schemas";
+import type { SlabScheduleRow } from "@vastumandal/dwg-schemas";
 
 const slabExamples: Example<SlabScheduleRow>[] = [
  { name: "Standard One-Way", data: { slabId: "S1", lx: 2500, ly: 5000, depth: 150, mainBarDia: 10, mainBarSpacing: 150, distBarDia: 8, distBarSpacing: 200 } },

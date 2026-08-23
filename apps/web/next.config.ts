@@ -9,7 +9,7 @@ const withSerwist = withSerwistInit({
 const nextConfig: NextConfig = {
   output: "export",
   images: { unoptimized: true },
-  transpilePackages: ["@rdcad-express/core-math", "@rdcad-express/dwg-schemas", "@rdcad-express/dxf-exporter"],
+  transpilePackages: ["@vastumandal/core-math", "@vastumandal/dwg-schemas", "@vastumandal/dxf-exporter"],
   serverExternalPackages: ["canvas", "konva"]
 };
 

@@ -35,7 +35,7 @@ export default function ProjectDashboard() {
  const url = URL.createObjectURL(blob);
  const a = document.createElement("a");
  a.href = url;
- a.download = `RDCAD_Project_Export.zip`;
+ a.download = `Vastumandal_Project_Export.zip`;
  a.click();
  URL.revokeObjectURL(url);
  };

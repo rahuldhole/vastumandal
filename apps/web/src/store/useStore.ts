@@ -8,7 +8,7 @@ import type {
  FoundationScheduleRow,
  StairsScheduleRow,
  TitleBlockRow
-} from '@rdcad-express/dwg-schemas';
+} from '@vastumandal/dwg-schemas';
 
 type TextNode = {
  id: string;
@@ -169,7 +169,7 @@ export const useAppStore = create<AppState>()(
  setProjectModalData: (data) => set({ projectModalData: data }),
  }),
  {
- name: 'rdcad-storage',
+ name: 'vastumandal-storage',
  }
  )
 );

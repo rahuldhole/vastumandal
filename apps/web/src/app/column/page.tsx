@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Download, Copy, Check, Save } from "lucide-react";
-import {  exportColumnSectionToDXF, exportColumnSectionToScript  } from "@rdcad-express/dxf-exporter";
+import {  exportColumnSectionToDXF, exportColumnSectionToScript  } from "@vastumandal/dxf-exporter";
 import { useAppStore } from "@/store/useStore";
 import DXFPreview from "@/components/DXFPreview";
 import ExampleSelector, { Example } from "@/components/ExampleSelector";
-import type { ColumnScheduleRow } from "@rdcad-express/dwg-schemas";
+import type { ColumnScheduleRow } from "@vastumandal/dwg-schemas";
 
 const columnExamples: Example<ColumnScheduleRow>[] = [
  { name: "Standard Square", data: { columnId: "C1", level: "GF", concreteGrade: "M30", width: 400, depth: 400, mainBarCount: 8, mainBarDia: 20, tieDia: 8, tieSpacing: 150 } },

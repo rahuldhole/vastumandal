@@ -1,4 +1,4 @@
-Building **`rdcad-express/`** as an open-source, web-first platform is the absolute best way to modernize this legacy tool. By abandoning desktop CAD plugins (`.Fas`/AutoLISP dependencies), you eliminate host CAD compatibility headaches and give engineers a fast, zero-install web application.
+Building **`vastumandal/`** web-first platform is the absolute best way to modernize this legacy tool. By abandoning desktop CAD plugins (`.Fas`/AutoLISP dependencies), you eliminate host CAD compatibility headaches and give engineers a fast, zero-install web application.
 
 Since you don't know CAD or civil engineering, the architecture must do two things: **abstract away all CAD complexity into standard web development** and **decouple the calculation engine from the drawing generator**.
 
@@ -6,13 +6,13 @@ Here is your complete blueprint and architectural strategy.
 
 ---
 
-## 1. High-Level Architecture (`rdcad-express/`)
+## 1. High-Level Architecture (`vastumandal/`)
 
-Instead of running inside AutoCAD or ZWCAD, `rdcad-express/` will run in the browser as a **local-first web application**. It takes user dimensions, computes the structural math, renders a live 2D preview, and exports native `.dxf` files or `.lsp` AutoLISP scripts.
+Instead of running inside AutoCAD or ZWCAD, `vastumandal/` will run in the browser as a **local-first web application**. It takes user dimensions, computes the structural math, renders a live 2D preview, and exports native `.dxf` files or `.lsp` AutoLISP scripts.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                      rdcad-express UI (Web App)                        │
+│                      vastumandal UI (Web App)                        │
 │   (Form Grids • Interactive Tables • Visual Parametric Modeler)         │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │
@@ -36,7 +36,7 @@ Instead of running inside AutoCAD or ZWCAD, `rdcad-express/` will run in the bro
 
 ## 2. Prescribed Tech Stack
 
-To keep the application fast, maintainable, and open-source friendly, use the following stack:
+To keep the application fast, maintainable, user friendly, use the following stack:
 
 | Layer | Recommended Technology | Why it's chosen |
 | --- | --- | --- |
@@ -117,7 +117,7 @@ To interact with desktop CAD programs without knowing low-level CAD C++ APIs:
 
 ### Phase 4: Module-by-Module Feature Rollout
 
-Build `rdcad-express` incrementally in 5 distinct milestones:
+Build `vastumandal` incrementally in 5 distinct milestones:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -155,12 +155,12 @@ Build `rdcad-express` incrementally in 5 distinct milestones:
 
 ---
 
-## 4. Open-Source Repository Structure (`rdcad-express/`)
+## 4. Repository Structure (`vastumandal/`)
 
 A clean monorepo or modular folder layout will make it easy for civil engineers and developer contributors to jump in:
 
 ```text
-rdcad-express/
+vastumandal/
 ├── apps/
 │   └── web/                   # Next.js / Nuxt Frontend App
 │       ├── components/        # Data grids, forms, canvas previews
@@ -172,7 +172,7 @@ rdcad-express/
 │   ├── lsp-generator/         # AutoLISP script string templates
 │   └── dwg-schemas/           # JSON definitions extracted from DWG templates
 ├── public/
-│   └── templates/             # Sample open-source DXF/SVG templates
+│   └── templates/             # Sample DXF/SVG templates
 └── README.md
 
 ```

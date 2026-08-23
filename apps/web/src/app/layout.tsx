@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
  subsets: ["latin"],
 });
 
-const title = "RDCAD Express - Structural Detailing";
+const title = "Vastumandal - Structural Detailing";
 const description = "Advanced parametric detailing and Bar Bending Schedule tools for structural engineers.";
 const icon = "🛠️";
 const ogImageUrl = `https://og-image.org/api/og?template=gradient&title=${encodeURIComponent(title)}&icon=${encodeURIComponent(icon)}&description=${encodeURIComponent(description)}&bg=1e3a5f&text=ffffff`;
@@ -69,26 +69,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
  </div>
  <div className="hidden sm:block w-px h-4 bg-muted"></div>
  <div>
- © {new Date().getFullYear()} RDCAD Express. Open Source under MIT License.
+ © {new Date().getFullYear()} Vastumandal. All rights reserved.
  </div>
  </div>
  <div className="flex items-center gap-4">
  <Link href="/guide" className="hover:text-foreground transition-colors hidden sm:inline font-medium">Guide</Link>
  <Link href="/faq" className="hover:text-foreground transition-colors hidden sm:inline font-medium">FAQ</Link>
  <ThemeToggle />
- <a 
- href="https://github.com/rahuldhole/rdcad-express/issues" 
- target="_blank" 
- rel="noopener noreferrer" 
- className="flex items-center gap-2 hover:text-muted-foreground dark:hover:text-foreground transition text-muted-foreground dark:hover:text-foreground"
- title="Report Issue"
- >
- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
- <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.03c3.18-.3 6.5-1.5 6.5-7.1a5.1 5.1 0 0 0-1.4-3.6 4.8 4.8 0 0 0-.1-3.5s-1.1-.3-3.5 1.3a11.5 11.5 0 0 0-6 0C7.1 1.7 6 2 6 2a4.8 4.8 0 0 0-.1 3.5 5.1 5.1 0 0 0-1.4 3.6c0 5.6 3.3 6.8 6.5 7.1a4.8 4.8 0 0 0-1 2.93V22"></path>
- <path d="M9 18c-4.5 1.5-5-2.5-7-3"></path>
- </svg>
- <span className="hidden sm:inline">Report Issue</span>
- </a>
  </div>
  </div>
  </footer>

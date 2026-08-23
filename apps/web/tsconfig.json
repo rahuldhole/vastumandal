@@ -26,13 +26,13 @@
       "@/*": [
         "./src/*"
       ],
-      "@rdcad-express/core-math": [
+      "@vastumandal/core-math": [
         "../../packages/core-math/src"
       ],
-      "@rdcad-express/dwg-schemas": [
+      "@vastumandal/dwg-schemas": [
         "../../packages/dwg-schemas/src"
       ],
-      "@rdcad-express/dxf-exporter": [
+      "@vastumandal/dxf-exporter": [
         "../../packages/dxf-exporter/src"
       ]
     }
