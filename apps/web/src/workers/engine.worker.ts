@@ -57,10 +57,15 @@ self.onmessage = async (event) => {
 
     // 1. Spatial & Bylaw
     // Derive building footprint from the setback envelope (guaranteed compliant)
+    const xs = bylawParams.plotPolygon.map((p: [number, number]) => p[0]);
+    const ys = bylawParams.plotPolygon.map((p: [number, number]) => p[1]);
+    const plotWidth = Math.max(...xs) - Math.min(...xs);
+    const plotDepth = Math.max(...ys) - Math.min(...ys);
+
     const bpLeft = bylawParams.sideSetbacks[0];
-    const bpRight = bylawParams.plotWidth - bylawParams.sideSetbacks[1];
+    const bpRight = plotWidth - bylawParams.sideSetbacks[1];
     const bpFront = bylawParams.frontSetback;
-    const bpRear = bylawParams.plotDepth - bylawParams.rearSetback;
+    const bpRear = plotDepth - bylawParams.rearSetback;
     const buildingPolygon: [number, number][] = [
       [bpLeft, bpFront],
       [bpRight, bpFront],
