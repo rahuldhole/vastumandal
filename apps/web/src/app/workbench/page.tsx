@@ -21,15 +21,25 @@ export default function Workbench() {
       // Hydrate worker calculation immediately on mount
       calculate(plotSpec, reqSpec, rates);
     }, 0);
+    
+    let wasDesktop = window.innerWidth >= 1024;
     const handleResize = () => {
       const isDesktop = window.innerWidth >= 1024;
-      setLeftPanelOpen(isDesktop);
-      setRightPanelOpen(isDesktop);
+      if (isDesktop !== wasDesktop) {
+        setLeftPanelOpen(isDesktop);
+        setRightPanelOpen(isDesktop);
+        wasDesktop = isDesktop;
+      }
     };
-    handleResize();
+    
+    // Set initial state on mount without triggering a transition if already correct
+    setLeftPanelOpen(wasDesktop);
+    setRightPanelOpen(wasDesktop);
+    
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [setLeftPanelOpen, setRightPanelOpen, calculate, plotSpec, reqSpec, rates]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Sync worker state to global store so panels can react
   useEffect(() => {

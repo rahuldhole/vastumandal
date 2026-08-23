@@ -104,20 +104,20 @@ export default function WorkbenchHeader() {
             </button>
             {activeMenu === 'View' && (
               <div className="absolute top-full left-0 mt-1 w-56 bg-card border border-border shadow-lg rounded-md py-1 z-50 flex flex-col">
-                <button onClick={() => { setLeftPanelOpen(!leftPanelOpen); setActiveMenu(null); }} className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between">
+                <button onClick={() => { setLeftPanelOpen(!leftPanelOpen); }} className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between">
                   <span>Control Panel</span>
                   {leftPanelOpen && <Check className="w-4 h-4" />}
                 </button>
-                <button onClick={() => { setRightPanelOpen(!rightPanelOpen); setActiveMenu(null); }} className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between">
+                <button onClick={() => { setRightPanelOpen(!rightPanelOpen); }} className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between">
                   <span>Live BOQ</span>
                   {rightPanelOpen && <Check className="w-4 h-4" />}
                 </button>
                 <div className="h-px bg-border my-1 mx-2"></div>
-                <button onClick={() => { setActiveTab('2D'); setActiveMenu(null); }} className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between">
+                <button onClick={() => { setActiveTab('2D'); }} className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between">
                   <span>2D Plan</span>
                   {activeTab === '2D' && <Check className="w-4 h-4" />}
                 </button>
-                <button onClick={() => { setActiveTab('3D'); setActiveMenu(null); }} className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between">
+                <button onClick={() => { setActiveTab('3D'); }} className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between">
                   <span>3D Isometric</span>
                   {activeTab === '3D' && <Check className="w-4 h-4" />}
                 </button>
