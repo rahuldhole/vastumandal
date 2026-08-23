@@ -5,21 +5,21 @@ import { useAppStore } from "@/store/useStore";
 import { PieChart, List, FileText } from "lucide-react";
 
 export default function LiveBOQPanel() {
-  const { plotSpec } = useAppStore();
+  const { plotSpec, boqResult, isCalculating } = useAppStore();
   
-  // Mock calculations based on plot dimensions
-  const plotArea = plotSpec.width * plotSpec.length;
-  const bua = plotArea * 0.7; // 70% coverage mock
-  const carpetArea = bua * 0.85;
+  // Use worker calculations or fallback to defaults
+  const plotArea = boqResult?.plotArea || (plotSpec.width * plotSpec.length);
+  const bua = boqResult?.bua || (plotArea * 0.7); 
+  const carpetArea = boqResult?.carpetArea || (bua * 0.85);
 
-  const totalCost = bua * 1500; // 1500 per sqft mock
+  const totalCost = boqResult?.totalCost || (bua * 1500); 
   
-  const materials = {
-    steel: (bua * 4).toFixed(1), // 4 kg / sqft
-    cement: (bua * 0.4).toFixed(0), // 0.4 bags / sqft
-    sand: (bua * 1.8).toFixed(0), // 1.8 cft / sqft
-    aggregate: (bua * 1.35).toFixed(0), // 1.35 cft / sqft
-    bricks: (bua * 8.5).toFixed(0), // 8.5 pcs / sqft
+  const materials = boqResult?.materials || {
+    steel: (bua * 4).toFixed(1),
+    cement: (bua * 0.4).toFixed(0),
+    sand: (bua * 1.8).toFixed(0),
+    aggregate: (bua * 1.35).toFixed(0),
+    bricks: (bua * 8.5).toFixed(0),
   };
 
   const formatCurrency = (val: number) => {
@@ -31,7 +31,7 @@ export default function LiveBOQPanel() {
   };
 
   return (
-    <div className="w-[320px] flex-shrink-0 bg-card border-l border-border h-full overflow-y-auto flex flex-col custom-scrollbar">
+    <div className={`w-[320px] flex-shrink-0 bg-card border-l border-border h-full overflow-y-auto flex flex-col custom-scrollbar transition-opacity ${isCalculating ? 'opacity-50' : 'opacity-100'}`}>
       <div className="p-4 font-semibold border-b border-border text-foreground sticky top-0 bg-card z-10 flex items-center gap-2">
         <PieChart className="w-4 h-4 text-primary" />
         Live Estimate & BOQ

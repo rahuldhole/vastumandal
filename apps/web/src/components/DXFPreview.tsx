@@ -42,9 +42,9 @@ export default function DXFPreview({ dxfString, staticMode = false }: DXFPreview
  try {
  if (!viewerRef.current) {
  const { DxfViewer } = await import("dxf-viewer");
- // Initialize viewer with clear color matching slate-900
+ const isDark = document.documentElement.classList.contains('dark');
  viewerRef.current = new DxfViewer(containerRef.current as HTMLElement, {
- clearColor: new THREE.Color("#0f172a"),
+ clearColor: new THREE.Color(isDark ? "#0f172a" : "#ffffff"),
  autoResize: true,
  // @ts-expect-error fontUrls is not in the type definition but works at runtime
  fontUrls: ['https://raw.githubusercontent.com/bjnortier/dxf/master/fonts/Roboto-Light.ttf'],
@@ -61,7 +61,7 @@ export default function DXFPreview({ dxfString, staticMode = false }: DXFPreview
 
  // Automatically fit and render after loading
  const bounds = viewerRef.current.GetBounds();
- if (bounds) {
+ if (bounds && !isNaN(bounds.minX) && !isNaN(bounds.maxX)) {
  viewerRef.current.FitView(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY, 1.2);
  viewerRef.current.Render();
  }
@@ -113,7 +113,7 @@ export default function DXFPreview({ dxfString, staticMode = false }: DXFPreview
  const handleFit = () => {
  if (!viewerRef.current) return;
  const bounds = viewerRef.current.GetBounds();
- if (bounds) {
+ if (bounds && !isNaN(bounds.minX) && !isNaN(bounds.maxX)) {
  // Use 1.2 padding which is equivalent to 20% margin
  viewerRef.current.FitView(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY, 1.2);
  viewerRef.current.Render();

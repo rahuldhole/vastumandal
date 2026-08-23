@@ -1,11 +1,30 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAppStore } from "@/store/useStore";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Loader2 } from "lucide-react";
+import { useEngineWorker } from "../hooks/useEngineWorker";
 
 export default function ControlPanel() {
-  const { plotSpec, setPlotSpec, reqSpec, setReqSpec, rates, setRates } = useAppStore();
+  const { plotSpec, setPlotSpec, reqSpec, setReqSpec, rates, setRates, setBoqResult, setGeometryResult, setIsCalculating } = useAppStore();
+  const { calculate, result, isCalculating } = useEngineWorker();
+
+  useEffect(() => {
+    // Debounce the worker calculation to avoid spamming the worker on fast slider/input changes
+    const timeoutId = setTimeout(() => {
+      calculate(plotSpec, reqSpec, rates);
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [plotSpec, reqSpec, rates, calculate]);
+
+  useEffect(() => {
+    setIsCalculating(isCalculating);
+    if (result) {
+      if (result.boq) setBoqResult(result.boq);
+      if (result.geometry) setGeometryResult(result.geometry);
+    }
+  }, [isCalculating, result, setBoqResult, setGeometryResult, setIsCalculating]);
+
   const [openSections, setOpenSections] = useState({
     plot: true,
     space: true,
@@ -18,9 +37,12 @@ export default function ControlPanel() {
 
   return (
     <div className="w-[340px] flex-shrink-0 bg-card border-r border-border h-full overflow-y-auto flex flex-col custom-scrollbar">
-      <div className="p-4 font-semibold border-b border-border text-foreground sticky top-0 bg-card z-10 flex items-center gap-2">
-        <span className="w-1.5 h-4 bg-primary rounded-full"></span>
-        Parametric Controls
+      <div className="p-4 font-semibold border-b border-border text-foreground sticky top-0 bg-card z-10 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-4 bg-primary rounded-full"></span>
+          Parametric Controls
+        </div>
+        {isCalculating && <Loader2 className="w-4 h-4 text-primary animate-spin" />}
       </div>
 
       <div className="p-2 space-y-2">

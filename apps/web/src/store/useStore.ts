@@ -73,6 +73,14 @@ interface AppState {
  
  layers: { zones: boolean; grid: boolean; dims: boolean; openings: boolean };
  setLayers: (layers: Partial<{ zones: boolean; grid: boolean; dims: boolean; openings: boolean }>) => void;
+
+ // Worker results
+ boqResult: any | null;
+ setBoqResult: (result: any) => void;
+ geometryResult: any | null;
+ setGeometryResult: (result: any) => void;
+ isCalculating: boolean;
+ setIsCalculating: (isCalc: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -207,6 +215,13 @@ export const useAppStore = create<AppState>()(
  
  layers: { zones: true, grid: true, dims: true, openings: true },
  setLayers: (data) => set((state) => ({ layers: { ...state.layers, ...data } })),
+
+ boqResult: null,
+ setBoqResult: (result) => set({ boqResult: result }),
+ geometryResult: null,
+ setGeometryResult: (result) => set({ geometryResult: result }),
+ isCalculating: false,
+ setIsCalculating: (isCalc) => set({ isCalculating: isCalc }),
  }),
  {
  name: 'vastumandal-storage',
