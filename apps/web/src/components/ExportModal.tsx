@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FileCode, Box, FileText, X, Archive, Copy, Check, Eye } from 'lucide-react';
 import { useAppStore } from '../store/useStore';
-import { exportTemplateToDXF, exportTemplateToScript } from '@vastumandal/dxf-exporter';
+import { exportVastumandalDXF, exportVastumandalScript } from '@vastumandal/dxf-exporter';
 import { exportVastumandalIFC } from '@vastumandal/ifc-exporter';
 import { IFCPreview } from './IFCPreview';
 
@@ -15,39 +15,38 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
   const getExportData = (format: string) => {
     const state = useAppStore.getState();
     const projectName = state.templateData?.projectName || 'Vastumandal';
+    const layout = state.geometryResult;
     
     if (format === 'vastu') {
       const exportData = {
         schemaVersion: "1.0.0",
-        meta: {
-          projectName,
-          createdAt: new Date().toISOString(),
+        project: {
+          name: projectName,
+          client: state.templateData?.clientName || '',
+          date: state.templateData?.date || ''
         },
-        state: {
-          ...state,
-          boqResult: null,
-          geometryResult: null,
+        spec: {
+          plot: state.plotSpec,
+          requirements: state.reqSpec
+        },
+        boq: state.boqResult,
+        geometry: layout,
+        metadata: {
+          generatedBy: "Vastumandal Engine",
           isCalculating: false
         }
       };
       return JSON.stringify(exportData, null, 2);
     } else if (format === 'dxf') {
-      return exportTemplateToDXF({
-        sheetSize: 'A1',
-        projectName: projectName,
-        clientName: 'Client',
-        date: new Date().toISOString().split('T')[0],
-        drawnBy: 'Engineer',
-        drawingTitle: 'Project Layout'
+      return exportVastumandalDXF({
+        layout: layout,
+        req: state.reqSpec,
+        isPreview: false
       });
     } else if (format === 'lsp') {
-      return exportTemplateToScript({
-        sheetSize: 'A1',
-        projectName: projectName,
-        clientName: 'Client',
-        date: new Date().toISOString().split('T')[0],
-        drawnBy: 'Engineer',
-        drawingTitle: 'Project Layout'
+      return exportVastumandalScript({
+        layout: layout,
+        req: state.reqSpec
       });
     } else if (format === 'ifc') {
       return exportVastumandalIFC({});

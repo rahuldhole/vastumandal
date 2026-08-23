@@ -18,6 +18,14 @@ export class ScriptWriter {
   setActiveLayer(name: string) {
     this.commands.push(`_-LAYER S ${name} `);
   }
+  
+  drawRect(x1: number, y1: number, x2: number, y2: number) {
+    this.drawLine(x1, y1, x2, y1);
+    this.drawLine(x2, y1, x2, y2);
+    this.drawLine(x2, y2, x1, y2);
+    this.drawLine(x1, y2, x1, y1);
+  }
+
   drawLine(x1: number, y1: number, x2: number, y2: number) {
     this.commands.push(`_LINE ${x1.toFixed(3)},${y1.toFixed(3)} ${x2.toFixed(3)},${y2.toFixed(3)} `);
   }
@@ -1288,4 +1296,106 @@ function getDxfStringWithExtents(dxf: any): string {
   str = str.replace(/\n3\ntxt\n/g, '\n3\nARIAL.TTF\n');
   
   return str;
+}
+
+export function exportVastumandalDXF(options: { layout: any, req: any, isPreview?: boolean }): string {
+  const dxf = new DXFWriter();
+  dxf.addLayer('PLOT', DXFWriter.ACI.CYAN, 'CONTINUOUS');
+  dxf.addLayer('BUILDABLE', DXFWriter.ACI.MAGENTA, 'DASHED');
+  dxf.addLayer('WALLS', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  dxf.addLayer('COLUMNS', DXFWriter.ACI.RED, 'CONTINUOUS');
+  dxf.addLayer('TEXT', DXFWriter.ACI.WHITE, 'CONTINUOUS');
+  
+  const { layout } = options;
+  if (!layout) return getDxfStringWithExtents(dxf);
+
+  // Plot Boundary
+  dxf.setActiveLayer('PLOT');
+  dxf.drawRect(0, 0, layout.plotW * 1000, layout.plotH * 1000);
+
+  // Buildable Area
+  if (layout.buildable) {
+    dxf.setActiveLayer('BUILDABLE');
+    dxf.drawRect(layout.buildable.x * 1000, layout.buildable.y * 1000, layout.buildable.x * 1000 + layout.buildable.w * 1000, layout.buildable.y * 1000 + layout.buildable.h * 1000);
+  }
+
+  // Walls / Rooms
+  dxf.setActiveLayer('WALLS');
+  const wt = 230; // 230mm wall thickness
+  for (const r of layout.rooms || []) {
+    const rx = r.x * 1000;
+    const ry = r.y * 1000;
+    const rw = r.w * 1000;
+    const rh = r.h * 1000;
+    
+    // Outer wall boundary
+    dxf.drawRect(rx - wt, ry - wt, rx + rw + wt, ry + rh + wt);
+    // Inner wall boundary
+    dxf.drawRect(rx, ry, rx + rw, ry + rh);
+
+    dxf.setActiveLayer('TEXT');
+    dxf.drawText(rx + rw / 2, ry + rh / 2, 250, 0, r.name, 'center', 'middle');
+    dxf.setActiveLayer('WALLS');
+  }
+
+  // Columns
+  dxf.setActiveLayer('COLUMNS');
+  for (const c of layout.columns || []) {
+    const cx = c.x * 1000;
+    const cy = c.y * 1000;
+    const hs = c.size / 2;
+    dxf.drawRect(cx - hs, cy - hs, cx + hs, cy + hs);
+  }
+
+  return getDxfStringWithExtents(dxf);
+}
+
+export function exportVastumandalScript(options: { layout: any, req: any }): string {
+  const script = new ScriptWriter();
+  script.addLayer('PLOT', 4, 'CONTINUOUS');
+  script.addLayer('BUILDABLE', 6, 'DASHED');
+  script.addLayer('WALLS', 2, 'CONTINUOUS');
+  script.addLayer('COLUMNS', 1, 'CONTINUOUS');
+  script.addLayer('TEXT', 7, 'CONTINUOUS');
+  
+  const { layout } = options;
+  if (!layout) return script.getScriptString();
+
+  // Plot Boundary
+  script.setActiveLayer('PLOT');
+  script.drawRect(0, 0, layout.plotW * 1000, layout.plotH * 1000);
+
+  // Buildable Area
+  if (layout.buildable) {
+    script.setActiveLayer('BUILDABLE');
+    script.drawRect(layout.buildable.x * 1000, layout.buildable.y * 1000, layout.buildable.x * 1000 + layout.buildable.w * 1000, layout.buildable.y * 1000 + layout.buildable.h * 1000);
+  }
+
+  // Walls / Rooms
+  script.setActiveLayer('WALLS');
+  const wt = 230;
+  for (const r of layout.rooms || []) {
+    const rx = r.x * 1000;
+    const ry = r.y * 1000;
+    const rw = r.w * 1000;
+    const rh = r.h * 1000;
+    
+    script.drawRect(rx - wt, ry - wt, rx + rw + wt, ry + rh + wt);
+    script.drawRect(rx, ry, rx + rw, ry + rh);
+
+    script.setActiveLayer('TEXT');
+    script.drawText(rx + rw / 2, ry + rh / 2, 250, 0, r.name);
+    script.setActiveLayer('WALLS');
+  }
+
+  // Columns
+  script.setActiveLayer('COLUMNS');
+  for (const c of layout.columns || []) {
+    const cx = c.x * 1000;
+    const cy = c.y * 1000;
+    const hs = c.size / 2;
+    script.drawRect(cx - hs, cy - hs, cx + hs, cy + hs);
+  }
+
+  return script.getScriptString();
 }

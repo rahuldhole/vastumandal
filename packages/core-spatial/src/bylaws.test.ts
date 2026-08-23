@@ -4,8 +4,7 @@ import type { BylawParams } from '@vastumandal/dwg-schemas/src/spatial';
 
 describe('Bylaw Validator', () => {
   const defaultParams: BylawParams = {
-    plotWidth: 12,
-    plotDepth: 18,
+    plotPolygon: [[0, 0], [12, 0], [12, 18], [0, 18]],
     frontSetback: 3,
     rearSetback: 1.5,
     sideSetbacks: [1, 1],
