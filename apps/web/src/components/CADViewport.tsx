@@ -432,22 +432,22 @@ function ThreeView({ layout, layers, floorCount }: {
       {layers.grid && <Grid infiniteGrid fadeDistance={Math.max(plotW, plotH) * 4} sectionColor="#6b7280" cellColor="#374151" />}
 
       {/* Ground plane */}
-      <mesh position={[plotW / 2, -0.05, plotH / 2]} receiveShadow>
+      <mesh position={[plotW / 2, -0.06, plotH / 2]} receiveShadow>
         <boxGeometry args={[plotW, 0.1, plotH]} />
         <meshStandardMaterial color="#1e293b" />
       </mesh>
 
       {/* Plot boundary outline on ground */}
-      <lineSegments position={[plotW / 2, 0.02, plotH / 2]}>
+      <lineSegments position={[plotW / 2, -0.005, plotH / 2]}>
         <edgesGeometry args={[new BoxGeometry(plotW, 0.01, plotH)]} />
         <lineBasicMaterial color="#6b7280" />
       </lineSegments>
 
       {/* Room zones on ground floor (semi-transparent) */}
       {layoutRooms.map(r => (
-        <mesh key={`room3d-${r.id}`} position={[r.x + r.w / 2, 0.06, r.y + r.h / 2]}>
-          <boxGeometry args={[r.w, 0.02, r.h]} />
-          <meshStandardMaterial color={r.color.includes('210') ? '#60a5fa' : r.color.includes('260') ? '#a78bfa' : r.color.includes('30,') ? '#fb923c' : r.color.includes('180') ? '#2dd4bf' : '#94a3b8'} opacity={0.4} transparent />
+        <mesh key={`room3d-${r.id}`} position={[r.x + r.w / 2, 0.01, r.y + r.h / 2]}>
+          <boxGeometry args={[r.w, 0.01, r.h]} />
+          <meshStandardMaterial color={r.color.includes('210') ? '#60a5fa' : r.color.includes('260') ? '#a78bfa' : r.color.includes('30,') ? '#fb923c' : r.color.includes('180') ? '#2dd4bf' : '#94a3b8'} opacity={0.4} transparent depthWrite={false} />
         </mesh>
       ))}
 
@@ -509,7 +509,7 @@ function ThreeView({ layout, layers, floorCount }: {
                   const span = xArr[i + 1] - xArr[i];
                   meshes.push(
                     <mesh key={`bm3-${fi}-${yVal}-${i}`} position={[(xArr[i] + xArr[i + 1]) / 2, floorH - 0.15, yVal]}>
-                      <boxGeometry args={[span, 0.3, 0.23]} />
+                      <boxGeometry args={[span, 0.295, 0.235]} />
                       <meshStandardMaterial color="#60a5fa" />
                     </mesh>
                   );
@@ -522,8 +522,8 @@ function ThreeView({ layout, layers, floorCount }: {
                 for (let i = 0; i < yArrSorted.length - 1; i++) {
                   const span = yArrSorted[i + 1] - yArrSorted[i];
                   meshes.push(
-                    <mesh key={`bmt3-${fi}-${xVal}-${i}`} position={[xVal, floorH - 0.15, (yArrSorted[i] + yArrSorted[i + 1]) / 2]}>
-                      <boxGeometry args={[0.23, 0.3, span]} />
+                    <mesh key={`bmt3-${fi}-${xVal}-${i}`} position={[xVal, floorH - 0.145, (yArrSorted[i] + yArrSorted[i + 1]) / 2]}>
+                      <boxGeometry args={[0.225, 0.285, span]} />
                       <meshStandardMaterial color="#60a5fa" />
                     </mesh>
                   );
@@ -540,9 +540,9 @@ function ThreeView({ layout, layers, floorCount }: {
         const footSize = 1.2;
         const footDepth = 0.45;
         return (
-          <mesh key={`ft-${c.id}`} position={[c.x, -footDepth / 2, c.y]}>
+          <mesh key={`ft-${c.id}`} position={[c.x, -footDepth / 2 - 0.011, c.y]}>
             <boxGeometry args={[footSize, footDepth, footSize]} />
-            <meshStandardMaterial color="#4ade80" opacity={0.6} transparent />
+            <meshStandardMaterial color="#4ade80" opacity={0.6} transparent depthWrite={false} />
           </mesh>
         );
       })}
