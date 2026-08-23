@@ -5,7 +5,7 @@ export function exportBBSReportToCSV(bbsReport: BBSReport): string {
   
   if (bbsReport.items) {
     for (const item of bbsReport.items) {
-      csv += `${item.memberId || ''},${item.barMark || ''},${item.diameter || ''},${item.numberOfBars || ''},${item.cuttingLength || ''},${item.shapeCode || ''},${item.totalWeight || ''}\n`;
+      csv += `${item.memberRef || ''},${item.barMark || ''},${item.barDiameter || ''},${item.numberOfBars || ''},${item.cuttingLength || ''},${item.barShape || ''},${item.totalWeight || ''}\n`;
     }
   }
   
