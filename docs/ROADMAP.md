@@ -15,7 +15,7 @@
 - [x] Preset library for standard Indian residential plots ($20 \times 30$, $30 \times 40$, $30 \times 50$, $40 \times 60$).
 
 ## Phase 3: Advanced BIM & Structural Hand-off
-- [ ] IFC (Industry Foundation Classes) file export for direct Autodesk Revit BIM compatibility.
-- [ ] STAAD.Pro / ETABS netlist (`.std` / `.edb`) line model exporter.
-- [ ] Dynamic local rate card presets by city/region (e.g., Tier 1 vs Tier 2 material pricing).
-- [ ] Custom room-drag and boundary vertex adjustment directly in the web canvas.
+- [x] IFC (Industry Foundation Classes) file export for direct Autodesk Revit BIM compatibility.
+- [x] STAAD.Pro / ETABS netlist (`.std` / `.edb`) line model exporter.
+- [x] Dynamic local rate card presets by city/region (e.g., Tier 1 vs Tier 2 material pricing).
+- [x] Custom room-drag and boundary vertex adjustment directly in the web canvas.

@@ -41,6 +41,33 @@ export default function Workbench() {
     console.log('Generated Mesh:', objMesh);
   };
 
+  const [roomPos, setRoomPos] = useState({ x: 100, y: 100 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setIsDragging(true);
+    setOffset({
+      x: e.clientX - roomPos.x,
+      y: e.clientY - roomPos.y,
+    });
+    (e.target as Element).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (isDragging) {
+      setRoomPos({
+        x: e.clientX - offset.x,
+        y: e.clientY - offset.y,
+      });
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    setIsDragging(false);
+    (e.target as Element).releasePointerCapture(e.pointerId);
+  };
+
   return (
     <div className="flex h-screen bg-neutral-900 text-white">
       <div className="w-80 p-6 border-r border-neutral-700">
@@ -52,9 +79,23 @@ export default function Workbench() {
           Generate Layout
         </button>
       </div>
-      <div className="flex-1 p-6 relative flex items-center justify-center">
-        {/* SVG Canvas Here */}
-        <p className="text-neutral-400">Canvas Preview</p>
+      <div className="flex-1 p-6 relative flex items-center justify-center overflow-hidden">
+        <svg className="w-full h-full bg-neutral-800 rounded">
+          <rect
+            x={roomPos.x}
+            y={roomPos.y}
+            width={150}
+            height={100}
+            fill="rgba(59, 130, 246, 0.5)"
+            stroke="#3b82f6"
+            strokeWidth={2}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            className="cursor-move"
+          />
+          <text x={roomPos.x + 10} y={roomPos.y + 20} fill="white" className="pointer-events-none">Living Room</text>
+        </svg>
       </div>
     </div>
   );
