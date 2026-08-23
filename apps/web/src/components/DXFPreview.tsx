@@ -47,13 +47,15 @@ export default function DXFPreview({ dxfString, staticMode = false, toolbarActio
  if (!viewerRef.current) {
  const { DxfViewer } = await import("dxf-viewer");
  const isDark = resolvedTheme === 'dark';
- // Use a darker background in light mode (#e2e8f0) to make CAD lines (often white/yellow) more visible
- viewerRef.current = new DxfViewer(containerRef.current as HTMLElement, {
- clearColor: new THREE.Color(isDark ? "#0f172a" : "#e2e8f0"),
- autoResize: true,
- // @ts-expect-error fontUrls is not in the type definition but works at runtime
- fontUrls: ['https://raw.githubusercontent.com/bjnortier/dxf/master/fonts/Roboto-Light.ttf'],
- });
+  // In light mode, we render the scene exactly like dark mode (black background) 
+  // and then use CSS invert + hue-rotate to naturally turn the black background white 
+  // and all light/white CAD lines into dark lines, perfectly preserving colors while increasing contrast!
+  viewerRef.current = new DxfViewer(containerRef.current as HTMLElement, {
+  clearColor: new THREE.Color(isDark ? "#0f172a" : "#000000"),
+  autoResize: true,
+  // @ts-expect-error fontUrls is not in the type definition but works at runtime
+  fontUrls: ['https://raw.githubusercontent.com/bjnortier/dxf/master/fonts/Roboto-Light.ttf'],
+  });
  }
 
  if (dxfString && isMounted) {
@@ -158,7 +160,7 @@ export default function DXFPreview({ dxfString, staticMode = false, toolbarActio
  )}
  <div className="flex-1 relative w-full h-full">
  {staticMode && <div className="absolute inset-0 z-20 cursor-pointer" />}
- {isVisible && <div ref={containerRef} className="w-full h-full absolute inset-0" />}
+ {isVisible && <div ref={containerRef} className={`w-full h-full absolute inset-0 ${resolvedTheme !== 'dark' ? 'invert hue-rotate-180' : ''}`} />}
  </div>
  {error && (
  <div className="absolute inset-0 flex items-center justify-center bg-card/80 text-red-700 dark:text-red-500 z-30 font-medium p-4 text-center">
