@@ -57,7 +57,7 @@ export function useEngineWorker() {
           plotSpec.setbacks?.left ?? 0,
           plotSpec.setbacks?.right ?? 0,
         ] as [number, number],
-        maxFsi: 1.5, // sensible default; make configurable later
+        maxFsi: plotSpec.maxFsi ?? 1.5,
         roadWidth: plotSpec.roadWidth ?? 9,
       };
 

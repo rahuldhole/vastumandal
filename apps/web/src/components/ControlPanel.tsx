@@ -44,7 +44,10 @@ export default function ControlPanel() {
     if (!preset) return;
     setSelectedPreset(presetLabel);
     // Hydrate store
-    setPlotSpec(preset.plotSpec);
+    setPlotSpec({
+      ...preset.plotSpec,
+      maxFsi: preset.bylaws.maxFsi,
+    });
     setReqSpec(preset.reqSpec);
     // Map preset RateCard to UI rates shape
     setRates({

@@ -4,6 +4,7 @@ export interface PlotSpec {
   facing?: string;
   roadWidth?: number;
   floorCount?: string;
+  maxFsi?: number;
   setbacks: {
     left: number;
     right: number;
