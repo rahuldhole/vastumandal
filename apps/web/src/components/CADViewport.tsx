@@ -9,6 +9,7 @@ import { generateLayout, type LayoutRoom, type ColumnPos } from '@/utils/generat
 import dynamic from 'next/dynamic';
 
 const IFCViewport = dynamic(() => import('./IFCViewport'), { ssr: false });
+import DxfInspector from './DxfInspector';
 
 // Scale factor: 1 metre = SCALE px in SVG
 const SCALE = 28;
@@ -182,9 +183,10 @@ export default function CADViewport() {
         </div>
       )}
 
-      {/* ── Canvas ── */}
       <div className="flex-1 w-full h-full relative">
-        {activeTab === 'IFC' ? (
+        {activeTab === 'DXF' ? (
+          <DxfInspector />
+        ) : activeTab === 'IFC' ? (
           <IFCViewport />
         ) : activeTab === '3D' ? (
           <ThreeView

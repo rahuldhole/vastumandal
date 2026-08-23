@@ -7,7 +7,6 @@ import { useProjectImport } from "@/hooks/useProjectImport";
 import { Download, Upload, Check, FolderOpen, Save, FilePlus, Undo2, Redo2, LayoutTemplate, Box } from "lucide-react";
 import ExportModal from "./ExportModal";
 import TemplateWarningModal from "./TemplateWarningModal";
-import DxfInspector from "./DxfInspector";
 import { exportVastumandalDXF } from "@vastumandal/dxf-exporter";
 import { PRESETS } from "@vastumandal/dwg-schemas/src/presets";
 import { useTheme } from "next-themes";
@@ -35,8 +34,6 @@ export default function WorkbenchHeader() {
   const futureStates = useStore(useAppStore.temporal, (state) => state.futureStates);
   
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [showDxfInspector, setShowDxfInspector] = useState(false);
-  const [dxfPreviewData, setDxfPreviewData] = useState<string | null>(null);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [pendingTemplate, setPendingTemplate] = useState<typeof PRESETS[0] | null>(null);
   
@@ -351,19 +348,13 @@ export default function WorkbenchHeader() {
                 <div className="h-px bg-border my-1 mx-2"></div>
                 <button 
                   onClick={() => { 
-                    const state = useAppStore.getState();
-                    const dxfString = exportVastumandalDXF({
-                      layout: state.geometryResult,
-                      req: state.reqSpec,
-                      isPreview: true
-                    });
-                    setDxfPreviewData(dxfString);
-                    setShowDxfInspector(true); 
+                    setActiveTab('DXF');
                     setActiveMenu(null); 
                   }} 
                   className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between"
                 >
-                  <span>DXF Template Preview</span>
+                  <span className="flex items-center gap-2"><Box className="w-3.5 h-3.5" /> DXF Audit</span>
+                  {activeTab === 'DXF' && <Check className="w-4 h-4" />}
                 </button>
                 <div className="h-px bg-border my-1 mx-2"></div>
                 <button 
@@ -413,12 +404,6 @@ export default function WorkbenchHeader() {
         onClose={() => setPendingTemplate(null)} 
         onConfirm={() => pendingTemplate && applyTemplate(pendingTemplate)} 
         templateName={pendingTemplate?.label || ''} 
-      />
-      
-      <DxfInspector
-        isOpen={showDxfInspector}
-        onClose={() => setShowDxfInspector(false)}
-        dxfString={dxfPreviewData}
       />
     </header>
   );

@@ -1,15 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { X, Layers, CheckSquare, Square } from 'lucide-react';
-import DxfParser from 'dxf-parser';
+import { useAppStore } from '@/store/useStore';
+import { exportVastumandalDXF } from '@vastumandal/dxf-exporter';
+import { generateLayout } from '@/utils/generateLayout';
 
-export default function DxfInspector({ isOpen, onClose, dxfString }: { isOpen: boolean, onClose: () => void, dxfString: string | null }) {
+export default function DxfInspector() {
+  const { plotSpec, reqSpec } = useAppStore();
+  const dxfString = useMemo(() => {
+    try {
+      const layout = generateLayout(plotSpec, reqSpec);
+      return exportVastumandalDXF({
+        layout: layout,
+        req: reqSpec,
+        isPreview: true
+      });
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }, [plotSpec, reqSpec]);
+  
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [parsedDxf, setParsedDxf] = useState<any>(null);
   const [layers, setLayers] = useState<{name: string, color: number, visible: boolean}[]>([]);
 
   useEffect(() => {
-    if (isOpen && dxfString) {
+    if (dxfString) {
       try {
+        const DxfParser = require('dxf-parser').default || require('dxf-parser');
         const parser = new DxfParser();
         const dxf = parser.parseSync(dxfString);
         setParsedDxf(dxf);
@@ -29,29 +47,22 @@ export default function DxfInspector({ isOpen, onClose, dxfString }: { isOpen: b
         console.error("Failed to parse DXF:", err);
       }
     }
-  }, [isOpen, dxfString]);
-
-  if (!isOpen) return null;
+  }, [dxfString]);
 
   const toggleLayer = (name: string) => {
     setLayers(layers.map(l => l.name === name ? { ...l, visible: !l.visible } : l));
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-in fade-in duration-200">
-      <div className="bg-card w-full max-w-4xl h-[80vh] rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden">
-        
-        <div className="p-4 border-b border-border flex justify-between items-center bg-muted/30">
+    <div className="w-full h-full flex flex-col bg-background overflow-hidden text-sm relative">
+        <div className="p-3 border-b border-border flex justify-between items-center bg-muted/30">
           <div className="flex items-center gap-2">
-            <Layers className="text-primary" size={20} />
-            <h2 className="text-lg font-bold text-foreground">DXF Layer Inspector</h2>
+            <Layers className="text-primary" size={18} />
+            <h2 className="font-bold text-foreground">DXF Layer Inspector (Audit Mode)</h2>
           </div>
-          <button onClick={onClose} className="p-2 bg-muted hover:bg-muted/80 rounded-full transition text-muted-foreground hover:text-foreground">
-            <X size={20} />
-          </button>
         </div>
         
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden h-full">
           {/* Layer Panel */}
           <div className="w-64 border-r border-border bg-muted/10 p-4 flex flex-col gap-2 overflow-y-auto">
             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Layers Detected</h3>
@@ -101,7 +112,6 @@ export default function DxfInspector({ isOpen, onClose, dxfString }: { isOpen: b
              )}
           </div>
         </div>
-      </div>
     </div>
   );
 }

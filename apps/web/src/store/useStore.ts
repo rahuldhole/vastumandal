@@ -129,8 +129,8 @@ interface AppState {
  rates: { steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string; sbc?: number };
  setRates: (data: Partial<{ steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string; sbc?: number }>) => void;
  
- activeTab: '2D' | '3D' | 'IFC';
- setActiveTab: (tab: '2D' | '3D' | 'IFC') => void;
+  activeTab: '2D' | '3D' | 'IFC' | 'DXF';
+  setActiveTab: (tab: '2D' | '3D' | 'IFC' | 'DXF') => void;
  
  layers: { vastu: boolean; zones: boolean; grid: boolean; dims: boolean; openings: boolean };
  setLayers: (layers: Partial<{ vastu: boolean; zones: boolean; grid: boolean; dims: boolean; openings: boolean }>) => void;
@@ -329,8 +329,9 @@ export const useAppStore = create<AppState>()(
         setPrintSetup: (data) => set((state) => ({ printSetup: { ...state.printSetup, ...data } })),
         setProjectMetadata: (data) => set((state) => ({ projectMetadata: { ...state.projectMetadata, ...data } })),
         setRates: (data) => set((state) => ({ rates: { ...state.rates, ...data } })),
+        activeTab: '2D',
+        setActiveTab: (tab: '2D' | '3D' | 'IFC' | 'DXF') => set({ activeTab: tab }),
         
-        setActiveTab: (tab) => set({ activeTab: tab }),
         setLayers: (data) => set((state) => ({ layers: { ...state.layers, ...data } })),
 
         setBoqResult: (result) => set({ boqResult: result }),
