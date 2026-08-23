@@ -65,8 +65,8 @@ interface AppState {
  reqSpec: RequirementSpec;
  setReqSpec: (data: Partial<RequirementSpec>) => void;
  
- rates: { steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string };
- setRates: (data: Partial<{ steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string }>) => void;
+ rates: { steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string; sbc?: number };
+ setRates: (data: Partial<{ steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string; sbc?: number }>) => void;
  
  activeTab: '2D' | '3D';
  setActiveTab: (tab: '2D' | '3D') => void;
@@ -217,7 +217,7 @@ export const useAppStore = create<AppState>()(
  },
  setReqSpec: (data) => set((state) => ({ reqSpec: { ...state.reqSpec, ...data } })),
  
- rates: { steel: 65, cement: 380, sand: 60, aggregate: 55, brick: 7, columnSize: "230x380" },
+ rates: { steel: 65, cement: 380, sand: 60, aggregate: 55, brick: 7, columnSize: "230x380", sbc: 200 },
  setRates: (data) => set((state) => ({ rates: { ...state.rates, ...data } })),
  
  activeTab: '2D',

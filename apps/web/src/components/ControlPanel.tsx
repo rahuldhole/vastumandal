@@ -19,7 +19,7 @@ const AccordionHeader = ({ title, section, openSection, setOpenSection, icon: Ic
 );
 
 export default function ControlPanel() {
-  const { reqSpec, setReqSpec, setPlotSpec, setRates } = useAppStore();
+  const { reqSpec, setReqSpec, plotSpec, setPlotSpec, setRates } = useAppStore();
   const vastu = reqSpec.vastu || {};
   const setVastu = (key: string, value: string) => {
     setReqSpec({ vastu: { ...vastu, [key]: value } });
@@ -70,6 +70,26 @@ export default function ControlPanel() {
   // Accordion State
   const [openSection, setOpenSection] = useState<SectionType>('B');
 
+  const handleStoreysChange = (val: number) => {
+    setStoreys(val);
+    setPlotSpec({ floorCount: val === 1 ? 'G' : `G+${val - 1}` });
+  };
+
+  const handleFSetbackChange = (val: number) => {
+    setFSetback(val);
+    setPlotSpec({ setbacks: { ...plotSpec.setbacks, front: val } });
+  };
+
+  const handleRSetbackChange = (val: number) => {
+    setRSetback(val);
+    setPlotSpec({ setbacks: { ...plotSpec.setbacks, rear: val } });
+  };
+
+  const handleSbcChange = (val: number) => {
+    setSbc(val);
+    setRates({ sbc: val });
+  };
+
   const triggerUpdate = () => {
     // legacy mock update
   };
@@ -119,7 +139,7 @@ export default function ControlPanel() {
                   {[1, 2, 3, 4, 5].map((val, idx) => (
                     <button
                       key={val}
-                      onClick={() => { setStoreys(val); triggerUpdate(); }}
+                      onClick={() => handleStoreysChange(val)}
                       className={`flex-1 py-1.5 text-xs font-medium rounded-md transition ${storeys === val ? 'bg-background shadow text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                     >
                       {idx === 0 ? 'G' : `G+${idx}`}
@@ -131,14 +151,14 @@ export default function ControlPanel() {
                 <div>
                   <label className="block text-xs font-medium mb-1 text-muted-foreground">Front Setback</label>
                   <div className="relative">
-                    <input type="number" value={fSetback} onChange={e => { setFSetback(Number(e.target.value)); triggerUpdate(); }} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
+                    <input type="number" value={fSetback} onChange={e => handleFSetbackChange(Number(e.target.value))} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
                     <span className="absolute right-2 top-1.5 text-muted-foreground text-xs font-medium">m</span>
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-medium mb-1 text-muted-foreground">Rear Setback</label>
                   <div className="relative">
-                    <input type="number" value={rSetback} onChange={e => { setRSetback(Number(e.target.value)); triggerUpdate(); }} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
+                    <input type="number" value={rSetback} onChange={e => handleRSetbackChange(Number(e.target.value))} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
                     <span className="absolute right-2 top-1.5 text-muted-foreground text-xs font-medium">m</span>
                   </div>
                 </div>
@@ -165,11 +185,11 @@ export default function ControlPanel() {
                 <div className="flex gap-2 items-center mb-2">
                   <input 
                     type="range" min="50" max="400" step="10" 
-                    value={sbc} onChange={e => { setSbc(Number(e.target.value)); triggerUpdate(); }}
+                    value={sbc} onChange={e => handleSbcChange(Number(e.target.value))}
                     className="flex-1 accent-primary"
                   />
                   <div className="relative w-24">
-                    <input type="number" value={sbc} onChange={e => { setSbc(Number(e.target.value)); triggerUpdate(); }} className="w-full p-1.5 pr-10 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none text-right font-mono text-xs" />
+                    <input type="number" value={sbc} onChange={e => handleSbcChange(Number(e.target.value))} className="w-full p-1.5 pr-10 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none text-right font-mono text-xs" />
                     <span className="absolute right-2 top-2 text-muted-foreground text-[10px]">kN/m²</span>
                   </div>
                 </div>

@@ -67,7 +67,7 @@ export function useEngineWorker() {
         payload: {
           spatialProject: { plotSpec, reqSpec },
           bylawParams,
-          soilCondition: { safeBearingCapacity: 200 },
+          soilCondition: { safeBearingCapacity: rates.sbc ?? 200 },
           // Map UI-level material rates → RateCard shape expected by core-estimator
           rateCard: {
             concrete: (rates.cement || 380) + (rates.sand || 60) + (rates.aggregate || 55) + 3500, // cement+sand+aggregate+labour
