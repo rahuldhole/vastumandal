@@ -1,1 +1,1 @@
-# vastumandal
+# Vastu Mandal - Accelerating Residential and Commercial Buildings Design and Documentation
