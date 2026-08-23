@@ -53,6 +53,11 @@ export default function Workbench() {
     }
   }, [workerCalc, result, setIsCalculating, setBoqResult]);
 
+  useEffect(() => {
+    if (!mounted) return;
+    calculate(plotSpec, reqSpec, rates);
+  }, [plotSpec, reqSpec, rates, calculate, mounted]);
+
   if (!mounted) {
     return <div className="flex w-full bg-background overflow-hidden relative" style={{ height: "calc(100vh - 48px)" }}></div>;
   }
