@@ -4,10 +4,12 @@ import { useAppStore } from '../store/useStore';
 import { exportVastumandalDXF, exportVastumandalScript } from '@vastumandal/dxf-exporter';
 import { exportVastumandalIFC } from '@vastumandal/ifc-exporter';
 import { IFCPreview } from './IFCPreview';
+import DxfInspector from './DxfInspector';
 
 export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showIfcPreview, setShowIfcPreview] = useState(false);
+  const [showDxfInspector, setShowDxfInspector] = useState(false);
   const [previewData, setPreviewData] = useState<string | null>(null);
   
   if (!isOpen) return null;
@@ -56,20 +58,42 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
 
   const getMimeType = (format: string) => {
     if (format === 'vastu' || format === 'json') return 'application/json';
+    if (format === 'pdf') return 'application/pdf';
     return 'text/plain';
   };
 
-  const downloadFile = (format: string) => {
+  const downloadFile = async (format: string) => {
     if (format === 'zip') {
       alert('Downloading ZIP not fully implemented yet...');
+      return;
+    }
+
+    const state = useAppStore.getState();
+    const projectName = state.templateData?.projectName || 'Vastumandal';
+    
+    if (format === 'pdf') {
+      const { exportToPdf } = await import('@vastumandal/pdf-exporter');
+      const blob = await exportToPdf({
+        floorPlan: state.geometryResult,
+        columns: [],
+        boq: state.boqResult,
+        printSetup: state.printSetup,
+        projectMetadata: state.projectMetadata
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${projectName.replace(/\\s+/g, '_')}_Drawings.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
       return;
     }
     
     const content = getExportData(format);
     if (!content) return;
     
-    const state = useAppStore.getState();
-    const projectName = state.templateData?.projectName || 'Vastumandal';
     const blob = new Blob([content], { type: getMimeType(format) });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -103,11 +127,18 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
         setPreviewData(content);
         setShowIfcPreview(true);
       }
+    } else if (format === 'dxf') {
+      const content = getExportData(format);
+      if (content) {
+        setPreviewData(content);
+        setShowDxfInspector(true);
+      }
     }
   };
 
   const formats = [
-    { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500', canCopy: true },
+    { id: 'pdf', title: 'PDF Sheet Set (.pdf)', desc: 'Direct-to-print vector architectural plans and structural schedules.', icon: FileText, color: 'text-red-500', canCopy: false },
+    { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500', canCopy: true, canPreview: true },
     { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500', canCopy: true, canPreview: true },
     { id: 'lsp', title: 'AutoLISP Script (.lsp)', desc: 'Direct command-line automation script for AutoCAD.', icon: FileText, color: 'text-amber-500', canCopy: true },
     { id: 'vastu', title: 'Vastumandal Project (.vastu)', desc: 'Native project format containing all specifications and parameters.', icon: FileCode, color: 'text-emerald-500', canCopy: false },
@@ -192,6 +223,12 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
         isOpen={showIfcPreview}
         onClose={() => setShowIfcPreview(false)}
         ifcData={previewData}
+      />
+      
+      <DxfInspector
+        isOpen={showDxfInspector}
+        onClose={() => setShowDxfInspector(false)}
+        dxfString={previewData}
       />
     </div>
   );

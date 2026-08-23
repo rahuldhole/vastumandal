@@ -14,6 +14,40 @@ import type {
  RequirementSpec
 } from '@vastumandal/dwg-schemas';
 
+export interface ArchitecturalOverrides {
+  exteriorWallThickness: number;
+  partitionWallThickness: number;
+  vastuStrictness: 'Strict' | 'Moderate' | 'Relaxed';
+  rooms: Record<string, { width: number; length: number }>;
+}
+
+export interface StructuralOverrides {
+  columnSize: string;
+  columnRebar: string;
+  stirrupSpacing: string;
+  footingDepth: number;
+  footingPadThickness: number;
+  concreteGrade: string;
+  steelGrade: string;
+  covers: { footing: number; column: number; slab: number };
+}
+
+export interface PrintSetup {
+  sheetPreset: 'A4 Portrait' | 'A4 Landscape' | 'A3' | 'A2' | 'A1';
+  viewScale: '1:50' | '1:100' | '1:200';
+  layoutTemplate: 'Sheet 1' | 'Sheet 2' | 'Sheet 3' | 'Sheet 4';
+}
+
+export interface ProjectMetadata {
+  projectName: string;
+  clientName: string;
+  siteLocation: string;
+  structuralEngineer: string;
+  revisionNumber: string;
+  date: string;
+  northArrowOrientation: number;
+}
+
 // Custom IndexedDB storage adapter for Zustand
 const idbStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -79,6 +113,18 @@ interface AppState {
  
  reqSpec: RequirementSpec;
  setReqSpec: (data: Partial<RequirementSpec>) => void;
+ 
+ architecturalOverrides: ArchitecturalOverrides;
+ setArchitecturalOverrides: (data: Partial<ArchitecturalOverrides>) => void;
+ 
+ structuralOverrides: StructuralOverrides;
+ setStructuralOverrides: (data: Partial<StructuralOverrides>) => void;
+ 
+ printSetup: PrintSetup;
+ setPrintSetup: (data: Partial<PrintSetup>) => void;
+ 
+ projectMetadata: ProjectMetadata;
+ setProjectMetadata: (data: Partial<ProjectMetadata>) => void;
  
  rates: { steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string; sbc?: number };
  setRates: (data: Partial<{ steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string; sbc?: number }>) => void;
@@ -210,6 +256,36 @@ const initialState = {
     parking: true,
     porch: true,
   } as RequirementSpec,
+  architecturalOverrides: {
+    exteriorWallThickness: 230,
+    partitionWallThickness: 115,
+    vastuStrictness: 'Moderate',
+    rooms: {},
+  } as ArchitecturalOverrides,
+  structuralOverrides: {
+    columnSize: '230x230',
+    columnRebar: '4-#16 + 2-#12',
+    stirrupSpacing: '8mm @ 150mm c/c',
+    footingDepth: 1.5,
+    footingPadThickness: 0.4,
+    concreteGrade: 'M25',
+    steelGrade: 'Fe500',
+    covers: { footing: 40, column: 40, slab: 20 },
+  } as StructuralOverrides,
+  printSetup: {
+    sheetPreset: 'A3',
+    viewScale: '1:100',
+    layoutTemplate: 'Sheet 1',
+  } as PrintSetup,
+  projectMetadata: {
+    projectName: 'Residential Building',
+    clientName: 'Acme Corp',
+    siteLocation: 'Unknown',
+    structuralEngineer: 'Engineer',
+    revisionNumber: 'R0',
+    date: new Date().toISOString().split('T')[0],
+    northArrowOrientation: 0,
+  } as ProjectMetadata,
   rates: { steel: 65, cement: 380, sand: 60, aggregate: 55, brick: 7, columnSize: "230x380", sbc: 200 },
   layers: { vastu: false, zones: true, grid: true, dims: true, openings: true },
   
@@ -248,6 +324,10 @@ export const useAppStore = create<AppState>()(
         
         setPlotSpec: (data) => set((state) => ({ plotSpec: { ...state.plotSpec, ...data } })),
         setReqSpec: (data) => set((state) => ({ reqSpec: { ...state.reqSpec, ...data } })),
+        setArchitecturalOverrides: (data) => set((state) => ({ architecturalOverrides: { ...state.architecturalOverrides, ...data } })),
+        setStructuralOverrides: (data) => set((state) => ({ structuralOverrides: { ...state.structuralOverrides, ...data } })),
+        setPrintSetup: (data) => set((state) => ({ printSetup: { ...state.printSetup, ...data } })),
+        setProjectMetadata: (data) => set((state) => ({ projectMetadata: { ...state.projectMetadata, ...data } })),
         setRates: (data) => set((state) => ({ rates: { ...state.rates, ...data } })),
         
         setActiveTab: (tab) => set({ activeTab: tab }),

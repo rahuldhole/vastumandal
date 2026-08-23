@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Info, AlertTriangle, Settings2, Compass } from 'lucide-react';
+import { ChevronDown, ChevronUp, Info, AlertTriangle, Settings2, Compass, Printer, Map, Building, DraftingCompass } from 'lucide-react';
 import { useAppStore } from '@/store/useStore';
 
-type SectionType = 'A' | 'B' | 'C' | 'D' | null;
+type SectionType = 'SITE' | 'ARCH' | 'STRUCT' | 'PRINT' | null;
 
 const AccordionHeader = ({ title, section, openSection, setOpenSection, icon: Icon }: { title: string, section: NonNullable<SectionType>, openSection: SectionType, setOpenSection: React.Dispatch<React.SetStateAction<SectionType>>, icon: React.ElementType<{ size?: number; className?: string }> }) => (
   <button 
@@ -18,53 +18,18 @@ const AccordionHeader = ({ title, section, openSection, setOpenSection, icon: Ic
 );
 
 export default function ControlPanel() {
-  const { reqSpec, setReqSpec, plotSpec, setPlotSpec, setRates } = useAppStore();
-  const vastu = reqSpec.vastu || {};
-  const setVastu = (key: string, value: string) => {
-    setReqSpec({ vastu: { ...vastu, [key]: value } });
-  };
-  const [sbc, setSbc] = useState(200);
-  const [storeys, setStoreys] = useState(2); // G+1
-  const [fSetback, setFSetback] = useState(3);
-  const [rSetback, setRSetback] = useState(1.5);
-  
-  // New States for Section B and C
-  const [soilType, setSoilType] = useState('Medium Soil');
-  const [depth, setDepth] = useState(1.5);
-  const [concreteGrade, setConcreteGrade] = useState('M25');
-  const [steelGrade, setSteelGrade] = useState('Fe500');
+  const { 
+    plotSpec, setPlotSpec, 
+    architecturalOverrides, setArchitecturalOverrides,
+    structuralOverrides, setStructuralOverrides,
+    printSetup, setPrintSetup,
+    projectMetadata, setProjectMetadata
+  } = useAppStore();
 
+  const [openSection, setOpenSection] = useState<SectionType>('SITE');
 
-
-  // Accordion State
-  const [openSection, setOpenSection] = useState<SectionType>('B');
-
-  const handleStoreysChange = (val: number) => {
-    setStoreys(val);
-    setPlotSpec({ floorCount: val === 1 ? 'G' : `G+${val - 1}` });
-  };
-
-  const handleFSetbackChange = (val: number) => {
-    setFSetback(val);
-    setPlotSpec({ setbacks: { ...plotSpec.setbacks, front: val } });
-  };
-
-  const handleRSetbackChange = (val: number) => {
-    setRSetback(val);
-    setPlotSpec({ setbacks: { ...plotSpec.setbacks, rear: val } });
-  };
-
-  const handleSbcChange = (val: number) => {
-    setSbc(val);
-    setRates({ sbc: val });
-  };
-
-  const triggerUpdate = () => {
-    // legacy mock update
-  };
-
-  const isLowSBC = Boolean(sbc < 80);
-  const isLargeSpan = false; // Mock for span > 7.5m
+  // Helpers
+  const triggerUpdate = () => { /* legacy mock update */ };
 
   return (
     <div className="flex flex-col h-full bg-card overflow-hidden">
@@ -73,96 +38,146 @@ export default function ControlPanel() {
         <h2 className="font-bold text-lg text-foreground">Workbench Controls</h2>
       </div>
 
-
       <div className="flex-1 overflow-auto">
         
-        {/* SECTION A: Building Envelope */}
+        {/* SECTION 1: Site, Setbacks & Bylaws */}
         <div>
-          <AccordionHeader title="Building Envelope & Geometry" section="A" icon={Settings2} openSection={openSection} setOpenSection={setOpenSection} />
-          {openSection === 'A' && (
+          <AccordionHeader title="Site, Setbacks & Bylaws" section="SITE" icon={Map} openSection={openSection} setOpenSection={setOpenSection} />
+          {openSection === 'SITE' && (
             <div className="p-4 space-y-4 text-sm bg-card">
-              <div>
-                <label className="block font-medium mb-1.5 flex items-center gap-1">Storey Level</label>
-                <div className="flex bg-muted p-1 rounded-lg">
-                  {[1, 2, 3, 4, 5].map((val, idx) => (
-                    <button
-                      key={val}
-                      onClick={() => handleStoreysChange(val)}
-                      className={`flex-1 py-1.5 text-xs font-medium rounded-md transition ${storeys === val ? 'bg-background shadow text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-                    >
-                      {idx === 0 ? 'G' : `G+${idx}`}
-                    </button>
-                  ))}
-                </div>
-              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium mb-1 text-muted-foreground">Front Setback</label>
                   <div className="relative">
-                    <input type="number" value={fSetback} onChange={e => handleFSetbackChange(Number(e.target.value))} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
+                    <input type="number" value={plotSpec.setbacks?.front || 0} onChange={e => setPlotSpec({ setbacks: { ...plotSpec.setbacks!, front: Number(e.target.value) } })} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
                     <span className="absolute right-2 top-1.5 text-muted-foreground text-xs font-medium">m</span>
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-medium mb-1 text-muted-foreground">Rear Setback</label>
                   <div className="relative">
-                    <input type="number" value={rSetback} onChange={e => handleRSetbackChange(Number(e.target.value))} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
+                    <input type="number" value={plotSpec.setbacks?.rear || 0} onChange={e => setPlotSpec({ setbacks: { ...plotSpec.setbacks!, rear: Number(e.target.value) } })} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
+                    <span className="absolute right-2 top-1.5 text-muted-foreground text-xs font-medium">m</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Left Setback</label>
+                  <div className="relative">
+                    <input type="number" value={plotSpec.setbacks?.left || 0} onChange={e => setPlotSpec({ setbacks: { ...plotSpec.setbacks!, left: Number(e.target.value) } })} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
+                    <span className="absolute right-2 top-1.5 text-muted-foreground text-xs font-medium">m</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Right Setback</label>
+                  <div className="relative">
+                    <input type="number" value={plotSpec.setbacks?.right || 0} onChange={e => setPlotSpec({ setbacks: { ...plotSpec.setbacks!, right: Number(e.target.value) } })} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
                     <span className="absolute right-2 top-1.5 text-muted-foreground text-xs font-medium">m</span>
                   </div>
                 </div>
               </div>
-              {isLargeSpan && (
-                <div className="mt-2 flex gap-2 p-2 bg-amber-50 border border-amber-200 text-amber-800 rounded-md text-xs items-start">
-                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <p>Large span detected. Verify deflection in ETABS.</p>
+              
+              <div className="grid grid-cols-2 gap-3">
+                 <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Road Width</label>
+                  <div className="relative">
+                    <input type="number" value={plotSpec.roadWidth || 0} onChange={e => setPlotSpec({ roadWidth: Number(e.target.value) })} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
+                    <span className="absolute right-2 top-1.5 text-muted-foreground text-xs font-medium">m</span>
+                  </div>
                 </div>
-              )}
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Ground Coverage</label>
+                  <div className="relative">
+                    <input type="number" value={50} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
+                    <span className="absolute right-2 top-1.5 text-muted-foreground text-xs font-medium">%</span>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
 
-        {/* SECTION B: Soil & Geotechnical */}
+        {/* SECTION 2: Architectural & Spatial Overrides */}
         <div>
-          <AccordionHeader title="Soil & Geotechnical" section="B" icon={Settings2} openSection={openSection} setOpenSection={setOpenSection} />
-          {openSection === 'B' && (
+          <AccordionHeader title="Architectural & Spatial Overrides" section="ARCH" icon={Building} openSection={openSection} setOpenSection={setOpenSection} />
+          {openSection === 'ARCH' && (
             <div className="p-4 space-y-4 text-sm bg-card">
-              <div>
-                <label className="block font-medium mb-1.5 flex justify-between items-center">
-                  <span className="flex items-center gap-1">Safe Bearing Capacity <span title="Standard SBC for residential footing design"><Info size={14} className="text-muted-foreground cursor-help" /></span></span>
-                </label>
-                <div className="flex gap-2 items-center mb-2">
-                  <input 
-                    type="range" min="50" max="400" step="10" 
-                    value={sbc} onChange={e => handleSbcChange(Number(e.target.value))}
-                    className="flex-1 accent-primary"
-                  />
-                  <div className="relative w-24">
-                    <input type="number" value={sbc} onChange={e => handleSbcChange(Number(e.target.value))} className="w-full p-1.5 pr-10 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none text-right font-mono text-xs" />
-                    <span className="absolute right-2 top-2 text-muted-foreground text-[10px]">kN/m²</span>
-                  </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Ext. Wall Thickness</label>
+                  <select value={architecturalOverrides.exteriorWallThickness} onChange={e => setArchitecturalOverrides({ exteriorWallThickness: Number(e.target.value) })} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option value={230}>230 mm</option>
+                    <option value={150}>150 mm</option>
+                  </select>
                 </div>
-                {isLowSBC && (
-                  <div className="mt-1 flex gap-2 p-2 bg-red-50 border border-red-200 text-red-800 rounded-md text-xs items-start">
-                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                    <p>Low bearing capacity: Isolated footings unsafe. Consider raft/pile foundation export.</p>
-                  </div>
-                )}
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Partition Wall</label>
+                  <select value={architecturalOverrides.partitionWallThickness} onChange={e => setArchitecturalOverrides({ partitionWallThickness: Number(e.target.value) })} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option value={115}>115 mm</option>
+                    <option value={100}>100 mm</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                 <label className="block text-xs font-medium mb-1 text-muted-foreground">Vastu Strictness</label>
+                 <select value={architecturalOverrides.vastuStrictness} onChange={e => setArchitecturalOverrides({ vastuStrictness: e.target.value as any })} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>Strict</option>
+                    <option>Moderate</option>
+                    <option>Relaxed</option>
+                 </select>
+              </div>
+              <button className="w-full py-2 bg-muted hover:bg-muted/80 text-foreground border border-border rounded text-xs font-medium transition">
+                Room Dimensional Tuning...
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* SECTION 3: Structural Detailing & Member Overrides */}
+        <div>
+          <AccordionHeader title="Structural Detailing" section="STRUCT" icon={DraftingCompass} openSection={openSection} setOpenSection={setOpenSection} />
+          {openSection === 'STRUCT' && (
+            <div className="p-4 space-y-4 text-sm bg-card">
+              <div className="grid grid-cols-2 gap-3">
+                 <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Column Size</label>
+                  <select value={structuralOverrides.columnSize} onChange={e => setStructuralOverrides({ columnSize: e.target.value })} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>230x230</option>
+                    <option>230x380</option>
+                    <option>230x450</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Rebar Config</label>
+                  <select value={structuralOverrides.columnRebar} onChange={e => setStructuralOverrides({ columnRebar: e.target.value })} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>4-#16 + 2-#12</option>
+                    <option>4-#16 + 4-#12</option>
+                    <option>8-#16</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Concrete Grade</label>
+                  <select value={structuralOverrides.concreteGrade} onChange={e => setStructuralOverrides({ concreteGrade: e.target.value })} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>M20</option>
+                    <option>M25</option>
+                    <option>M30</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Steel Grade</label>
+                  <select value={structuralOverrides.steelGrade} onChange={e => setStructuralOverrides({ steelGrade: e.target.value })} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>Fe500</option>
+                    <option>Fe550D</option>
+                  </select>
+                </div>
               </div>
               
               <div>
-                <label className="block font-medium mb-1.5">Soil Type</label>
-                <select value={soilType} onChange={e => { setSoilType(e.target.value); triggerUpdate(); }} className="w-full p-2 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none">
-                  <option>Soft Clay</option>
-                  <option>Medium Soil</option>
-                  <option>Hard Strata / Murrum</option>
-                  <option>Rock</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-medium mb-1 text-muted-foreground text-xs">Depth of Foundation (Df)</label>
-                <div className="relative w-1/2">
-                  <input type="number" step="0.1" value={depth} onChange={e => { setDepth(Number(e.target.value)); triggerUpdate(); }} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
+                <label className="block text-xs font-medium mb-1 text-muted-foreground">Footing Depth (Df)</label>
+                <div className="relative w-full">
+                  <input type="number" step="0.1" value={structuralOverrides.footingDepth} onChange={e => setStructuralOverrides({ footingDepth: Number(e.target.value) })} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
                   <span className="absolute right-2 top-2 text-muted-foreground text-xs">m</span>
                 </div>
               </div>
@@ -170,78 +185,54 @@ export default function ControlPanel() {
           )}
         </div>
 
-        {/* SECTION C: Materials & Rates */}
+        {/* SECTION 4: Drawing Sheet & Print Setup */}
         <div>
-          <AccordionHeader title="Materials & Regional Rates" section="C" icon={Settings2} openSection={openSection} setOpenSection={setOpenSection} />
-          {openSection === 'C' && (
+          <AccordionHeader title="Drawing Sheet & Print Setup" section="PRINT" icon={Printer} openSection={openSection} setOpenSection={setOpenSection} />
+          {openSection === 'PRINT' && (
             <div className="p-4 space-y-4 text-sm bg-card">
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Concrete</label>
-                  <select value={concreteGrade} onChange={e => { setConcreteGrade(e.target.value); triggerUpdate(); }} className="w-full p-2 border border-border rounded bg-background outline-none">
-                    <option>M20</option>
-                    <option>M25</option>
-                    <option>M30</option>
+                 <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Sheet Preset</label>
+                  <select value={printSetup.sheetPreset} onChange={e => setPrintSetup({ sheetPreset: e.target.value as any })} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>A4 Portrait</option>
+                    <option>A4 Landscape</option>
+                    <option>A3</option>
+                    <option>A2</option>
+                    <option>A1</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Steel</label>
-                  <select value={steelGrade} onChange={e => { setSteelGrade(e.target.value); triggerUpdate(); }} className="w-full p-2 border border-border rounded bg-background outline-none">
-                    <option>Fe500</option>
-                    <option>Fe550</option>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">View Scale</label>
+                  <select value={printSetup.viewScale} onChange={e => setPrintSetup({ viewScale: e.target.value as any })} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>1:50</option>
+                    <option>1:100</option>
+                    <option>1:200</option>
                   </select>
                 </div>
               </div>
-              <button className="w-full py-2 bg-muted hover:bg-muted/80 text-foreground border border-border rounded text-xs font-medium transition">
-                Configure Regional Rates...
-              </button>
+              
+              <div>
+                <label className="block text-xs font-medium mb-1 text-muted-foreground">Layout Template</label>
+                <select value={printSetup.layoutTemplate} onChange={e => setPrintSetup({ layoutTemplate: e.target.value as any })} className="w-full p-2 border border-border rounded bg-background outline-none">
+                  <option value="Sheet 1">Sheet 1 (Arch Plan + Dims + Schedule)</option>
+                  <option value="Sheet 2">Sheet 2 (Column & Footing Layout)</option>
+                  <option value="Sheet 3">Sheet 3 (BBS Table + Stock)</option>
+                  <option value="Sheet 4">Sheet 4 (Live BOQ Cost Sheet)</option>
+                </select>
+              </div>
+
+              <div className="pt-2 border-t border-border space-y-3">
+                <h3 className="text-xs font-bold text-foreground">Title Block Metadata</h3>
+                <div className="space-y-2">
+                   <input type="text" placeholder="Project Name" value={projectMetadata.projectName} onChange={e => setProjectMetadata({ projectName: e.target.value })} className="w-full p-2 text-xs border border-border rounded bg-background outline-none" />
+                   <input type="text" placeholder="Client Name" value={projectMetadata.clientName} onChange={e => setProjectMetadata({ clientName: e.target.value })} className="w-full p-2 text-xs border border-border rounded bg-background outline-none" />
+                   <input type="text" placeholder="Structural Engineer" value={projectMetadata.structuralEngineer} onChange={e => setProjectMetadata({ structuralEngineer: e.target.value })} className="w-full p-2 text-xs border border-border rounded bg-background outline-none" />
+                </div>
+              </div>
             </div>
           )}
         </div>
 
-        {/* SECTION D: Vastu Purusha Mandala */}
-        <div>
-          <AccordionHeader title="Vastu Purusha Mandala" section="D" icon={Compass} openSection={openSection} setOpenSection={setOpenSection} />
-          {openSection === 'D' && (
-            <div className="p-4 space-y-4 text-sm bg-card">
-              <div>
-                <label className="block text-xs font-medium mb-1 text-muted-foreground">Plot Facing</label>
-                <select value={vastu.plotFacing || 'North'} onChange={e => setVastu('plotFacing', e.target.value)} className="w-full p-2 border border-border rounded bg-background outline-none">
-                  <option>North</option><option>East</option><option>South</option><option>West</option>
-                  <option>NE</option><option>NW</option><option>SE</option><option>SW</option>
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Mandir</label>
-                  <select value={vastu.mandirPosition || 'NE (Ishan)'} onChange={e => setVastu('mandirPosition', e.target.value)} className="w-full p-2 border border-border rounded bg-background outline-none">
-                    <option>NE (Ishan)</option><option>East</option><option>Center (Brahmasthan)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Kitchen</label>
-                  <select value={vastu.kitchenPosition || 'SE (Agni)'} onChange={e => setVastu('kitchenPosition', e.target.value)} className="w-full p-2 border border-border rounded bg-background outline-none">
-                    <option>SE (Agni)</option><option>NW (Vayu)</option><option>East</option>
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Master Bed</label>
-                  <select value={vastu.masterBedPosition || 'SW (Nairutya)'} onChange={e => setVastu('masterBedPosition', e.target.value)} className="w-full p-2 border border-border rounded bg-background outline-none">
-                    <option>SW (Nairutya)</option><option>South</option><option>West</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Main Gate</label>
-                  <select value={vastu.entrancePada || 'Favorable'} onChange={e => setVastu('entrancePada', e.target.value)} className="w-full p-2 border border-border rounded bg-background outline-none">
-                    <option>Favorable</option><option>Neutral</option><option>Unfavorable</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
