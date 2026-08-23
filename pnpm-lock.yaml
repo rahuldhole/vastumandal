@@ -21,9 +21,12 @@ importers:
       '@serwist/next':
         specifier: ^9.5.12
         version: 9.5.12(next@15.2.1(@babel/core@7.29.7)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
-      '@vastumandal/core-math':
+      '@vastumandal/core-estimator':
         specifier: workspace:*
-        version: link:../../packages/core-math
+        version: link:../../packages/core-estimator
+      '@vastumandal/core-structural':
+        specifier: workspace:*
+        version: link:../../packages/core-structural
       '@vastumandal/dwg-schemas':
         specifier: workspace:*
         version: link:../../packages/dwg-schemas
@@ -120,6 +123,10 @@ importers:
   packages/core-structural: {}
 
   packages/dwg-schemas:
+    dependencies:
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       typescript:
         specifier: ^5.0.0

@@ -1,78 +1,48 @@
-# VASTUMANDAL — Design System & UI/UX Specification
+# VastuMandal Engineering & Design Rules
 
-## 1. Design Philosophy: Divine Geometric Precision
-Vastumandal blends traditional Vedic sacred geometry (Mandala / Yantra balance) with modern CAD/BIM workstation ergonomics. The visual tone is technical, disciplined, and refined—balancing deep obsidian and warm stone neutrals with subtle, energized accents of sacred vermilion, ochre, and brass.
+## 1. Spatial Planning & Vaastu Allocation
 
-The application is engineered strictly as an **Interactive Workbench / Dashboard**, not a marketing landing page.
+The spatial engine maps residential space requirements to the traditional 9-zone **Vaastu Purusha Mandala**:
 
----
-
-## 2. Color Palette & Design Tokens
-
-### Dark Canvas Theme (Primary CAD Viewport)
-- **Space / Base Background (`--bg-mandala`):** `#0c0d10` (Deep obsidian)
-- **Panel / Surface 1 (`--bg-surface-1`):** `#14161b` (Charcoal slate)
-- **Panel / Surface 2 (`--bg-surface-2`):** `#1c1f26` (Subtle elevated card)
-- **Borders & Grid Lines (`--border-grid`):** `#292d39` / `#1e222d`
-
-### Sacred Accents & Active States
-- **Agni / Vermilion (`--accent-agni`):** `#e65100` / `#ff5722` (SE quadrant, warnings, heat markers)
-- **Soma / Ochre Gold (`--accent-gold`):** `#d4af37` / `#f59e0b` (Active selection, Vastu highlights, Brahmasthan marker)
-- **Vayu / Cyan-Ice (`--accent-vayu`):** `#06b6d4` (NW quadrant, dimension strings, snap vectors)
-- **Prithvi / Earth Brown (`--accent-earth`):** `#78350f` (SW Master structural anchoring)
-- **IS 456 Concrete Grey (`--cad-concrete`):** `#94a3b8` (Column/beam framing)
-- **Rebar Steel Blue (`--cad-steel`):** `#38bdf8` (Reinforcement bars and BBS markers)
+| Zone / Direction | Element | Permitted Rooms / Functions | Prohibited Allocations |
+| :--- | :--- | :--- | :--- |
+| **North-East ($NE$)** | *Ishanya* (Water) | Pooja / Mandir, Entrance Foyer, Open Verandah | Master Bed, Kitchen, Toilets |
+| **South-East ($SE$)** | *Agni* (Fire) | Kitchen, Main Cooktop, Electrical DB / Inverters | Toilets, Bedrooms |
+| **South-West ($SW$)** | *Nairutya* (Earth) | Master Bedroom (Heaviest / Highest Zone) | Pooja, Kitchen, Main Entrance |
+| **North-West ($NW$)** | *Vayavya* (Air) | Common Toilet, Guest Bed, Dining, Staircase | Master Bedroom, Pooja |
+| **North ($N$) / East ($E$)** | *Kuber / Aditya* | Living Hall, Study, Balconies | Heavy Storage, Toilets |
+| **Center ($Center$)** | *Brahmasthan* | Open Hall, Circulation Spines | Columns, Walls, Toilets |
 
 ---
 
-## 3. Typography
-- **UI & Numbers:** `JetBrains Mono` or `Fira Code` for all coordinate readouts, dimensions, costs, and data tables.
-- **Labels & Controls:** `Plus Jakarta Sans` or `Inter` (geometric, legible at 11px–13px).
-- **Mandala Headings & Zone Tags:** `Cinzel` or `Space Grotesk` (all-caps, tracking-wide).
+## 2. Dimensional Minimums (NBC Standards)
+
+* **Living Room:** Minimum width $3.0\text{m}$ ($10\text{ ft}$), minimum area $11.0\text{ m}^2$ ($120\text{ sq ft}$).
+* **Bedrooms:** Minimum width $2.7\text{m}$ ($9\text{ ft}$), minimum area $9.5\text{ m}^2$ ($100\text{ sq ft}$).
+* **Kitchen:** Minimum width $1.8\text{m}$ ($6\text{ ft}$), minimum area $5.0\text{ m}^2$ ($55\text{ sq ft}$).
+* **Bath/Toilet (Combined):** Minimum $1.2\text{m} \times 2.1\text{m}$ ($4\text{ ft} \times 7\text{ ft}$).
+* **Corridors & Passages:** Clear minimum width $\ge 0.9\text{m}$ ($3\text{ ft}$).
+* **Wall Thicknesses:** Outer perimeter $= 230\text{mm}$ ($9\text{ in}$); Internal partitions $= 115\text{mm}$ ($4.5\text{ in}$).
 
 ---
 
-## 4. Workbench Dashboard Layout (3-Pane Workspace)
+## 3. Structural Column Layout Rules
 
-```text
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ TOP BAR: Project Title | Grid Snap: 100mm | Vastu Compliance Score: 94% | Export (DXF/PDF)│
-├─────────────┬────────────────────────────────────────────────────────────┬─────────────┤
-│ LEFT PANEL  │ CENTER VIEWPORT (Dual Mode: 2D Floorplan / 3D Isometric)   │ RIGHT PANEL │
-│ (18% Width) │                                                            │ (22% Width) │
-│             │  ┌──────────────────────────────────────────────────────┐  │             │
-│ • Plot Spec │  │                                                      │  │ • IS 456    │
-│ • Direction │  │                  8-Pada Yantra Grid                  │  │   Framing   │
-│   Orientation│ │                                                      │  │ • Concrete  │
-│ • Room Tree │  │             [ Interactive SVG / Three.js ]           │  │   Volume    │
-│ • Vastu     │  │                                                      │  │ • Steel (kg)│
-│   Constraints│ │                                                      │  │ • Live BOQ  │
-│             │  └──────────────────────────────────────────────────────┘  │   Cost      │
-│             │  BOTTOM TRAY: Console / Validation Warnings / BBS Summary  │   Ledger    │
-└─────────────┴────────────────────────────────────────────────────────────┴─────────────┘
-```
+* **Column Sizing:** Standard $230\text{mm} \times 380\text{mm}$ ($9'' \times 15''$) for G+1; $230\text{mm} \times 230\text{mm}$ ($9'' \times 9''$) for single-story G.
+* **Maximum Clear Span:** $\le 4.5\text{m}$ ($15\text{ ft}$) without secondary structural beams.
+* **Placement Priority:**
+  1. All 4 building envelope perimeter corners.
+  2. Structural wall T-junctions and 4-way intersections.
+  3. Staircase corners and heavy water tank load paths.
 
 ---
 
-## 5. UI Micro-Components & Sacred Geometry Touches
+## 4. Quantity Takeoff (QTO) Empirical Constants
 
-### A. Ashta-Dikpalaka Orientation HUD
-- A dynamic compass rose docked in the top-right of the viewport.
-- Highlights Cardinal Directions (N, E, S, W) and Intercardinal Vastu Deities (NE - Ishanya, SE - Agni, SW - Nairuthi, NW - Vayu).
-- Rotates dynamically if the plot orientation is non-zero.
+Calculated over the total Built-Up Area (BUA in square feet):
 
-### B. Mandala Grid Overlay (Toggleable)
-- 9-zone (Peetha / Pitha Mandala) and 81-zone (Paramasayika Mandala) SVG grid overlay.
-- Subtle golden line weights (`rgba(212, 175, 55, 0.15)`) with center Brahmasthan bounding square.
-
-### C. Live IS 456 Structural & Cost Ledger
-- Floating glassmorphic cards displaying live material readouts:
-  - Concrete: `28.4 m³` (M20 grade)
-  - Fe500 Rebar: `2,840 kg`
-  - Total Estimated Cost: `₹14,20,000` (auto-calculated per square foot / regional unit rate).
-
-### D. Export Modal
-- Single-click production actions:
-  - **AutoCAD (`.dxf`):** Layer-separated drawing sheet.
-  - **3D Model (`.obj`):** 3ds Max / Revit compatible with wall cutouts.
-  - **Civil Estimate (`.pdf`):** Formal municipal-ready floorplan with itemized BOQ.
+$$\text{TMT Steel Rebar (Fe500/550)} = \text{BUA} \times 4.00 \text{ kg / sq ft}$$
+$$\text{Cement (50kg Bags)} = \text{BUA} \times 0.43 \text{ bags / sq ft}$$
+$$\text{Sand / M-Sand} = \text{BUA} \times 1.90 \text{ cu ft / sq ft}$$
+$$\text{Coarse Aggregate (10/20mm)} = \text{BUA} \times 1.40 \text{ cu ft / sq ft}$$
+$$\text{Masonry Bricks (Red Standard)} = \text{BUA} \times 8.50 \text{ bricks / sq ft}$$
