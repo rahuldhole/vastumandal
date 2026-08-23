@@ -7,9 +7,11 @@ import { useAppStore } from "@/store/useStore";
 import { ThemeToggle } from "./ThemeToggle";
 import { Download, FileDown, Layers } from "lucide-react";
 import { PLOT_PRESETS } from "@vastumandal/dwg-schemas";
+import ExportModal from "./ExportModal";
 
 export default function Navbar() {
   const { plotSpec, setPlotSpec, layers, setLayers } = useAppStore();
+  const [isExportModalOpen, setIsExportModalOpen] = React.useState(false);
 
   const handlePresetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const presetKey = e.target.value;
@@ -91,20 +93,11 @@ export default function Navbar() {
 
           {/* Export Actions */}
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded transition shadow-sm">
-              <Download className="w-3.5 h-3.5" /> .DXF
-            </button>
-            <button className="flex items-center gap-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded transition shadow-sm">
-              <Download className="w-3.5 h-3.5" /> .OBJ
-            </button>
-            <button className="flex items-center gap-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded transition shadow-sm">
-              <Download className="w-3.5 h-3.5" /> .IFC
-            </button>
-            <button className="flex items-center gap-1.5 text-xs font-medium bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded transition shadow-sm">
-              <FileDown className="w-3.5 h-3.5" /> .PDF
-            </button>
-            <button className="flex items-center gap-1.5 text-xs font-medium bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded transition shadow-sm">
-              <Download className="w-3.5 h-3.5" /> .LSP
+            <button 
+              onClick={() => setIsExportModalOpen(true)}
+              className="flex items-center gap-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-1.5 rounded-md transition shadow-sm"
+            >
+              <Download className="w-4 h-4" /> Export...
             </button>
           </div>
 
@@ -114,6 +107,7 @@ export default function Navbar() {
         </div>
 
       </div>
+      <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
     </header>
   );
 }
