@@ -1,0 +1,23 @@
+{
+  "name": "RDCAD Express - Structural Detailing",
+  "short_name": "RDCAD Express",
+  "description": "Advanced parametric detailing and Bar Bending Schedule tools for structural engineers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    {
+      "src": "/icon512_maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon512_rounded.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

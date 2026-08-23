@@ -1,0 +1,44 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@rdcad-express/core-math": "workspace:*",
+    "@rdcad-express/dwg-schemas": "workspace:*",
+    "@rdcad-express/dxf-exporter": "workspace:*",
+    "@serwist/next": "^9.5.12",
+    "dxf-viewer": "^1.0.48",
+    "jszip": "^3.10.1",
+    "konva": "^10.3.0",
+    "lucide-react": "^1.31.0",
+    "next": "15.2.1",
+    "next-themes": "^0.4.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-konva": "^19.2.5",
+    "serwist": "^9.5.12",
+    "three": "^0.185.1",
+    "xlsx": "^0.18.5",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/jszip": "^3.4.1",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/three": "^0.185.4",
+    "dxf-parser": "^1.1.2",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.12",
+    "typescript": "^5"
+  }
+}

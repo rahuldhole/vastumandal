@@ -1,0 +1,16 @@
+{
+  "name": "vastumandal",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"*\" run dev",
+    "build": "pnpm --filter \"*\" run build",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "dxf-parser": "^1.1.2"
+  }
+}

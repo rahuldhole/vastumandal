@@ -1,0 +1,21 @@
+{
+  "name": "@rdcad-express/dxf-exporter",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsc -w"
+  },
+  "devDependencies": {
+    "dxf-parser": "^1.1.2",
+    "typescript": "^5.0.0",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "@rdcad-express/dwg-schemas": "workspace:*",
+    "dxf-viewer": "^1.0.48",
+    "dxf-writer": "^1.18.4"
+  }
+}
