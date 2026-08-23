@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAppStore } from "@/store/useStore";
 import { useProjectImport } from "@/hooks/useProjectImport";
-import { Download, Upload, Check } from "lucide-react";
+import { Download, Upload, Check, FolderOpen, Save } from "lucide-react";
 import ExportModal from "./ExportModal";
 
 export default function WorkbenchHeader() {
@@ -19,10 +19,14 @@ export default function WorkbenchHeader() {
     isCalculating 
   } = useAppStore();
   
-  const [isExportModalOpen, setIsExportModalOpen] = React.useState(false);
-  const [activeMenu, setActiveMenu] = React.useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
   
+  // File System Access API handle
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [fileHandle, setFileHandle] = useState<any>(null);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { importFile } = useProjectImport();
 
   const handleImportClick = () => {
@@ -35,6 +39,7 @@ export default function WorkbenchHeader() {
       try {
         await importFile(file);
         setActiveMenu(null);
+        setFileHandle(null); // Clear handle as it's a new legacy import
       } catch (error) {
         console.error("Import failed:", error);
         alert("Failed to import file.");
@@ -43,6 +48,92 @@ export default function WorkbenchHeader() {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const handleOpenProject = async () => {
+    try {
+      if ('showOpenFilePicker' in window) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const [handle] = await (window as any).showOpenFilePicker({
+          types: [{
+            description: 'Vastumandal Project',
+            accept: { 'application/json': ['.vastu', '.json'] }
+          }],
+          multiple: false
+        });
+        const file = await handle.getFile();
+        await importFile(file);
+        setFileHandle(handle);
+        setActiveMenu(null);
+      } else {
+        // Fallback to legacy import
+        handleImportClick();
+        setActiveMenu(null);
+      }
+    } catch (error) {
+      // User cancelled or error occurred
+      console.error(error);
+    }
+  };
+
+  const handleSaveProject = async () => {
+    const state = useAppStore.getState();
+    const exportData = {
+      schemaVersion: "1.0.0",
+      meta: {
+        projectName: state.templateData?.projectName || 'Vastumandal',
+        createdAt: new Date().toISOString(),
+      },
+      state: {
+        ...state,
+        boqResult: null,
+        geometryResult: null,
+        isCalculating: false
+      }
+    };
+    
+    const jsonStr = JSON.stringify(exportData, null, 2);
+    const defaultFileName = `${(state.templateData?.projectName || 'Vastumandal').replace(/\s+/g, '_')}_Project.vastu`;
+
+    try {
+      if ('showSaveFilePicker' in window) {
+        let currentHandle = fileHandle;
+        if (!currentHandle) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          currentHandle = await (window as any).showSaveFilePicker({
+            suggestedName: defaultFileName,
+            types: [{
+              description: 'Vastumandal Project',
+              accept: { 'application/json': ['.vastu'] }
+            }]
+          });
+          setFileHandle(currentHandle);
+        }
+        
+        const writable = await currentHandle.createWritable();
+        await writable.write(jsonStr);
+        await writable.close();
+        alert('Project saved successfully!');
+      } else {
+        // Fallback to standard download link if File System Access API is not supported
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = defaultFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error("Save failed", err);
+      // Don't alert if user just cancelled the picker
+      if (err instanceof Error && err.name !== 'AbortError') {
+        alert('Failed to save file.');
+      }
+    }
+    setActiveMenu(null);
   };
 
   return (
@@ -74,6 +165,18 @@ export default function WorkbenchHeader() {
             </button>
             {activeMenu === 'File' && (
               <div className="absolute top-full left-0 mt-1 w-56 bg-card border border-border shadow-lg rounded-md py-1 z-50 flex flex-col">
+                <button 
+                  onClick={handleOpenProject}
+                  className="flex items-center gap-2 px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors"
+                >
+                  <FolderOpen className="w-4 h-4" /> Open Project...
+                </button>
+                <button 
+                  onClick={handleSaveProject}
+                  className="flex items-center gap-2 px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors"
+                >
+                  <Save className="w-4 h-4" /> Save Project
+                </button>
                 <button 
                   onClick={() => { handleImportClick(); setActiveMenu(null); }}
                   className="flex items-center gap-2 px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors"

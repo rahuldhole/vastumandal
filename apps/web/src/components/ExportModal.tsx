@@ -36,7 +36,6 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
   };
 
   const formats = [
-    { id: 'vastu', title: 'Save Project (.vastu)', desc: 'Full Vastumandal project state for backup and drag-and-drop restore.', icon: Database, color: 'text-emerald-500' },
     { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500' },
     { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500' },
     { id: 'lsp', title: 'AutoLISP Script (.lsp)', desc: 'Direct command-line automation script for AutoCAD.', icon: FileText, color: 'text-amber-500' },
