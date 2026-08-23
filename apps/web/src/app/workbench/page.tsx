@@ -1,70 +1,174 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 
 export default function WorkbenchPage() {
-  return (
-    <div className="flex h-screen bg-[#0c0d10] text-slate-300 font-sans overflow-hidden">
-      {/* LEFT PANEL */}
-      <div className="w-[18%] bg-[#14161b] border-r border-[#292d39] p-4 flex flex-col gap-4">
-        <h2 className="text-xs uppercase tracking-widest text-[#d4af37] font-bold mb-4 font-[Space Grotesk]">Plot Settings</h2>
-        <div className="text-sm space-y-4">
-          <div>
-            <div className="text-[10px] text-gray-500 uppercase mb-1">Orientation</div>
-            <div className="font-mono text-[#06b6d4]">North</div>
-          </div>
-          <div>
-            <div className="text-[10px] text-gray-500 uppercase mb-1">Room Tree</div>
-            <div className="text-xs text-slate-400 italic">No rooms added</div>
-          </div>
-          <div>
-            <div className="text-[10px] text-gray-500 uppercase mb-1">Vastu Constraints</div>
-            <div className="text-xs text-emerald-500">All rules passing</div>
-          </div>
-        </div>
-      </div>
+  const [showMandala, setShowMandala] = useState(false);
 
-      {/* CENTER VIEWPORT */}
-      <div className="flex-1 flex flex-col relative bg-[#0c0d10]">
-        <div className="h-12 border-b border-[#292d39] flex items-center px-4 justify-between bg-[#14161b]">
-          <span className="font-mono text-xs font-bold text-white">Project Title</span>
-          <span className="text-xs text-[#06b6d4] font-mono">Grid Snap: 100mm | Vastu Compliance Score: 94%</span>
-          <button className="text-xs bg-[#e65100] px-4 py-1.5 rounded text-white font-bold tracking-wider hover:bg-[#ff5722] transition-colors">Export (DXF/PDF)</button>
+  return (
+    <div className="flex flex-col h-screen bg-[#0c0d10] text-gray-200 font-sans overflow-hidden">
+      {/* Top Bar */}
+      <header className="flex items-center justify-between px-4 py-2 bg-[#14161b] border-b border-[#292d39]">
+        <div className="flex items-center space-x-4">
+          <h1 className="text-lg font-semibold tracking-wider text-gray-100 uppercase" style={{ fontFamily: 'Cinzel, Space Grotesk, sans-serif' }}>
+            VASTUMANDAL
+          </h1>
+          <span className="text-xs text-gray-400">Project: Villa Residence</span>
         </div>
         
-        <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-           {/* Mandala Grid Overlay */}
-           <div className="absolute inset-0 opacity-15" style={{ backgroundImage: 'radial-gradient(#d4af37 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-           <div className="absolute top-4 right-4 text-xs font-mono text-[#d4af37] bg-black/50 p-2 rounded border border-[#d4af37]/30">N ↑</div>
-           <div className="text-xl font-bold uppercase tracking-widest text-[#d4af37] border border-[#d4af37] p-8 rounded shadow-[0_0_15px_rgba(212,175,55,0.2)] bg-black/50 backdrop-blur-sm relative z-10 flex flex-col items-center gap-2">
-              <span>8-Pada Yantra Grid</span>
-              <span className="text-xs font-normal opacity-70">Interactive SVG / Three.js Placeholder</span>
-           </div>
+        <div className="flex items-center space-x-6 text-sm font-mono">
+          <div className="flex items-center space-x-2">
+            <span className="text-gray-500">Grid Snap:</span>
+            <span className="text-cyan-400">100mm</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="text-gray-500">Vastu Score:</span>
+            <span className="text-amber-500">94%</span>
+          </div>
         </div>
 
-        {/* BOTTOM TRAY */}
-        <div className="h-32 border-t border-[#292d39] bg-[#1c1f26] p-4 font-mono text-xs overflow-y-auto">
-          <div className="text-gray-500 mb-2">Console / Validation Warnings / BBS Summary</div>
-          <div className="text-emerald-500">&gt; System initialized. Ready for CAD input.</div>
+        <div className="flex space-x-2">
+          <button className="px-3 py-1 text-xs bg-[#1c1f26] border border-[#292d39] rounded hover:bg-[#292d39] transition">
+            Export DXF
+          </button>
+          <button className="px-3 py-1 text-xs bg-[#1c1f26] border border-[#292d39] rounded hover:bg-[#292d39] transition">
+            Export PDF
+          </button>
         </div>
-      </div>
+      </header>
 
-      {/* RIGHT PANEL */}
-      <div className="w-[22%] bg-[#14161b] border-l border-[#292d39] p-4 flex flex-col gap-4">
-        <h2 className="text-xs uppercase tracking-widest text-[#d4af37] font-bold mb-4 font-[Space Grotesk]">Cost Ledger</h2>
-        <div className="space-y-4">
-          <div className="bg-[#1c1f26] p-4 rounded border border-[#292d39] hover:border-[#94a3b8]/50 transition-colors">
-            <div className="text-[10px] text-gray-500 uppercase mb-1">Concrete (M20)</div>
-            <div className="font-mono text-xl text-[#94a3b8] font-bold">28.4 m³</div>
+      {/* Main Workspace */}
+      <main className="flex flex-1 overflow-hidden">
+        
+        {/* Left Pane: Inspector & Constraints (18%) */}
+        <aside className="w-[18%] bg-[#14161b] border-r border-[#292d39] flex flex-col">
+          <div className="p-4 border-b border-[#292d39]">
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Plot Settings</h2>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Width</span>
+                <span className="font-mono text-gray-300">9000 mm</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Length</span>
+                <span className="font-mono text-gray-300">12000 mm</span>
+              </div>
+            </div>
           </div>
-          <div className="bg-[#1c1f26] p-4 rounded border border-[#292d39] hover:border-[#38bdf8]/50 transition-colors">
-            <div className="text-[10px] text-gray-500 uppercase mb-1">Fe500 Rebar</div>
-            <div className="font-mono text-xl text-[#38bdf8] font-bold">2,840 kg</div>
+          
+          <div className="p-4 flex-1 overflow-y-auto">
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Room Wishlist</h2>
+            <ul className="space-y-2">
+              <li className="p-2 bg-[#1c1f26] rounded border border-[#292d39] flex justify-between items-center cursor-pointer hover:border-[#d4af37] transition">
+                <span className="text-sm">Living Hub</span>
+                <span className="text-xs font-mono text-gray-500">24 m²</span>
+              </li>
+              <li className="p-2 bg-[#1c1f26] rounded border border-[#d4af37] text-[#d4af37] flex justify-between items-center cursor-pointer transition">
+                <span className="text-sm">Kitchen (SE)</span>
+                <span className="text-xs font-mono">12 m²</span>
+              </li>
+              <li className="p-2 bg-[#1c1f26] rounded border border-[#292d39] flex justify-between items-center cursor-pointer hover:border-[#d4af37] transition">
+                <span className="text-sm">Master Bed</span>
+                <span className="text-xs font-mono text-gray-500">16 m²</span>
+              </li>
+            </ul>
           </div>
-          <div className="bg-[#1c1f26] p-4 rounded border border-[#d4af37]/30 shadow-[0_0_10px_rgba(212,175,55,0.1)]">
-            <div className="text-[10px] text-[#d4af37] uppercase mb-1">Total Estimated Cost</div>
-            <div className="font-mono text-2xl text-[#d4af37] font-bold">₹14,20,000</div>
+        </aside>
+
+        {/* Center Viewport (60%) */}
+        <section className="flex-1 relative bg-[#0c0d10] flex flex-col">
+          {/* Viewport Toolbar */}
+          <div className="absolute top-4 right-4 z-10 flex space-x-2">
+            <button 
+              onClick={() => setShowMandala(!showMandala)}
+              className={`px-3 py-1.5 text-xs rounded border transition ${
+                showMandala 
+                ? 'bg-[rgba(212,175,55,0.15)] border-[#d4af37] text-[#d4af37]' 
+                : 'bg-[#1c1f26] border-[#292d39] text-gray-400 hover:border-gray-500'
+              }`}
+            >
+              Mandala Grid
+            </button>
+            <button className="px-3 py-1.5 text-xs rounded border bg-[#1c1f26] border-[#292d39] text-gray-400 hover:border-gray-500 transition">
+              2D / 3D
+            </button>
           </div>
-        </div>
-      </div>
+
+          {/* Canvas Placeholder */}
+          <div className="flex-1 flex items-center justify-center relative overflow-hidden" style={{
+            backgroundImage: 'radial-gradient(#292d39 1px, transparent 1px)',
+            backgroundSize: '20px 20px'
+          }}>
+            {showMandala && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
+                {/* Placeholder 9-Pada Grid */}
+                <div className="w-[400px] h-[400px] border-2 border-[#d4af37] grid grid-cols-3 grid-rows-3">
+                  <div className="border border-[#d4af37]/50 flex items-center justify-center text-xs font-mono text-[#d4af37]">Vayu</div>
+                  <div className="border border-[#d4af37]/50"></div>
+                  <div className="border border-[#d4af37]/50 flex items-center justify-center text-xs font-mono text-[#d4af37]">Ishanya</div>
+                  <div className="border border-[#d4af37]/50"></div>
+                  <div className="border border-[#d4af37] bg-[#d4af37]/10 flex items-center justify-center text-xs font-mono text-[#d4af37] tracking-widest uppercase">Brahmasthan</div>
+                  <div className="border border-[#d4af37]/50"></div>
+                  <div className="border border-[#d4af37]/50 flex items-center justify-center text-xs font-mono text-[#d4af37]">Nairuthi</div>
+                  <div className="border border-[#d4af37]/50"></div>
+                  <div className="border border-[#d4af37]/50 flex items-center justify-center text-xs font-mono text-[#e65100]">Agni</div>
+                </div>
+              </div>
+            )}
+            
+            <div className="text-[#292d39] text-2xl font-mono opacity-50 select-none">
+              SVG CANVAS ACTIVE
+            </div>
+          </div>
+
+          {/* Bottom Tray */}
+          <div className="h-48 bg-[#14161b] border-t border-[#292d39] p-4 font-mono text-xs overflow-y-auto">
+            <h3 className="text-gray-500 mb-2 uppercase tracking-wide">Validation Console</h3>
+            <div className="text-[#06b6d4] mb-1">» Graph Solver initialized.</div>
+            <div className="text-amber-500 mb-1">» Warning: Kitchen aspect ratio at 1:1.4.</div>
+            <div className="text-gray-400 mb-1">» Grid snapped to 100mm increments.</div>
+          </div>
+        </section>
+
+        {/* Right Pane: Ledger (22%) */}
+        <aside className="w-[22%] bg-[#14161b] border-l border-[#292d39] flex flex-col">
+          <div className="p-4 border-b border-[#292d39]">
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Live IS 456 Ledger</h2>
+            <p className="text-[10px] text-gray-500">Real-time material takeoff</p>
+          </div>
+          
+          <div className="p-4 space-y-4 flex-1 overflow-y-auto">
+            {/* Concrete */}
+            <div className="bg-[#1c1f26] border border-[#292d39] rounded p-3">
+              <div className="flex justify-between items-end mb-2">
+                <span className="text-sm font-semibold text-[#94a3b8]">Concrete (M20)</span>
+                <span className="text-lg font-mono text-gray-200">28.4 <span className="text-xs text-gray-500">m³</span></span>
+              </div>
+              <div className="w-full bg-[#0c0d10] h-1.5 rounded overflow-hidden">
+                <div className="bg-[#94a3b8] w-[65%] h-full"></div>
+              </div>
+            </div>
+
+            {/* Steel */}
+            <div className="bg-[#1c1f26] border border-[#292d39] rounded p-3">
+              <div className="flex justify-between items-end mb-2">
+                <span className="text-sm font-semibold text-[#38bdf8]">Fe500 Rebar</span>
+                <span className="text-lg font-mono text-gray-200">2,840 <span className="text-xs text-gray-500">kg</span></span>
+              </div>
+              <div className="w-full bg-[#0c0d10] h-1.5 rounded overflow-hidden">
+                <div className="bg-[#38bdf8] w-[45%] h-full"></div>
+              </div>
+            </div>
+
+            {/* Total Cost */}
+            <div className="mt-6 p-4 border border-[#d4af37]/30 bg-[#d4af37]/5 rounded">
+              <span className="block text-xs text-gray-500 uppercase tracking-widest mb-1">Estimated Cost</span>
+              <span className="block text-2xl font-mono text-[#d4af37]">₹ 14,20,000</span>
+            </div>
+          </div>
+        </aside>
+
+      </main>
     </div>
   );
 }
