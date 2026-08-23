@@ -159,8 +159,8 @@ export default function LiveBOQPanel() {
                     <td className="p-2 text-center text-primary"><BarShapeIcon shape={item.barShape} /></td>
                     <td className="p-2 text-center">{item.barDiameter}</td>
                     <td className="p-2 text-right font-mono">-</td>
-                    <td className="p-2 text-right font-mono">{item.numberOfBars}</td>
-                    <td className="p-2 text-right font-mono">{Number(item.totalWeight ?? 0).toFixed(2)}</td>
+                    <td className="p-2 text-right font-mono">{Number(item.numberOfBars || 0)}</td>
+                    <td className="p-2 text-right font-mono">{Number(item.totalWeight || 0).toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>

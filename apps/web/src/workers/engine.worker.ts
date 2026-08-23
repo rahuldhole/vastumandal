@@ -67,8 +67,8 @@ self.onmessage = async (event) => {
       [bpRight, bpRear],
       [bpLeft, bpRear],
     ];
-    const buildableW = bpRight - bpLeft;
-    const buildableH = bpRear - bpFront;
+    const buildableW = Math.max(0.1, bpRight - bpLeft);
+    const buildableH = Math.max(0.1, bpRear - bpFront);
     const groundFootprint = buildableW * buildableH;
 
     // Estimate floors from spatialProject if available

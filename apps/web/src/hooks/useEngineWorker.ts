@@ -48,9 +48,10 @@ export function useEngineWorker() {
       setIsCalculating(true);
       
       // Map PlotSpec → BylawParams shape expected by core-spatial
+      const w = plotSpec.width || 10;
+      const d = plotSpec.length || 15;
       const bylawParams = {
-        plotWidth: plotSpec.width,
-        plotDepth: plotSpec.length,
+        plotPolygon: [[0, 0], [w, 0], [w, d], [0, d]] as [number, number][],
         frontSetback: plotSpec.setbacks?.front ?? 0,
         rearSetback: plotSpec.setbacks?.rear ?? 0,
         sideSetbacks: [
