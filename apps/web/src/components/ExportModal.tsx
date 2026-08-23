@@ -1,78 +1,26 @@
-"use client";
+import React from 'react';
 
-import React from "react";
-import { Download, FileDown, X } from "lucide-react";
-
-interface ExportModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export default function ExportModal({ isOpen, onClose }: ExportModalProps) {
-  if (!isOpen) return null;
+export function ExportModal({ onClose }: { onClose: () => void }) {
+  const downloadFile = (format: string) => {
+    alert(`Downloading model in ${format.toUpperCase()} format...`);
+    // In actual implementation, this triggers Blob download
+  };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
-          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <Download className="w-5 h-5 text-primary" />
-            Export Project
-          </h2>
-          <button 
-            onClick={onClose}
-            className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full space-y-4">
+        <h2 className="text-xl font-bold">Export Project</h2>
+        <p className="text-sm text-gray-600">Select standard interoperability format for downstream processing:</p>
         
-        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto">
-          <p className="text-sm text-muted-foreground mb-4">
-            Select an export format for your current configuration.
-          </p>
-          
-          <div className="grid grid-cols-2 gap-3">
-            <button className="flex flex-col items-center justify-center p-3 sm:p-4 border border-border rounded-lg bg-card hover:bg-muted hover:border-blue-500 transition-all group">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
-                <Download className="w-5 h-5 text-blue-500" />
-              </div>
-              <span className="font-semibold text-foreground">.DXF</span>
-              <span className="text-xs text-muted-foreground mt-1">2D CAD Format</span>
-            </button>
-            
-            <button className="flex flex-col items-center justify-center p-3 sm:p-4 border border-border rounded-lg bg-card hover:bg-muted hover:border-indigo-500 transition-all group">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-500/10 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
-                <Download className="w-5 h-5 text-indigo-500" />
-              </div>
-              <span className="font-semibold text-foreground">.OBJ</span>
-              <span className="text-xs text-muted-foreground mt-1">3D Mesh Data</span>
-            </button>
-            
-            <button className="flex flex-col items-center justify-center p-3 sm:p-4 border border-border rounded-lg bg-card hover:bg-muted hover:border-emerald-500 transition-all group">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/10 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
-                <Download className="w-5 h-5 text-emerald-500" />
-              </div>
-              <span className="font-semibold text-foreground">.IFC</span>
-              <span className="text-xs text-muted-foreground mt-1">BIM Model</span>
-            </button>
-            
-            <button className="flex flex-col items-center justify-center p-3 sm:p-4 border border-border rounded-lg bg-card hover:bg-muted hover:border-rose-500 transition-all group">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-rose-500/10 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
-                <FileDown className="w-5 h-5 text-rose-500" />
-              </div>
-              <span className="font-semibold text-foreground">.PDF</span>
-              <span className="text-xs text-muted-foreground mt-1">Reports & BOQ</span>
-            </button>
+        <div className="flex flex-col space-y-2">
+          <button onClick={() => downloadFile('dxf')} className="bg-blue-100 text-blue-800 p-2 rounded hover:bg-blue-200">AutoCAD DXF (R12)</button>
+          <button onClick={() => downloadFile('ifc')} className="bg-blue-100 text-blue-800 p-2 rounded hover:bg-blue-200">IFC4 STEP (BIM)</button>
+          <button onClick={() => downloadFile('json')} className="bg-blue-100 text-blue-800 p-2 rounded hover:bg-blue-200">Vastumandal JSON</button>
+          <button onClick={() => downloadFile('csv')} className="bg-blue-100 text-blue-800 p-2 rounded hover:bg-blue-200">BOQ & BBS (CSV)</button>
+        </div>
 
-            <button className="flex flex-col items-center justify-center p-3 sm:p-4 border border-border rounded-lg bg-card hover:bg-muted hover:border-amber-500 transition-all group col-span-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-500/10 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
-                <Download className="w-5 h-5 text-amber-500" />
-              </div>
-              <span className="font-semibold text-foreground">.LSP</span>
-              <span className="text-xs text-muted-foreground mt-1">AutoLISP Script</span>
-            </button>
-          </div>
+        <div className="pt-4 border-t text-right">
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">Close</button>
         </div>
       </div>
     </div>
