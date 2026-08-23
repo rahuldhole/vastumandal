@@ -75,9 +75,13 @@ interface AppState {
  setLayers: (layers: Partial<{ zones: boolean; grid: boolean; dims: boolean; openings: boolean }>) => void;
 
  // Worker results
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
  boqResult: any | null;
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
  setBoqResult: (result: any) => void;
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
  geometryResult: any | null;
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
  setGeometryResult: (result: any) => void;
  isCalculating: boolean;
  setIsCalculating: (isCalc: boolean) => void;

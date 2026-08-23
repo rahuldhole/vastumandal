@@ -12,7 +12,7 @@ export default function Workbench() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setTimeout(() => setMounted(true), 0);
     const handleResize = () => {
       const isDesktop = window.innerWidth >= 1024;
       setLeftPanelOpen(isDesktop);

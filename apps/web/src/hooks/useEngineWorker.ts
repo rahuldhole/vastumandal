@@ -24,9 +24,9 @@ export function useEngineWorker() {
           
           setIsCalculating(false);
         };
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to initialize engine worker", err);
-        setError("Web Workers are not supported or failed to initialize.");
+        setTimeout(() => setError("Web Workers are not supported or failed to initialize."), 0);
       }
     }
 
@@ -37,6 +37,7 @@ export function useEngineWorker() {
     };
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const calculate = useCallback((plotSpec: PlotSpec, reqSpec: RequirementSpec, rates: any) => {
     if (workerRef.current) {
       setIsCalculating(true);

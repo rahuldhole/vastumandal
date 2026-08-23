@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Download, FileDown, X } from "lucide-react";
 
 interface ExportModalProps {

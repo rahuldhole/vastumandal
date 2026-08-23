@@ -9,6 +9,7 @@ export interface EngineWorkerRequest {
   payload: {
     plotSpec: PlotSpec;
     reqSpec: RequirementSpec;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rates: any;
   };
 }
@@ -18,7 +19,9 @@ export interface EngineWorkerResponse {
   id: string;
   type: 'RESULT' | 'ERROR';
   payload?: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     geometry: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     boq: any;
     dxfPayload: string;
   };
@@ -74,11 +77,11 @@ self.onmessage = async (event: MessageEvent<EngineWorkerRequest>) => {
       };
 
       self.postMessage(response);
-    } catch (error: any) {
+    } catch (error: unknown) {
       self.postMessage({
         id,
         type: 'ERROR',
-        error: error.message || 'Unknown error in worker'
+        error: error instanceof Error ? error.message : 'Unknown error in worker'
       } as EngineWorkerResponse);
     }
   }
