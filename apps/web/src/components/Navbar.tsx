@@ -37,7 +37,7 @@ export default function Navbar() {
             <Menu className="w-5 h-5" />
           </button>
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.jpg" alt="Vastumandal Logo" width={28} height={28} className="w-6 h-6 sm:w-7 sm:h-7 rounded-md" />
+            <Image src="/logo.jpg" alt="Vastumandal Logo" width={32} height={32} className="w-8 h-8 rounded-md" />
             <div className="font-bold text-lg text-primary hidden sm:flex items-center gap-2">
               <span className="hidden sm:inline">VastuMandal</span>
               <span className="hidden md:inline px-1.5 py-0.5 rounded text-[9px] font-bold bg-primary/20 text-primary border border-primary/30 uppercase tracking-wider">Studio</span>
