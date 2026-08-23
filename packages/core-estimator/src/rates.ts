@@ -5,28 +5,47 @@ export interface RateCard {
   steelPerKg: number; // in INR
   sandPerCft: number; // in INR
   aggregatePerCft: number; // in INR
+  labourConcretePerCum: number; // in INR
+  labourMasonryPerSqm: number; // in INR
 }
 
-export const Tier1Rates: RateCard = {
-  name: "Tier 1 City (e.g. Mumbai, Bangalore)",
-  region: "Tier 1",
-  cementPerBag: 450,
-  steelPerKg: 85,
-  sandPerCft: 80,
-  aggregatePerCft: 60
-};
-
-export const Tier2Rates: RateCard = {
-  name: "Tier 2 City (e.g. Pune, Jaipur)",
-  region: "Tier 2",
-  cementPerBag: 380,
+export const CPWD_DSR_2024: RateCard = {
+  name: "CPWD DSR 2024 (Base)",
+  region: "National",
+  cementPerBag: 400,
   steelPerKg: 75,
-  sandPerCft: 60,
-  aggregatePerCft: 45
+  sandPerCft: 65,
+  aggregatePerCft: 50,
+  labourConcretePerCum: 800,
+  labourMasonryPerSqm: 450
 };
 
-export function getRateCard(region: 'Tier1' | 'Tier2'): RateCard {
-  return region === 'Tier1' ? Tier1Rates : Tier2Rates;
+export const State_PWD_2023: RateCard = {
+  name: "State PWD DSR 2023",
+  region: "State",
+  cementPerBag: 380,
+  steelPerKg: 70,
+  sandPerCft: 60,
+  aggregatePerCft: 45,
+  labourConcretePerCum: 750,
+  labourMasonryPerSqm: 400
+};
+
+export const CustomLocalContractor: RateCard = {
+  name: "Custom Local Contractor",
+  region: "Local",
+  cementPerBag: 360,
+  steelPerKg: 65,
+  sandPerCft: 50,
+  aggregatePerCft: 40,
+  labourConcretePerCum: 600,
+  labourMasonryPerSqm: 350
+};
+
+export function getRateCard(profile: 'CPWD' | 'PWD' | 'Local'): RateCard {
+  if (profile === 'CPWD') return CPWD_DSR_2024;
+  if (profile === 'PWD') return State_PWD_2023;
+  return CustomLocalContractor;
 }
 
 export function calculateMaterialCost(rates: RateCard, cementBags: number, steelKg: number, sandCft: number, aggregateCft: number): number {

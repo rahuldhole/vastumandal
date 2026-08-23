@@ -1,117 +1,30 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { IfcViewerAPI } from 'web-ifc-viewer';
-import { X, Loader2 } from 'lucide-react';
-import { Color } from 'three';
+import React from 'react';
 
 interface IFCPreviewProps {
   isOpen: boolean;
   onClose: () => void;
-  ifcData: string | Uint8Array | null;
+  ifcData: string | null;
 }
 
 export function IFCPreview({ isOpen, onClose, ifcData }: IFCPreviewProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const viewerRef = useRef<IfcViewerAPI | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isOpen || !containerRef.current || !ifcData) return;
-
-    let blobUrl: string | null = null;
-    let isActive = true;
-
-    const initViewer = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Initialize viewer if it doesn't exist
-        if (!viewerRef.current && containerRef.current) {
-          const viewer = new IfcViewerAPI({
-            container: containerRef.current,
-            backgroundColor: new Color(0xffffff),
-          });
-
-          // Setup WASM path to public directory
-          await viewer.IFC.setWasmPath('/');
-          
-          viewer.axes.setAxes();
-          viewer.grid.setGrid();
-          viewerRef.current = viewer;
-        }
-
-        // Convert string or Uint8Array to Blob
-        const blob = new Blob([ifcData as BlobPart], { type: 'application/x-step' });
-        
-        blobUrl = URL.createObjectURL(blob);
-        
-        await viewerRef.current!.IFC.loadIfcUrl(blobUrl);
-
-        if (!isActive) return;
-        setLoading(false);
-
-      } catch (err) {
-        console.error('Error loading IFC model:', err);
-        if (isActive) {
-          setError(err instanceof Error ? err.message : 'Failed to load IFC model');
-          setLoading(false);
-        }
-      }
-    };
-
-    initViewer();
-
-    return () => {
-      isActive = false;
-      if (blobUrl) {
-        URL.revokeObjectURL(blobUrl);
-      }
-    };
-  }, [isOpen, ifcData]);
-
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative flex h-[90vh] w-[90vw] flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-neutral-900">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-neutral-200 p-4 dark:border-neutral-800">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">
-            IFC 3D Preview
-          </h3>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
-          >
-            <X className="h-5 w-5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-3/4 h-3/4 flex flex-col overflow-hidden">
+        <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">IFC Output Preview (Raw STEP)</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
-
-        {/* Viewer Container */}
-        <div className="relative flex-1 bg-neutral-100 dark:bg-neutral-800">
-          <div ref={containerRef} className="absolute inset-0" />
-          
-          {loading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm">
-              <Loader2 className="h-8 w-8 animate-spin text-primary-500 mb-4" />
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-300">
-                Loading IFC Model...
-              </p>
-            </div>
-          )}
-
-          {error && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-neutral-900">
-              <p className="text-red-500 font-medium mb-2">Error</p>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-md text-center">
-                {error}
-              </p>
-            </div>
-          )}
+        
+        <div className="flex-1 overflow-auto bg-gray-50 dark:bg-slate-900 p-4">
+          <pre className="text-sm font-mono text-gray-800 dark:text-gray-300 whitespace-pre-wrap">
+            {ifcData ? ifcData.slice(0, 5000) + (ifcData.length > 5000 ? '\n\n... (truncated for preview)' : '') : 'No data available'}
+          </pre>
         </div>
       </div>
     </div>

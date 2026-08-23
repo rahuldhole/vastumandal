@@ -40,12 +40,30 @@ export class ScriptWriter {
   }
 }
 
+/**
+ * Configure standard AutoCAD layers, ACI indexed colors, and text styles.
+ */
+export function configureStandardLayersAndStyles(dxf: any) {
+  // Architectural
+  dxf.addLayer('A-WALL', DXFWriter.ACI.WHITE, 'CONTINUOUS');
+  dxf.addLayer('A-DOOR', DXFWriter.ACI.CYAN, 'CONTINUOUS');
+  dxf.addLayer('A-GLAZ', DXFWriter.ACI.GREEN, 'CONTINUOUS');
+  dxf.addLayer('A-VASTU-GRID', DXFWriter.ACI.MAGENTA, 'DASHED');
+  dxf.addLayer('A-ANNO-TEXT', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  dxf.addLayer('A-ANNO-DIMS', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  
+  // Structural
+  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
+  dxf.addLayer('S-COLS', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
+  dxf.addLayer('S-REBAR-BBS', DXFWriter.ACI.RED, 'CONTINUOUS');
+
+  // Text Styles (Assuming dxf-writer supports adding styles or we define standard names)
+  // Most simple DXF generators just output TEXT entities, but standardizing layer assignment is key.
+}
 
 function drawBeamSection(dxf: any, data: BeamScheduleRow) {
-  
-
-  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
+  configureStandardLayersAndStyles(dxf);
 
   const w = data.width;
   const d = data.depth;
@@ -95,11 +113,7 @@ export function exportBeamSectionToScript(data: BeamScheduleRow): string {
 }
 
 function drawColumnSection(dxf: any, data: ColumnScheduleRow) {
-  
-  
-  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
-  dxf.addLayer('S-COL', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  configureStandardLayersAndStyles(dxf);
   
   // Begin Block Definition
   const blockName = `C1_${data.width || 400}x${data.depth || 400}`;
@@ -170,9 +184,7 @@ export function exportColumnSectionToScript(data: ColumnScheduleRow): string {
 }
 
 function drawTextNodes(dxf: any, nodes: { id: string, text: string, x: number, y: number }[]) {
-  
-  
-  dxf.addLayer('A-ANNO-TEXT', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  configureStandardLayersAndStyles(dxf);
   dxf.setActiveLayer('A-ANNO-TEXT');
   
   nodes.forEach(node => {
@@ -200,9 +212,7 @@ export function exportTextNodesToScript(nodes: { id: string, text: string, x: nu
 }
 
 function drawSlabSection(dxf: any, data: SlabScheduleRow) {
-  
-  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
+  configureStandardLayersAndStyles(dxf);
   
   dxf.setActiveLayer('S-CONC');
   dxf.drawLine(0, 0, data.lx, 0);
@@ -244,9 +254,7 @@ export function exportSlabSectionToScript(data: SlabScheduleRow): string {
 }
 
 function drawFoundationSection(dxf: any, data: FoundationScheduleRow) {
-  
-  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
+  configureStandardLayersAndStyles(dxf);
   
   dxf.setActiveLayer('S-CONC');
   dxf.drawLine(0, 0, data.lx, 0);
@@ -288,9 +296,7 @@ export function exportFoundationSectionToScript(data: FoundationScheduleRow): st
 }
 
 function drawTankSection(dxf: any, data: TankScheduleRow) {
-  
-  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
+  configureStandardLayersAndStyles(dxf);
   
   dxf.setActiveLayer('S-CONC');
   
@@ -395,9 +401,7 @@ export function exportTankSectionToScript(data: TankScheduleRow): string {
 }
 
 function drawStairsSection(dxf: any, data: StairsScheduleRow) {
-  
-  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
+  configureStandardLayersAndStyles(dxf);
   
   dxf.setActiveLayer('S-CONC');
   const tread = data.tread || 250;

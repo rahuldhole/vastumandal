@@ -1,6 +1,66 @@
 export type Point2D = [number, number];
 
 /**
+ * Parses a GeoJSON Feature representing a Polygon footprint.
+ */
+export function parseGeoJSONPolygon(geoJsonString: string): Point2D[] {
+  try {
+    const data = JSON.parse(geoJsonString);
+    let coordinates;
+    if (data.type === 'Feature' && data.geometry?.type === 'Polygon') {
+      coordinates = data.geometry.coordinates[0];
+    } else if (data.type === 'Polygon') {
+      coordinates = data.coordinates[0];
+    }
+    if (coordinates && Array.isArray(coordinates)) {
+      return coordinates.map((c: any) => [c[0], c[1]] as Point2D);
+    }
+  } catch (e) {
+    console.warn("Failed to parse GeoJSON polygon", e);
+  }
+  return [];
+}
+
+/**
+ * Parses a simple DXF file string to extract the largest CLOSED POLYLINE as the plot boundary.
+ */
+export function parseDXFPolygon(dxfString: string): Point2D[] {
+  // A naive regex-based extraction of lightweight polylines (LWPOLYLINE) from DXF.
+  // In a real implementation, a full DXF parser (e.g. dxf-parser) should be used.
+  const points: Point2D[] = [];
+  const lines = dxfString.split(/\r?\n/);
+  let inPolyline = false;
+  let currentX: number | null = null;
+  let currentY: number | null = null;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const code = lines[i].trim();
+    const value = lines[i+1]?.trim();
+    
+    if (code === '0' && value === 'LWPOLYLINE') {
+      inPolyline = true;
+      i++; continue;
+    }
+    if (inPolyline && code === '0' && value !== 'LWPOLYLINE' && value !== 'VERTEX') {
+      inPolyline = false;
+      break; // Found the first polyline, break for simplicity
+    }
+    if (inPolyline) {
+      if (code === '10') currentX = parseFloat(value);
+      if (code === '20') currentY = parseFloat(value);
+      
+      if (currentX !== null && currentY !== null) {
+        points.push([currentX, currentY]);
+        currentX = null;
+        currentY = null;
+      }
+    }
+    i++; // skip value line
+  }
+  return points;
+}
+
+/**
  * Calculates the area of an arbitrary 2D polygon using the Shoelace formula.
  * The vertices should be in order (either clockwise or counter-clockwise).
  */

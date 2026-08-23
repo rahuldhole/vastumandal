@@ -15,6 +15,62 @@ export function getHookAllowance(dia: number, angle: 90 | 135 | 180 = 135): numb
   return 8 * dia;
 }
 
+export function getBendDeduction(dia: number, angle: 45 | 90 | 135 | 180): number {
+  if (angle === 45) return 1 * dia;
+  if (angle === 90) return 2 * dia;
+  if (angle === 135) return 3 * dia;
+  return 4 * dia;
+}
+
+export interface CuttingStockResult {
+  totalBarsNeeded: number;
+  scrapGenerated: number; // meters
+  cuttingPatterns: {
+    stockLength: number;
+    cuts: number[];
+    scrap: number;
+  }[];
+}
+
+export function optimizeCuttingStock(cutLengths: number[], stockLength: number = 12): CuttingStockResult {
+  // Simple greedy algorithm (First Fit Decreasing)
+  const sortedCuts = [...cutLengths].sort((a, b) => b - a);
+  const patterns: { stockLength: number; cuts: number[]; scrap: number }[] = [];
+  
+  for (const cut of sortedCuts) {
+    if (cut > stockLength) {
+      patterns.push({ stockLength: cut, cuts: [cut], scrap: 0 });
+      continue;
+    }
+    
+    let placed = false;
+    for (const pattern of patterns) {
+      if (pattern.scrap >= cut) {
+        pattern.cuts.push(cut);
+        pattern.scrap -= cut;
+        placed = true;
+        break;
+      }
+    }
+    
+    if (!placed) {
+      patterns.push({
+        stockLength,
+        cuts: [cut],
+        scrap: stockLength - cut
+      });
+    }
+  }
+  
+  const scrapGenerated = patterns.reduce((sum, p) => sum + p.scrap, 0);
+  
+  return {
+    totalBarsNeeded: patterns.length,
+    scrapGenerated,
+    cuttingPatterns: patterns
+  };
+}
+
 export function generateBeamBBS(
   beamId: string,
   clearSpan: number, // mm
@@ -34,7 +90,7 @@ export function generateBeamBBS(
   // L_d (Development length) required into the support
   const Ld = getDevelopmentLength(bottomDia);
   const endAnchorage = Math.min(Ld, 200 + getHookAllowance(bottomDia, 90)); // simplified anchorage
-  const bottomCutLen = clearSpan + 2 * endAnchorage - 2 * (2 * bottomDia); // 90 deg deduction = 2d per bend
+  const bottomCutLen = clearSpan + 2 * endAnchorage - 2 * getBendDeduction(bottomDia, 90);
   items.push({
     id: `${beamId}-bottom`,
     memberRef: beamId,
@@ -51,7 +107,7 @@ export function generateBeamBBS(
   // Top Anchor Bars
   const topLd = getDevelopmentLength(topDia);
   const topEndAnchorage = Math.min(topLd, 200 + getHookAllowance(topDia, 90));
-  const topCutLen = clearSpan + 2 * topEndAnchorage - 2 * (2 * topDia);
+  const topCutLen = clearSpan + 2 * topEndAnchorage - 2 * getBendDeduction(topDia, 90);
   items.push({
     id: `${beamId}-top`,
     memberRef: beamId,
@@ -84,9 +140,7 @@ export function generateBeamBBS(
   const stirrupA = width - 2 * cover;
   const stirrupB = depth - 2 * cover;
   const hookLen = getHookAllowance(stirrupDia, 135); // standard ductile detailing hook
-  // 135 deg bend deduction = 3d
-  // A standard stirrup has 3 90-deg bends and 2 135-deg bends
-  const stirrupCutLen = 2 * (stirrupA + stirrupB) + 2 * hookLen - 3 * (2 * stirrupDia) - 2 * (3 * stirrupDia);
+  const stirrupCutLen = 2 * (stirrupA + stirrupB) + 2 * hookLen - 3 * getBendDeduction(stirrupDia, 90) - 2 * getBendDeduction(stirrupDia, 135);
   const stirrupCount = Math.floor(clearSpan / stirrupSpacing) + 1;
   items.push({
     id: `${beamId}-stirrups`,
@@ -138,7 +192,7 @@ export function generateColumnBBS(
   const tieA = width - 2 * cover;
   const tieB = depth - 2 * cover;
   const hookLen = getHookAllowance(tieDia, 135);
-  const tieCutLen = 2 * (tieA + tieB) + 2 * hookLen - 3 * (2 * tieDia) - 2 * (3 * tieDia);
+  const tieCutLen = 2 * (tieA + tieB) + 2 * hookLen - 3 * getBendDeduction(tieDia, 90) - 2 * getBendDeduction(tieDia, 135);
   const tieCount = Math.floor(height / tieSpacing) + 1;
   items.push({
     id: `${colId}-ties`,
@@ -170,7 +224,7 @@ export function generateFootingBBS(
 
   // X direction bars
   const lenX = length - 2 * cover;
-  const cutLenX = lenX + 2 * verticalReturn - 2 * (2 * barDia); // two 90-deg bends
+  const cutLenX = lenX + 2 * verticalReturn - 2 * getBendDeduction(barDia, 90); // two 90-deg bends
   const numBarsX = Math.floor(width / spacing) + 1;
   items.push({
     id: `${footingId}-x`,
@@ -187,7 +241,7 @@ export function generateFootingBBS(
 
   // Y direction bars
   const lenY = width - 2 * cover;
-  const cutLenY = lenY + 2 * verticalReturn - 2 * (2 * barDia);
+  const cutLenY = lenY + 2 * verticalReturn - 2 * getBendDeduction(barDia, 90);
   const numBarsY = Math.floor(length / spacing) + 1;
   items.push({
     id: `${footingId}-y`,

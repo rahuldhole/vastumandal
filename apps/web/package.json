@@ -21,6 +21,7 @@
     "@vastumandal/mesh-exporter": "workspace:*",
     "@vastumandal/pdf-exporter": "workspace:*",
     "dxf-viewer": "^1.0.48",
+    "idb-keyval": "^6.3.0",
     "jszip": "^3.10.1",
     "konva": "^10.3.0",
     "lucide-react": "^1.31.0",
@@ -31,8 +32,6 @@
     "react-konva": "^19.2.5",
     "serwist": "^9.5.12",
     "three": "^0.185.1",
-    "web-ifc": "^0.0.77",
-    "web-ifc-viewer": "^1.0.218",
     "xlsx": "^0.18.5",
     "zundo": "^2.3.0",
     "zustand": "^5.0.15"

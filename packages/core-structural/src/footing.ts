@@ -96,7 +96,12 @@ function rectsOverlap(
   );
 }
 
-export function generateFootingLayout(columns: Column[], sbc: number = 200, assumedLoadPerFloorKN: number = 500): Footing[] {
+export function generateFootingLayout(
+  columns: Column[], 
+  sbc: number = 200, 
+  assumedLoadPerFloorKN: number = 500,
+  plotBounds?: { minX: number; maxX: number; minY: number; maxY: number }
+): Footing[] {
   let footings: Footing[] = [];
 
   // Generate initial isolated footings
@@ -105,14 +110,38 @@ export function generateFootingLayout(columns: Column[], sbc: number = 200, assu
     const load = assumedLoadPerFloorKN * 3; 
     const design = sizeFooting(load, col.width, col.depth, sbc);
     
+    let cx = col.center.x;
+    let cy = col.center.y;
+    let isEccentric = false;
+
+    // Boundary edge check
+    if (plotBounds) {
+      if (cx - design.width / 2 < plotBounds.minX) {
+        cx = plotBounds.minX + design.width / 2;
+        isEccentric = true;
+      }
+      if (cx + design.width / 2 > plotBounds.maxX) {
+        cx = plotBounds.maxX - design.width / 2;
+        isEccentric = true;
+      }
+      if (cy - design.length / 2 < plotBounds.minY) {
+        cy = plotBounds.minY + design.length / 2;
+        isEccentric = true;
+      }
+      if (cy + design.length / 2 > plotBounds.maxY) {
+        cy = plotBounds.maxY - design.length / 2;
+        isEccentric = true;
+      }
+    }
+
     footings.push({
       id: `footing-${col.id}`,
       columnId: col.id,
-      center: { x: col.center.x, y: col.center.y },
+      center: { x: cx, y: cy },
       length: design.length,
       width: design.width,
       depth: design.depth,
-      type: 'ISOLATED'
+      type: isEccentric ? 'ECCENTRIC' : 'ISOLATED'
     });
   });
 

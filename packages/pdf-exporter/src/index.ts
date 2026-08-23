@@ -39,7 +39,7 @@ export async function exportToPdf(floorPlan: FloorPlan, columns: Column[], boq: 
   
   let currentY = 700;
   for (const col of columns.slice(0, 10)) { // limit for demo
-    centerlinePage.drawText(`C${col.id} - W:${col.width} D:${col.depth} at (${col.center.x.toFixed(1)}, ${col.center.y.toFixed(1)})`, {
+    centerlinePage.drawText(`C${col.id} - W:${col.width} D:${col.depth} at (${(col.x || 0).toFixed(1)}, ${(col.y || 0).toFixed(1)})`, {
       x: 50, y: currentY, size: 12, font: timesRomanFont
     });
     currentY -= 15;

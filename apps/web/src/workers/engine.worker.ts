@@ -175,6 +175,48 @@ self.onmessage = async (event) => {
 
     const boq = generateBOQ(quantities, bbsReport, rateCard as RateCard);
 
+    // Generate Geometry Buffers (Transferable Objects) for 3D Viewport
+    // We will pack [x, y, z, sx, sy, sz, typeId] for each element
+    // typeId: 1 = footing, 2 = column, 3 = slab
+    const numElements = numColumns * 2 + 1; // footings + columns + 1 slab
+    const geomBuffer = new Float32Array(numElements * 7);
+    let offset = 0;
+
+    // Slab
+    geomBuffer[offset++] = (bpLeft + bpRight) / 2 * 1000;
+    geomBuffer[offset++] = 150 / 2; // half depth
+    geomBuffer[offset++] = (bpFront + bpRear) / 2 * 1000;
+    geomBuffer[offset++] = buildableW * 1000;
+    geomBuffer[offset++] = 150;
+    geomBuffer[offset++] = buildableH * 1000;
+    geomBuffer[offset++] = 3;
+
+    // Footings & Columns
+    for (let i = 0; i < colsX; i++) {
+      for (let j = 0; j < colsY; j++) {
+        const cx = bpLeft * 1000 + i * spanX;
+        const cy = bpFront * 1000 + j * spanY;
+
+        // Footing
+        geomBuffer[offset++] = cx;
+        geomBuffer[offset++] = -footingDesign.depth / 2;
+        geomBuffer[offset++] = cy;
+        geomBuffer[offset++] = footingDesign.width;
+        geomBuffer[offset++] = footingDesign.depth;
+        geomBuffer[offset++] = footingDesign.length;
+        geomBuffer[offset++] = 1;
+
+        // Column
+        geomBuffer[offset++] = cx;
+        geomBuffer[offset++] = floorHeight * floors / 2;
+        geomBuffer[offset++] = cy;
+        geomBuffer[offset++] = colW;
+        geomBuffer[offset++] = floorHeight * floors;
+        geomBuffer[offset++] = colD;
+        geomBuffer[offset++] = 2;
+      }
+    }
+
     self.postMessage({
       type: 'PIPELINE_RESULT',
       payload: {
@@ -182,8 +224,9 @@ self.onmessage = async (event) => {
         bylawResult,
         footingDesign,
         bbsReport,
-        boq
+        boq,
+        geometryBuffer: geomBuffer.buffer
       }
-    });
+    }, { transfer: [geomBuffer.buffer] });
   }
 };

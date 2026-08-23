@@ -74,7 +74,14 @@ export interface FloorPlan {
 }
 
 export interface BOQReport {
-  // Add as needed
+  lineItems?: {
+    category?: string;
+    itemCode?: string;
+    description?: string;
+    quantity: number;
+    unit?: string;
+    unitRate?: number;
+  }[];
 }
 
 export interface BeamScheduleRow {

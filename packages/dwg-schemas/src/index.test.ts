@@ -27,7 +27,7 @@ describe('DWG Schemas Validation', () => {
     it('should throw on negative bylaw parameters where not allowed', () => {
       const invalidBylaws = {
         ...G_PLUS_1_RESIDENTIAL.bylaws,
-        plotWidth: -5, // Invalid
+        frontSetback: -5, // Invalid
       };
       
       const result = BylawParamsSchema.safeParse(invalidBylaws);

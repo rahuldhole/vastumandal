@@ -7,7 +7,7 @@ describe("ifc-exporter tests", () => {
     expect(ifcString).toContain("ISO-10303-21;");
     expect(ifcString).toContain("HEADER;");
     expect(ifcString).toContain("FILE_DESCRIPTION");
-    expect(ifcString).toContain("FILE_SCHEMA(('IFC2X3'))");
+    expect(ifcString).toContain("FILE_SCHEMA(('IFC4'))");
     expect(ifcString).toContain("DATA;");
     expect(ifcString).toContain("ENDSEC;");
     expect(ifcString).toContain("END-ISO-10303-21;");

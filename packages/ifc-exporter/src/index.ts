@@ -28,7 +28,7 @@ export function exportVastumandalIFC(data: any): string {
 HEADER;
 FILE_DESCRIPTION(('ViewDefinition [CoordinationView]'),'2;1');
 FILE_NAME('vastumandal_project.ifc','${timestamp}',('Vastumandal Engine'),('Architect'),'','Vastumandal Exporter','');
-FILE_SCHEMA(('IFC2X3'));
+FILE_SCHEMA(('IFC4'));
 ENDSEC;
 
 DATA;
@@ -130,8 +130,18 @@ DATA;
 #607=IFCOPENINGELEMENT('${ifcGuid('opening')}',#5,'Door Opening','Door',$,#606,#605,$);
 #608=IFCRELVOIDSELEMENT('${ifcGuid('void')}',#5,'WallDoorVoid','Subtraction',#207,#607);
 
+/* Reinforcing Bar -> IfcReinforcingBar */
+#700=IFCCARTESIANPOINT((115.,225.,0.));
+#701=IFCAXIS2PLACEMENT3D(#700,$,$);
+#702=IFCCIRCLEPROFILEDEF(.AREA.,'RebarProfile',#51,8.);
+#703=IFCEXTRUDEDAREASOLID(#702,#701,#52,3000.);
+#704=IFCSHAPEREPRESENTATION(#12,'Body','SweptSolid',(#703));
+#705=IFCPRODUCTDEFINITIONSHAPE($,$,(#704));
+#706=IFCLOCALPLACEMENT(#40,#9);
+#707=IFCREINFORCINGBAR('${ifcGuid('rebar')}',#5,'MainRebar','T16',$,#706,#705,'C1',$,.MAIN.,$,$,$);
+
 /* Spatial containment */
-#900=IFCRELCONTAINEDINSPATIALSTRUCTURE('${ifcGuid('containment')}',#5,'StoreyElements','Contains',(#107,#207,#307,#407,#507),#41);
+#900=IFCRELCONTAINEDINSPATIALSTRUCTURE('${ifcGuid('containment')}',#5,'StoreyElements','Contains',(#107,#207,#307,#407,#507,#707),#41);
 
 ENDSEC;
 END-ISO-10303-21;`;

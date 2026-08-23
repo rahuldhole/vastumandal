@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, StateStorage, createJSONStorage } from 'zustand/middleware';
 import { temporal } from 'zundo';
+import { get, set, del } from 'idb-keyval';
 import type { 
  BeamScheduleRow, 
  TankScheduleRow, 
@@ -12,6 +13,19 @@ import type {
  PlotSpec,
  RequirementSpec
 } from '@vastumandal/dwg-schemas';
+
+// Custom IndexedDB storage adapter for Zustand
+const idbStorage: StateStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    return (await get(name)) || null;
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    await set(name, value);
+  },
+  removeItem: async (name: string): Promise<void> => {
+    await del(name);
+  },
+};
 
 type TextNode = {
  id: string;
@@ -92,6 +106,10 @@ interface AppState {
  setLeftPanelOpen: (isOpen: boolean) => void;
  rightPanelOpen: boolean;
  setRightPanelOpen: (isOpen: boolean) => void;
+ 
+ // Selected Element State for linking 2D CAD and 3D Viewport
+ selectedElementId: string | null;
+ setSelectedElementId: (id: string | null) => void;
  
   // State restoration
   restoreState: (state: Partial<AppState>) => void;
@@ -202,6 +220,7 @@ const initialState = {
   isCalculating: false,
   leftPanelOpen: false,
   rightPanelOpen: false,
+  selectedElementId: null,
 };
 
 export const useAppStore = create<AppState>()(
@@ -241,17 +260,20 @@ export const useAppStore = create<AppState>()(
         setLeftPanelOpen: (isOpen) => set({ leftPanelOpen: isOpen }),
         setRightPanelOpen: (isOpen) => set({ rightPanelOpen: isOpen }),
         
+        setSelectedElementId: (id) => set({ selectedElementId: id }),
+        
         restoreState: (newState) => set((state) => ({ ...state, ...newState })),
         resetProject: () => set({ ...initialState, boqResult: null, geometryResult: null }),
       }),
       {
         name: 'vastumandal-storage',
+        storage: createJSONStorage(() => idbStorage),
       }
     ),
     {
       partialize: (state) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { activeTab, leftPanelOpen, rightPanelOpen, isCalculating, boqResult, geometryResult, ...domainState } = state;
+        const { activeTab, leftPanelOpen, rightPanelOpen, isCalculating, boqResult, geometryResult, selectedElementId, ...domainState } = state;
         return domainState;
       }
     }

@@ -45,7 +45,7 @@ export interface Footing {
   length: number;
   width: number;
   depth: number;
-  type: 'ISOLATED' | 'COMBINED';
+  type: 'ISOLATED' | 'COMBINED' | 'ECCENTRIC';
 }
 
 export interface StructuralFraming {
