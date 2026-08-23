@@ -75,6 +75,7 @@ export function useEngineWorker() {
             formwork: 450, // ₹/sqm typical
             masonry: (rates.brick || 7) * 500 + 1500, // bricks-per-cum * rate + labour
             excavation: 350, // ₹/cum typical
+            columnSize: rates.columnSize || '230x380',
           }
         }
       };

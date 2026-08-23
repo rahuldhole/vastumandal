@@ -8,9 +8,9 @@ const copyToCSV = () => {
 };
 
 const BarShapeIcon = ({ shape }: { shape: string }) => {
-  if (shape === 'Straight') return <svg width="40" height="20" viewBox="0 0 40 20"><path d="M5 10 L35 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>;
-  if (shape === 'L-Bent') return <svg width="40" height="20" viewBox="0 0 40 20"><path d="M5 5 L5 15 L35 15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
-  if (shape === 'Stirrup') return <svg width="40" height="20" viewBox="0 0 40 20"><rect x="10" y="2" width="20" height="16" fill="none" stroke="currentColor" strokeWidth="2" rx="2" /></svg>;
+  if (shape === 'STRAIGHT' || shape === 'Straight') return <svg width="40" height="20" viewBox="0 0 40 20"><path d="M5 10 L35 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>;
+  if (shape === 'L_BENT' || shape === 'L-Bent') return <svg width="40" height="20" viewBox="0 0 40 20"><path d="M5 5 L5 15 L35 15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  if (shape === 'RECT_STIRRUP' || shape === 'Stirrup') return <svg width="40" height="20" viewBox="0 0 40 20"><rect x="10" y="2" width="20" height="16" fill="none" stroke="currentColor" strokeWidth="2" rx="2" /></svg>;
   return <span className="text-xs">{shape}</span>;
 };
 
