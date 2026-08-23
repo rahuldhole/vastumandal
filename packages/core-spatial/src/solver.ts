@@ -1,4 +1,4 @@
-import { PlotSpec, RequirementSpec, FloorPlan, Room } from '@vastumandal/dwg-schemas';
+import { PlotSpec, RequirementSpec, FloorPlan, ArchRoom } from '@vastumandal/dwg-schemas';
 
 // Simple mock implementation for the benchmark.
 // A real spatial constraint solver would be much more complex.
@@ -6,7 +6,7 @@ export function generateFloorPlan(plot: PlotSpec, req: RequirementSpec): FloorPl
   const buildableWidth = plot.width - (plot.setbacks.left + plot.setbacks.right);
   const buildableLength = plot.length - (plot.setbacks.front + plot.setbacks.rear);
 
-  const rooms: Room[] = [];
+  const rooms: ArchRoom[] = [];
   
   // Just create a dummy living room for now to satisfy types
   rooms.push({

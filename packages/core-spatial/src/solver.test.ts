@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateFloorPlan } from './solver';
-import { PlotSpec, RequirementSpec } from '@vastumandal/dwg-schemas';
+import { PlotSpec, RequirementSpec, ArchRoom } from '@vastumandal/dwg-schemas';
 
 describe('Spatial Solver', () => {
   it('generates a floor plan for a 30x40 ft plot', () => {

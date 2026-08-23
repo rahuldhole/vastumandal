@@ -33,7 +33,7 @@ self.onmessage = async (event: MessageEvent<EngineWorkerRequest>) => {
 
   if (type === 'CALCULATE') {
     try {
-      const { plotSpec, reqSpec, rates } = payload;
+      const { plotSpec, reqSpec: _reqSpec, rates: _rates } = payload;
       
       // Simulate heavy processing / solver calculation
       // Here we would call packages/core-spatial, core-structural, etc.

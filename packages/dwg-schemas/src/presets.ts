@@ -47,3 +47,8 @@ export const G_PLUS_2_APARTMENT: { bylaws: BylawParams; soil: SoilCondition; rat
     excavation: 250,
   },
 };
+
+export const PLOT_PRESETS: Record<string, any> = {
+  'G+1 Residential': G_PLUS_1_RESIDENTIAL,
+  'G+2 Apartment': G_PLUS_2_APARTMENT
+};
