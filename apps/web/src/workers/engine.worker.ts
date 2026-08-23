@@ -1,88 +1,82 @@
-/// <reference lib="webworker" />
+import { validateBylaws } from '@vastumandal/core-spatial/src/bylaws';
+import { sizeFooting } from '@vastumandal/core-structural/src/footing';
+import { generateFootingBBS, compileBBSReport } from '@vastumandal/core-structural/src/bbs';
+import { generateBOQ } from '@vastumandal/core-estimator/src/boq';
+import type { BylawParams } from '@vastumandal/dwg-schemas/src/spatial';
+import type { SoilCondition } from '@vastumandal/dwg-schemas/src/structural';
+import type { RateCard } from '@vastumandal/dwg-schemas/src/estimator';
 
-import type { PlotSpec, RequirementSpec } from '@vastumandal/dwg-schemas';
+self.onmessage = async (event) => {
+  const { type, payload } = event.data;
 
-// Define the incoming message type
-export interface EngineWorkerRequest {
-  id: string;
-  type: 'CALCULATE';
-  payload: {
-    plotSpec: PlotSpec;
-    reqSpec: RequirementSpec;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rates: any;
-  };
-}
-
-// Define the outgoing message type
-export interface EngineWorkerResponse {
-  id: string;
-  type: 'RESULT' | 'ERROR';
-  payload?: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    geometry: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    boq: any;
-    dxfPayload: string;
-  };
-  error?: string;
-}
-
-self.onmessage = async (event: MessageEvent<EngineWorkerRequest>) => {
-  const { id, type, payload } = event.data;
-
-  if (type === 'CALCULATE') {
-    try {
-      const { plotSpec, reqSpec: _reqSpec, rates: _rates } = payload;
-      
-      // Simulate heavy processing / solver calculation
-      // Here we would call packages/core-spatial, core-structural, etc.
-      
-      const plotArea = plotSpec.width * plotSpec.length;
-      const bua = plotArea * 0.7; // 70% coverage mock
-      const carpetArea = bua * 0.85;
-      const totalCost = bua * 1500; // 1500 per sqft mock
-      
-      const materials = {
-        steel: (bua * 4).toFixed(1),
-        cement: (bua * 0.4).toFixed(0),
-        sand: (bua * 1.8).toFixed(0),
-        aggregate: (bua * 1.35).toFixed(0),
-        bricks: (bua * 8.5).toFixed(0),
-      };
-
-      const boq = {
-        plotArea,
-        bua,
-        carpetArea,
-        totalCost,
-        materials,
-      };
-
-      // Mock geometry / spatial layout results
-      const geometry = {
-        width: plotSpec.width,
-        length: plotSpec.length,
-        setbacks: plotSpec.setbacks,
-      };
-
-      const response: EngineWorkerResponse = {
-        id,
-        type: 'RESULT',
-        payload: {
-          geometry,
-          boq,
-          dxfPayload: 'MOCK_DXF_STRING' // In a real scenario, output of dxf-exporter
-        }
-      };
-
-      self.postMessage(response);
-    } catch (error: unknown) {
-      self.postMessage({
-        id,
-        type: 'ERROR',
-        error: error instanceof Error ? error.message : 'Unknown error in worker'
-      } as EngineWorkerResponse);
+  if (type === 'RUN_PIPELINE') {
+    const { spatialProject, bylawParams, soilCondition, rateCard } = payload;
+    
+    // Boundary Checks
+    const diagnostics: any[] = [];
+    
+    if (soilCondition.safeBearingCapacity < 80) {
+      diagnostics.push({
+        level: 'WARNING',
+        message: 'Low soil bearing capacity detected. Shallow isolated pad footings are unsafe. Export geometry to SAFE/PLAXIS for deep pile/raft foundation design.',
+        code: 'SBC_LOW'
+      });
     }
+
+    // Mock span check for master demo
+    const maxSpanDetected = 8.0; // from spatialProject hypothetically
+    if (maxSpanDetected > 7.5) {
+      diagnostics.push({
+        level: 'WARNING',
+        message: 'Large span detected requiring post-tensioned or dynamic deflection verification. Export to ETABS/STAAD.Pro.',
+        code: 'SPAN_LARGE'
+      });
+    }
+    
+    const storeys = 6; // from spatialProject hypothetically
+    if (storeys > 5) {
+      diagnostics.push({
+        level: 'WARNING',
+        message: 'High-rise structure requires dynamic seismic response spectrum and wind tunnel FEA. Export to ETABS.',
+        code: 'HIGH_RISE'
+      });
+    }
+
+    // 1. Spatial & Bylaw
+    const bylawResult = validateBylaws(
+      bylawParams as BylawParams,
+      [[0,0], [10,0], [10,15], [0,15]], // mock polygon
+      250, // mock total built up
+      150  // mock ground footprint
+    );
+
+    diagnostics.push(...bylawResult.diagnostics);
+
+    // 2. Structural & BBS
+    const footingDesign = sizeFooting(1500, 230, 450, soilCondition.safeBearingCapacity);
+    const footingBBS = generateFootingBBS('F1', footingDesign.length, footingDesign.width, footingDesign.depth);
+    const bbsReport = compileBBSReport(footingBBS);
+
+    // 3. Estimator & BOQ
+    const mockQuantities = {
+      excavationVolume: 50,
+      concreteVolume: 35,
+      masonryVolume: 40,
+      plasterArea: 300,
+      formworkArea: 250
+    };
+    
+    const boq = generateBOQ(mockQuantities, bbsReport, rateCard as RateCard);
+
+    self.postMessage({
+      type: 'PIPELINE_RESULT',
+      payload: {
+        diagnostics,
+        bylawResult,
+        footingDesign,
+        bbsReport,
+        boq
+      }
+    });
   }
 };

@@ -1,152 +1,97 @@
-"use client";
+import React, { useState } from 'react';
+import type { BOQSummary } from '@vastumandal/dwg-schemas/src/estimator';
+import type { BBSReport } from '@vastumandal/dwg-schemas/src/bbs';
 
-import React from "react";
-import { useAppStore } from "@/store/useStore";
-import { PieChart, List, FileText } from "lucide-react";
+interface LiveBOQPanelProps {
+  boq: BOQSummary | null;
+  bbs: BBSReport | null;
+  diagnostics: any[];
+}
 
-export default function LiveBOQPanel() {
-  const { plotSpec, boqResult, isCalculating } = useAppStore();
-  
-  // Use worker calculations or fallback to defaults
-  const plotArea = boqResult?.plotArea || (plotSpec.width * plotSpec.length);
-  const bua = boqResult?.bua || (plotArea * 0.7); 
-  const carpetArea = boqResult?.carpetArea || (bua * 0.85);
-
-  const totalCost = boqResult?.totalCost || (bua * 1500); 
-  
-  const materials = boqResult?.materials || {
-    steel: (bua * 4).toFixed(1),
-    cement: (bua * 0.4).toFixed(0),
-    sand: (bua * 1.8).toFixed(0),
-    aggregate: (bua * 1.35).toFixed(0),
-    bricks: (bua * 8.5).toFixed(0),
-  };
-
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(val);
-  };
+export function LiveBOQPanel({ boq, bbs, diagnostics }: LiveBOQPanelProps) {
+  const [tab, setTab] = useState<'BOQ' | 'BBS' | 'SANCTION'>('BOQ');
 
   return (
-    <div className={`w-[320px] flex-shrink-0 bg-card border-l border-border h-full overflow-y-auto flex flex-col custom-scrollbar transition-opacity ${isCalculating ? 'opacity-50' : 'opacity-100'}`}>
-      <div className="p-4 font-semibold border-b border-border text-foreground sticky top-0 bg-card z-10 flex items-center gap-2">
-        <PieChart className="w-4 h-4 text-primary" />
-        Live Estimate & BOQ
+    <div className="flex flex-col h-full bg-white shadow rounded p-4">
+      <div className="flex space-x-4 border-b pb-2 mb-4">
+        <button className={`font-bold ${tab === 'BOQ' ? 'text-blue-600' : 'text-gray-500'}`} onClick={() => setTab('BOQ')}>Live BOQ</button>
+        <button className={`font-bold ${tab === 'BBS' ? 'text-blue-600' : 'text-gray-500'}`} onClick={() => setTab('BBS')}>BBS</button>
+        <button className={`font-bold ${tab === 'SANCTION' ? 'text-blue-600' : 'text-gray-500'}`} onClick={() => setTab('SANCTION')}>Sanction</button>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* Project Metrics */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-            <List className="w-3.5 h-3.5" /> Project Metrics
-          </h3>
-          <div className="bg-muted/20 border border-border rounded-lg p-3 space-y-2">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Plot Area:</span>
-              <span className="font-medium text-foreground">{plotArea} sq.ft</span>
-            </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Built-Up Area:</span>
-              <span className="font-medium text-emerald-500 dark:text-emerald-400">{bua.toFixed(0)} sq.ft</span>
-            </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Carpet Area:</span>
-              <span className="font-medium text-foreground">{carpetArea.toFixed(0)} sq.ft</span>
-            </div>
-            <div className="pt-2 mt-2 border-t border-border flex justify-between items-center">
-              <span className="text-sm font-medium">Est. Cost:</span>
-              <span className="text-lg font-bold text-primary">{formatCurrency(totalCost)}</span>
-            </div>
-          </div>
-        </div>
+      <div className="flex-1 overflow-auto">
+        {tab === 'BOQ' && boq && (
+          <table className="w-full text-sm text-left">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="p-2">Item</th>
+                <th className="p-2">Qty</th>
+                <th className="p-2">Unit</th>
+                <th className="p-2">Rate</th>
+                <th className="p-2">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {boq.lineItems.map(item => (
+                <tr key={item.itemCode} className="border-b">
+                  <td className="p-2">{item.description}</td>
+                  <td className="p-2">{item.quantity.toFixed(2)}</td>
+                  <td className="p-2">{item.unit}</td>
+                  <td className="p-2">{item.unitRate.toFixed(2)}</td>
+                  <td className="p-2">{item.totalAmount.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colSpan={4} className="p-2 font-bold text-right">Subtotal</td>
+                <td className="p-2 font-bold">{boq.subTotal.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td colSpan={4} className="p-2 font-bold text-right">Grand Total (+3%)</td>
+                <td className="p-2 font-bold text-green-600">{boq.grandTotal.toFixed(2)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        )}
 
-        {/* Material Takeoff */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-            <FileText className="w-3.5 h-3.5" /> Material Takeoff
-          </h3>
-          <div className="bg-muted/20 border border-border rounded-lg p-3">
-            <table className="w-full text-sm">
+        {tab === 'BBS' && bbs && (
+          <div>
+            <h3 className="font-bold text-lg mb-2">Total Steel: {bbs.totalTonnage.toFixed(2)} MT</h3>
+            <table className="w-full text-sm text-left">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="p-2">Mark</th>
+                  <th className="p-2">Shape</th>
+                  <th className="p-2">Dia (mm)</th>
+                  <th className="p-2">Count</th>
+                  <th className="p-2">Weight (kg)</th>
+                </tr>
+              </thead>
               <tbody>
-                <tr className="border-b border-border/50 last:border-0">
-                  <td className="py-2 text-muted-foreground">Steel</td>
-                  <td className="py-2 text-right font-medium">{materials.steel} kg</td>
-                </tr>
-                <tr className="border-b border-border/50 last:border-0">
-                  <td className="py-2 text-muted-foreground">Cement</td>
-                  <td className="py-2 text-right font-medium">{materials.cement} bags</td>
-                </tr>
-                <tr className="border-b border-border/50 last:border-0">
-                  <td className="py-2 text-muted-foreground">Sand</td>
-                  <td className="py-2 text-right font-medium">{materials.sand} cft</td>
-                </tr>
-                <tr className="border-b border-border/50 last:border-0">
-                  <td className="py-2 text-muted-foreground">Aggregate</td>
-                  <td className="py-2 text-right font-medium">{materials.aggregate} cft</td>
-                </tr>
-                <tr className="border-b border-border/50 last:border-0">
-                  <td className="py-2 text-muted-foreground">Bricks</td>
-                  <td className="py-2 text-right font-medium">{materials.bricks} pcs</td>
-                </tr>
+                {bbs.items.map(item => (
+                  <tr key={item.id} className="border-b">
+                    <td className="p-2">{item.barMark}</td>
+                    <td className="p-2">{item.barShape}</td>
+                    <td className="p-2">{item.barDiameter}</td>
+                    <td className="p-2">{item.numberOfBars}</td>
+                    <td className="p-2">{item.totalWeight.toFixed(2)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
-        </div>
+        )}
 
-        {/* Phase Breakdown */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Phase Breakdown</h3>
-          <div className="space-y-3 bg-muted/20 border border-border rounded-lg p-3">
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span>Substructure (15%)</span>
-                <span>{formatCurrency(totalCost * 0.15)}</span>
+        {tab === 'SANCTION' && (
+          <div className="space-y-2">
+            {diagnostics.map((d, i) => (
+              <div key={i} className={`p-3 rounded border ${d.level === 'ERROR' ? 'bg-red-50 border-red-200 text-red-800' : d.level === 'WARNING' ? 'bg-yellow-50 border-yellow-200 text-yellow-800' : 'bg-blue-50 border-blue-200 text-blue-800'}`}>
+                <strong>[{d.code}]</strong> {d.message}
               </div>
-              <div className="w-full bg-muted rounded-full h-1.5">
-                <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '15%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span>RCC Framing (25%)</span>
-                <span>{formatCurrency(totalCost * 0.25)}</span>
-              </div>
-              <div className="w-full bg-muted rounded-full h-1.5">
-                <div className="bg-indigo-500 h-1.5 rounded-full" style={{ width: '25%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span>Masonry (20%)</span>
-                <span>{formatCurrency(totalCost * 0.20)}</span>
-              </div>
-              <div className="w-full bg-muted rounded-full h-1.5">
-                <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: '20%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span>Plumbing & Elec (25%)</span>
-                <span>{formatCurrency(totalCost * 0.25)}</span>
-              </div>
-              <div className="w-full bg-muted rounded-full h-1.5">
-                <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: '25%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span>Finishing (15%)</span>
-                <span>{formatCurrency(totalCost * 0.15)}</span>
-              </div>
-              <div className="w-full bg-muted rounded-full h-1.5">
-                <div className="bg-rose-500 h-1.5 rounded-full" style={{ width: '15%' }}></div>
-              </div>
-            </div>
+            ))}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
