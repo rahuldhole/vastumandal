@@ -87,7 +87,7 @@ export default function ControlPanel() {
                 <div>
                   <label className="block text-xs font-medium mb-1 text-muted-foreground">Ground Coverage</label>
                   <div className="relative">
-                    <input type="number" value={50} className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
+                    <input type="number" value={50} readOnly className="w-full p-2 pr-6 border border-border rounded bg-background focus:ring-1 focus:ring-primary outline-none" />
                     <span className="absolute right-2 top-1.5 text-muted-foreground text-xs font-medium">%</span>
                   </div>
                 </div>
