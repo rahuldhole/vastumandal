@@ -4,12 +4,10 @@ import { useAppStore } from '../store/useStore';
 import { exportVastumandalDXF, exportVastumandalScript } from '@vastumandal/dxf-exporter';
 import { exportVastumandalIFC } from '@vastumandal/ifc-exporter';
 import { IFCPreview } from './IFCPreview';
-import DxfInspector from './DxfInspector';
 
 export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showIfcPreview, setShowIfcPreview] = useState(false);
-  const [showDxfInspector, setShowDxfInspector] = useState(false);
   const [previewData, setPreviewData] = useState<string | null>(null);
   
   if (!isOpen) return null;
@@ -127,18 +125,12 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
         setPreviewData(content);
         setShowIfcPreview(true);
       }
-    } else if (format === 'dxf') {
-      const content = getExportData(format);
-      if (content) {
-        setPreviewData(content);
-        setShowDxfInspector(true);
-      }
     }
   };
 
   const formats = [
     { id: 'pdf', title: 'PDF Sheet Set (.pdf)', desc: 'Direct-to-print vector architectural plans and structural schedules.', icon: FileText, color: 'text-red-500', canCopy: false },
-    { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500', canCopy: true, canPreview: true },
+    { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500', canCopy: true },
     { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500', canCopy: true, canPreview: true },
     { id: 'lsp', title: 'AutoLISP Script (.lsp)', desc: 'Direct command-line automation script for AutoCAD.', icon: FileText, color: 'text-amber-500', canCopy: true },
     { id: 'vastu', title: 'Vastumandal Project (.vastu)', desc: 'Native project format containing all specifications and parameters.', icon: FileCode, color: 'text-emerald-500', canCopy: false },
@@ -223,12 +215,6 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
         isOpen={showIfcPreview}
         onClose={() => setShowIfcPreview(false)}
         ifcData={previewData}
-      />
-      
-      <DxfInspector
-        isOpen={showDxfInspector}
-        onClose={() => setShowDxfInspector(false)}
-        dxfString={previewData}
       />
     </div>
   );
