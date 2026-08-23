@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import ControlPanel from "@/components/ControlPanel";
-import CADViewport from "@/components/CADViewport";
 import LiveBOQPanel from "@/components/LiveBOQPanel";
+import dynamic from "next/dynamic";
+
+const CADViewport = dynamic(() => import("@/components/CADViewport"), { ssr: false });
 import { X } from "lucide-react";
 import { useAppStore } from "@/store/useStore";
 
