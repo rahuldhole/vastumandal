@@ -56,11 +56,32 @@ self.onmessage = async (event) => {
     }
 
     // 1. Spatial & Bylaw
+    // Derive building footprint from the setback envelope (guaranteed compliant)
+    const bpLeft = bylawParams.sideSetbacks[0];
+    const bpRight = bylawParams.plotWidth - bylawParams.sideSetbacks[1];
+    const bpFront = bylawParams.frontSetback;
+    const bpRear = bylawParams.plotDepth - bylawParams.rearSetback;
+    const buildingPolygon: [number, number][] = [
+      [bpLeft, bpFront],
+      [bpRight, bpFront],
+      [bpRight, bpRear],
+      [bpLeft, bpRear],
+    ];
+    const buildableW = bpRight - bpLeft;
+    const buildableH = bpRear - bpFront;
+    const groundFootprint = buildableW * buildableH;
+
+    // Estimate floors from spatialProject if available
+    const floorStr = payload.spatialProject?.plotSpec?.floorCount || 'G';
+    const floorMatch = floorStr.match(/G\+(\d+)/i);
+    const floors = floorMatch ? 1 + parseInt(floorMatch[1], 10) : 1;
+    const totalBuiltUp = groundFootprint * floors;
+
     const bylawResult = validateBylaws(
       bylawParams as BylawParams,
-      [[0,0], [10,0], [10,15], [0,15]], // mock polygon
-      250, // mock total built up
-      150  // mock ground footprint
+      buildingPolygon,
+      totalBuiltUp,
+      groundFootprint
     );
 
     diagnostics.push(...bylawResult.diagnostics);
