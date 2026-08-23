@@ -48,11 +48,11 @@ export default function LiveBOQPanel() {
         </div>
         <div className="bg-background border border-border p-2 rounded-lg shadow-sm">
           <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-1"><Cuboid size={12} className="text-blue-500" /> Concrete</div>
-          <div className="font-bold text-sm text-foreground">{concreteVol.toFixed(1)} <span className="text-[10px] font-normal">m³</span></div>
+          <div className="font-bold text-sm text-foreground">{Number(concreteVol || 0).toFixed(1)} <span className="text-[10px] font-normal">m³</span></div>
         </div>
         <div className="bg-background border border-border p-2 rounded-lg shadow-sm">
           <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-1"><Layers size={12} className="text-orange-500" /> Steel</div>
-          <div className="font-bold text-sm text-foreground">{steelTonnage.toFixed(2)} <span className="text-[10px] font-normal">MT</span></div>
+          <div className="font-bold text-sm text-foreground">{Number(steelTonnage || 0).toFixed(2)} <span className="text-[10px] font-normal">MT</span></div>
         </div>
         <div className="bg-background border border-border p-2 rounded-lg shadow-sm">
           <div className="flex items-center justify-between gap-1 text-[10px] text-muted-foreground mb-1">
@@ -115,21 +115,21 @@ export default function LiveBOQPanel() {
                 {boq.lineItems.map((item: { itemCode: string; description: string; quantity: number; unit: string; unitRate: number; totalAmount: number }) => (
                   <tr key={item.itemCode} className="border-b border-border hover:bg-muted/20">
                     <td className="p-2">{item.description}</td>
-                    <td className="p-2 text-right font-mono">{item.quantity.toFixed(2)}</td>
+                    <td className="p-2 text-right font-mono">{Number(item.quantity ?? 0).toFixed(2)}</td>
                     <td className="p-2 text-muted-foreground">{item.unit}</td>
-                    <td className="p-2 text-right font-mono">{item.unitRate.toFixed(2)}</td>
-                    <td className="p-2 text-right font-mono">{item.totalAmount.toFixed(2)}</td>
+                    <td className="p-2 text-right font-mono">{Number(item.unitRate ?? 0).toFixed(2)}</td>
+                    <td className="p-2 text-right font-mono">{Number(item.totalAmount ?? 0).toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot className="bg-muted/30">
                 <tr>
                   <td colSpan={4} className="p-2 text-right text-muted-foreground">Contingency (3%)</td>
-                  <td className="p-2 text-right font-mono">{(boq.grandTotal - boq.subTotal).toFixed(2)}</td>
+                  <td className="p-2 text-right font-mono">{Number((boq.grandTotal || 0) - (boq.subTotal || 0)).toFixed(2)}</td>
                 </tr>
                 <tr>
                   <td colSpan={4} className="p-2 font-bold text-right text-foreground">Grand Total</td>
-                  <td className="p-2 font-bold text-right font-mono text-emerald-600 dark:text-emerald-400">{boq.grandTotal.toFixed(2)}</td>
+                  <td className="p-2 font-bold text-right font-mono text-emerald-600 dark:text-emerald-400">{Number(boq.grandTotal ?? 0).toFixed(2)}</td>
                 </tr>
               </tfoot>
             </table>
@@ -160,7 +160,7 @@ export default function LiveBOQPanel() {
                     <td className="p-2 text-center">{item.barDiameter}</td>
                     <td className="p-2 text-right font-mono">-</td>
                     <td className="p-2 text-right font-mono">{item.numberOfBars}</td>
-                    <td className="p-2 text-right font-mono">{item.totalWeight.toFixed(2)}</td>
+                    <td className="p-2 text-right font-mono">{Number(item.totalWeight ?? 0).toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>

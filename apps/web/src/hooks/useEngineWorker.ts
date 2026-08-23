@@ -47,14 +47,35 @@ export function useEngineWorker() {
     if (workerRef.current) {
       setIsCalculating(true);
       
+      // Map PlotSpec → BylawParams shape expected by core-spatial
+      const bylawParams = {
+        plotWidth: plotSpec.width,
+        plotDepth: plotSpec.length,
+        frontSetback: plotSpec.setbacks?.front ?? 0,
+        rearSetback: plotSpec.setbacks?.rear ?? 0,
+        sideSetbacks: [
+          plotSpec.setbacks?.left ?? 0,
+          plotSpec.setbacks?.right ?? 0,
+        ] as [number, number],
+        maxFsi: 1.5, // sensible default; make configurable later
+        roadWidth: plotSpec.roadWidth ?? 9,
+      };
+
       const request: EngineWorkerRequest = {
         id: crypto.randomUUID(),
         type: 'RUN_PIPELINE',
         payload: {
           spatialProject: { plotSpec, reqSpec },
-          bylawParams: plotSpec,
+          bylawParams,
           soilCondition: { safeBearingCapacity: 200 },
-          rateCard: rates
+          // Map UI-level material rates → RateCard shape expected by core-estimator
+          rateCard: {
+            concrete: (rates.cement || 380) + (rates.sand || 60) + (rates.aggregate || 55) + 3500, // cement+sand+aggregate+labour
+            steel: (rates.steel || 65) * 1000, // per-kg → per-MT
+            formwork: 450, // ₹/sqm typical
+            masonry: (rates.brick || 7) * 500 + 1500, // bricks-per-cum * rate + labour
+            excavation: 350, // ₹/cum typical
+          }
         }
       };
       
