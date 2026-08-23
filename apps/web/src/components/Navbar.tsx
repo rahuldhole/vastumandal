@@ -13,14 +13,14 @@ export default function Navbar() {
   const pathname = usePathname();
   const isWorkbench = pathname === '/workbench';
   
-  if (isWorkbench) {
-    return <WorkbenchHeader />;
-  }
-  
   // Marketing site Navbar state
   // We can still use these if needed on marketing pages, though right now mostly static.
   const { leftPanelOpen, setLeftPanelOpen, rightPanelOpen, setRightPanelOpen, activeTab, setActiveTab, isCalculating } = useAppStore();
   const [isExportModalOpen, setIsExportModalOpen] = React.useState(false);
+
+  if (isWorkbench) {
+    return <WorkbenchHeader />;
+  }
 
   return (
     <header className="bg-card border-b border-border h-14 flex items-center shrink-0 z-50">
