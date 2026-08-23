@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useStore } from "zustand";
@@ -32,6 +32,29 @@ export default function WorkbenchHeader() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [pendingTemplate, setPendingTemplate] = useState<typeof PRESETS[0] | null>(null);
+  
+  // Undo/Redo Hotkeys
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger hotkeys when typing in inputs/textareas
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          if (futureStates.length > 0) redo();
+        } else {
+          if (pastStates.length > 0) undo();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        if (futureStates.length > 0) redo();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo, pastStates.length, futureStates.length]);
   
   // File System Access API handle
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
