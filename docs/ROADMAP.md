@@ -12,7 +12,7 @@
 - [x] Interactive 2D SVG canvas preview with dynamic dimension annotations in `apps/web`[cite: 1].
 - [x] Three.js 3D isometric cutaway viewer with material textures[cite: 1].
 - [x] Instant PDF schedule generator (Floor plan + Openings schedule + Phase-wise BOQ).
-- [ ] Preset library for standard Indian residential plots ($20 \times 30$, $30 \times 40$, $30 \times 50$, $40 \times 60$).
+- [x] Preset library for standard Indian residential plots ($20 \times 30$, $30 \times 40$, $30 \times 50$, $40 \times 60$).
 
 ## Phase 3: Advanced BIM & Structural Hand-off
 - [ ] IFC (Industry Foundation Classes) file export for direct Autodesk Revit BIM compatibility.
