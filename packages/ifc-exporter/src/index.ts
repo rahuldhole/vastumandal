@@ -1,112 +1,139 @@
+// Base64 character set for IFC GlobalId (64 chars)
+const B64 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$';
+
+let _guidCounter = 0;
+
+function ifcGuid(seed: string): string {
+  // Generate a deterministic 22-char IFC GlobalId from a seed string
+  let hash = 0;
+  const input = seed + (_guidCounter++).toString();
+  for (let i = 0; i < input.length; i++) {
+    hash = ((hash << 5) - hash + input.charCodeAt(i)) | 0;
+  }
+  let result = '';
+  for (let i = 0; i < 22; i++) {
+    const idx = Math.abs((hash * (i + 1) * 31 + i * 17) % 64);
+    result += B64[idx];
+  }
+  return result;
+}
+
 export function exportVastumandalIFC(data: any): string {
-  // ISO-10303-21 STEP File format generator for IFC4
+  // ISO-10303-21 STEP File format generator for IFC2X3
+  _guidCounter = 0;
   const timestamp = new Date().toISOString();
-  
+  const unixTime = Math.floor(Date.now() / 1000);
+
   return `ISO-10303-21;
 HEADER;
-FILE_DESCRIPTION(('ViewDefinition [CoordinationView]'), '2;1');
-FILE_NAME('vastumandal_project.ifc', '${timestamp}', ('Vastumandal Engine'), ('Architect'), 'IFC4', 'Vastumandal Exporter', '');
-FILE_SCHEMA(('IFC4'));
+FILE_DESCRIPTION(('ViewDefinition [CoordinationView]'),'2;1');
+FILE_NAME('vastumandal_project.ifc','${timestamp}',('Vastumandal Engine'),('Architect'),'','Vastumandal Exporter','');
+FILE_SCHEMA(('IFC2X3'));
 ENDSEC;
 
 DATA;
-#1= IFCPROJECT('1234567890', #2, 'Vastumandal Project', 'Generated BIM Model', $, $, $, (#3), #4);
-#2= IFCOWNERHISTORY(#5, #6, $, .ADDED., $, $, $, ${Math.floor(Date.now() / 1000)});
-#3= IFCGEOMETRICREPRESENTATIONCONTEXT($, 'Model', 3, 1.0E-5, #7, #8);
-#4= IFCUNITASSIGNMENT((#9, #10));
-#5= IFCPERSONANDORGANIZATION(#11, #12, $);
-#6= IFCAPPLICATION(#12, '1.0', 'Vastumandal', 'VASTU');
-#7= IFCAXIS2PLACEMENT3D(#13, #14, #15);
-#8= IFCDIRECTION((0., 1., 0.));
-#9= IFCSIUNIT(*, .LENGTHUNIT., .MILLI., .METRE.);
-#10= IFCSIUNIT(*, .AREAUNIT., $, .SQUARE_METRE.);
-#11= IFCPERSON($, 'Engineer', $, $, $, $, $, $);
-#12= IFCORGANIZATION($, 'Vastumandal', 'Tech', $, $);
-#13= IFCCARTESIANPOINT((0., 0., 0.));
-#14= IFCDIRECTION((0., 0., 1.));
-#15= IFCDIRECTION((1., 0., 0.));
+#1=IFCPERSON($,'Engineer',$,$,$,$,$,$);
+#2=IFCORGANIZATION($,'Vastumandal','Vastumandal Tech',$,$);
+#3=IFCPERSONANDORGANIZATION(#1,#2,$);
+#4=IFCAPPLICATION(#2,'1.0','Vastumandal','VASTU');
+#5=IFCOWNERHISTORY(#3,#4,$,.NOCHANGE.,$,$,$,${unixTime});
+#6=IFCCARTESIANPOINT((0.,0.,0.));
+#7=IFCDIRECTION((0.,0.,1.));
+#8=IFCDIRECTION((1.,0.,0.));
+#9=IFCAXIS2PLACEMENT3D(#6,#7,#8);
+#10=IFCDIRECTION((0.,1.));
+#11=IFCGEOMETRICREPRESENTATIONCONTEXT($,'Model',3,1.0E-5,#9,$);
+#12=IFCGEOMETRICREPRESENTATIONSUBCONTEXT('Body','Model',*,*,*,*,#11,.MODEL_VIEW.,$);
+#13=IFCSIUNIT(*,.LENGTHUNIT.,.MILLI.,.METRE.);
+#14=IFCSIUNIT(*,.AREAUNIT.,$,.SQUARE_METRE.);
+#15=IFCSIUNIT(*,.VOLUMEUNIT.,$,.CUBIC_METRE.);
+#16=IFCSIUNIT(*,.PLANEANGLEUNIT.,$,.RADIAN.);
+#17=IFCUNITASSIGNMENT((#13,#14,#15,#16));
+#18=IFCPROJECT('${ifcGuid('project')}',#5,'Vastumandal Project','Generated BIM Model',$,$,$,(#11),#17);
 
 /* Spatial Hierarchy */
-#20= IFCSITE('site_123', #2, 'Site', 'Plot bounds', $, #21, $, $, .ELEMENT., (34, 0, 0), (118, 0, 0), 0., $, $);
-#21= IFCLOCALPLACEMENT($, #7);
-#22= IFCRELAGGREGATES('rel_1', #2, 'ProjectContainer', 'Site Aggregation', #1, (#20));
+#20=IFCLOCALPLACEMENT($,#9);
+#21=IFCSITE('${ifcGuid('site')}',#5,'Site','Plot bounds',$,#20,$,$,.ELEMENT.,(28,0,0),(77,0,0),0.,$,$);
+#22=IFCRELAGGREGATES('${ifcGuid('rel_proj_site')}',#5,'ProjectContainer','ProjectSiteLink',#18,(#21));
 
-#30= IFCBUILDING('bldg_123', #2, 'Building', 'Main Structure', $, #31, $, $, .ELEMENT., $, $, $);
-#31= IFCLOCALPLACEMENT(#21, #7);
-#32= IFCRELAGGREGATES('rel_2', #2, 'SiteContainer', 'Building Aggregation', #20, (#30));
+#30=IFCLOCALPLACEMENT(#20,#9);
+#31=IFCBUILDING('${ifcGuid('building')}',#5,'Building','Main Structure',$,#30,$,$,.ELEMENT.,$,$,$);
+#32=IFCRELAGGREGATES('${ifcGuid('rel_site_bldg')}',#5,'SiteContainer','SiteBuildingLink',#21,(#31));
 
-#40= IFCBUILDINGSTOREY('storey_0', #2, 'Ground Floor', 'G', $, #41, $, $, .ELEMENT., 0.);
-#41= IFCLOCALPLACEMENT(#31, #7);
-#42= IFCRELAGGREGATES('rel_3', #2, 'BuildingContainer', 'Storey Aggregation', #30, (#40));
+#40=IFCLOCALPLACEMENT(#30,#9);
+#41=IFCBUILDINGSTOREY('${ifcGuid('storey')}',#5,'Ground Floor','G',$,#40,$,$,.ELEMENT.,0.);
+#42=IFCRELAGGREGATES('${ifcGuid('rel_bldg_storey')}',#5,'BuildingContainer','BuildingStoreyLink',#31,(#41));
 
-/* Entities mapping simulation */
-/* Floor Slabs -> IfcSlab */
-#100= IFCSLAB('slab_1', #2, 'Ground Slab', 'Concrete', $, #101, #102, 'FLOOR');
-#101= IFCLOCALPLACEMENT(#41, #7);
-#102= IFCPRODUCTDEFINITIONSHAPE($, $, (#103));
-#103= IFCSHAPEREPRESENTATION(#3, 'Body', 'SweptSolid', (#104));
-#104= IFCEXTRUDEDAREASOLID(#105, #106, #107, 150.);
-#105= IFCRECTANGLEPROFILEDEF(.AREA., 'SlabProfile', #108, 5000., 4000.);
-#106= IFCAXIS2PLACEMENT3D(#109, $, $);
-#107= IFCDIRECTION((0., 0., 1.));
-#108= IFCAXIS2PLACEMENT2D(#110, $);
-#109= IFCCARTESIANPOINT((2500., 2000., 0.));
-#110= IFCCARTESIANPOINT((0., 0.));
+/* Shared geometry helpers */
+#50=IFCCARTESIANPOINT((0.,0.));
+#51=IFCAXIS2PLACEMENT2D(#50,#10);
+#52=IFCDIRECTION((0.,0.,1.));
+
+/* Floor Slab -> IfcSlab */
+#100=IFCCARTESIANPOINT((2500.,2000.,0.));
+#101=IFCAXIS2PLACEMENT3D(#100,$,$);
+#102=IFCRECTANGLEPROFILEDEF(.AREA.,'SlabProfile',#51,5000.,4000.);
+#103=IFCEXTRUDEDAREASOLID(#102,#101,#52,150.);
+#104=IFCSHAPEREPRESENTATION(#12,'Body','SweptSolid',(#103));
+#105=IFCPRODUCTDEFINITIONSHAPE($,$,(#104));
+#106=IFCLOCALPLACEMENT(#40,#9);
+#107=IFCSLAB('${ifcGuid('slab')}',#5,'Ground Slab','Concrete',$,#106,#105,$);
 
 /* Wall -> IfcWallStandardCase */
-#200= IFCWALLSTANDARDCASE('wall_1', #2, 'Outer Wall', 'Brick', $, #201, #202, '230MM_WALL');
-#201= IFCLOCALPLACEMENT(#41, #7);
-#202= IFCPRODUCTDEFINITIONSHAPE($, $, (#203));
-#203= IFCSHAPEREPRESENTATION(#3, 'Body', 'SweptSolid', (#204));
-#204= IFCEXTRUDEDAREASOLID(#205, #206, #107, 3000.);
-#205= IFCRECTANGLEPROFILEDEF(.AREA., 'WallProfile', #108, 230., 4000.);
-#206= IFCAXIS2PLACEMENT3D(#209, $, $);
-#209= IFCCARTESIANPOINT((115., 2000., 0.));
+#200=IFCCARTESIANPOINT((115.,2000.,0.));
+#201=IFCAXIS2PLACEMENT3D(#200,$,$);
+#202=IFCRECTANGLEPROFILEDEF(.AREA.,'WallProfile',#51,230.,4000.);
+#203=IFCEXTRUDEDAREASOLID(#202,#201,#52,3000.);
+#204=IFCSHAPEREPRESENTATION(#12,'Body','SweptSolid',(#203));
+#205=IFCPRODUCTDEFINITIONSHAPE($,$,(#204));
+#206=IFCLOCALPLACEMENT(#40,#9);
+#207=IFCWALLSTANDARDCASE('${ifcGuid('wall')}',#5,'Outer Wall','Brick',$,#206,#205,$);
 
 /* Column -> IfcColumn */
-#300= IFCCOLUMN('col_1', #2, 'C1', 'Concrete Column', $, #301, #302, $);
-#301= IFCLOCALPLACEMENT(#41, #7);
-#302= IFCPRODUCTDEFINITIONSHAPE($, $, (#303));
-#303= IFCSHAPEREPRESENTATION(#3, 'Body', 'SweptSolid', (#304));
-#304= IFCEXTRUDEDAREASOLID(#305, #306, #107, 3000.);
-#305= IFCRECTANGLEPROFILEDEF(.AREA., 'ColProfile', #108, 230., 450.);
-#306= IFCAXIS2PLACEMENT3D(#309, $, $);
-#309= IFCCARTESIANPOINT((115., 225., 0.));
+#300=IFCCARTESIANPOINT((115.,225.,0.));
+#301=IFCAXIS2PLACEMENT3D(#300,$,$);
+#302=IFCRECTANGLEPROFILEDEF(.AREA.,'ColProfile',#51,230.,450.);
+#303=IFCEXTRUDEDAREASOLID(#302,#301,#52,3000.);
+#304=IFCSHAPEREPRESENTATION(#12,'Body','SweptSolid',(#303));
+#305=IFCPRODUCTDEFINITIONSHAPE($,$,(#304));
+#306=IFCLOCALPLACEMENT(#40,#9);
+#307=IFCCOLUMN('${ifcGuid('col')}',#5,'C1','Concrete Column',$,#306,#305,$);
 
 /* Beam -> IfcBeam */
-#400= IFCBEAM('beam_1', #2, 'B1', 'Concrete Beam', $, #401, #402, $);
-#401= IFCLOCALPLACEMENT(#41, #7);
-#402= IFCPRODUCTDEFINITIONSHAPE($, $, (#403));
-#403= IFCSHAPEREPRESENTATION(#3, 'Body', 'SweptSolid', (#404));
-#404= IFCEXTRUDEDAREASOLID(#405, #406, #107, 4000.);
-#405= IFCRECTANGLEPROFILEDEF(.AREA., 'BeamProfile', #108, 230., 450.);
-#406= IFCAXIS2PLACEMENT3D(#409, $, $);
-#409= IFCCARTESIANPOINT((2000., 115., 3000.));
+#400=IFCCARTESIANPOINT((2000.,115.,3000.));
+#401=IFCAXIS2PLACEMENT3D(#400,$,$);
+#402=IFCRECTANGLEPROFILEDEF(.AREA.,'BeamProfile',#51,230.,450.);
+#403=IFCEXTRUDEDAREASOLID(#402,#401,#52,4000.);
+#404=IFCSHAPEREPRESENTATION(#12,'Body','SweptSolid',(#403));
+#405=IFCPRODUCTDEFINITIONSHAPE($,$,(#404));
+#406=IFCLOCALPLACEMENT(#40,#9);
+#407=IFCBEAM('${ifcGuid('beam')}',#5,'B1','Concrete Beam',$,#406,#405,$);
 
-/* Pad Footings -> IfcFooting */
-#500= IFCFOOTING('footing_1', #2, 'F1', 'Pad Footing', $, #501, #502, .PAD_FOOTING.);
-#501= IFCLOCALPLACEMENT(#41, #7);
-#502= IFCPRODUCTDEFINITIONSHAPE($, $, (#503));
-#503= IFCSHAPEREPRESENTATION(#3, 'Body', 'SweptSolid', (#504));
-#504= IFCEXTRUDEDAREASOLID(#505, #506, #107, 450.);
-#505= IFCRECTANGLEPROFILEDEF(.AREA., 'FootingProfile', #108, 1500., 1500.);
-#506= IFCAXIS2PLACEMENT3D(#509, $, $);
-#509= IFCCARTESIANPOINT((750., 750., -450.));
+/* Pad Footing -> IfcFooting */
+#500=IFCCARTESIANPOINT((750.,750.,-450.));
+#501=IFCAXIS2PLACEMENT3D(#500,$,$);
+#502=IFCRECTANGLEPROFILEDEF(.AREA.,'FootingProfile',#51,1500.,1500.);
+#503=IFCEXTRUDEDAREASOLID(#502,#501,#52,450.);
+#504=IFCSHAPEREPRESENTATION(#12,'Body','SweptSolid',(#503));
+#505=IFCPRODUCTDEFINITIONSHAPE($,$,(#504));
+#506=IFCLOCALPLACEMENT(#40,#9);
+#507=IFCFOOTING('${ifcGuid('footing')}',#5,'F1','Pad Footing',$,#506,#505,.PAD_FOOTING.);
 
-/* Openings -> IfcOpeningElement */
-#600= IFCOPENINGELEMENT('opening_1', #2, 'Door Opening', 'Door', $, #601, #602, $);
-#601= IFCLOCALPLACEMENT(#201, #7); /* Placed relative to wall */
-#602= IFCPRODUCTDEFINITIONSHAPE($, $, (#603));
-#603= IFCSHAPEREPRESENTATION(#3, 'Body', 'SweptSolid', (#604));
-#604= IFCEXTRUDEDAREASOLID(#605, #606, #107, 2100.);
-#605= IFCRECTANGLEPROFILEDEF(.AREA., 'OpeningProfile', #108, 230., 900.);
-#606= IFCAXIS2PLACEMENT3D(#609, $, $);
-#609= IFCCARTESIANPOINT((115., 1000., 0.));
-#610= IFCRELVOIDSELEMENT('void_1', #2, 'Wall_Door_Void', 'Subtraction', #200, #600);
+/* Opening -> IfcOpeningElement */
+#600=IFCCARTESIANPOINT((115.,1000.,0.));
+#601=IFCAXIS2PLACEMENT3D(#600,$,$);
+#602=IFCRECTANGLEPROFILEDEF(.AREA.,'OpeningProfile',#51,230.,900.);
+#603=IFCEXTRUDEDAREASOLID(#602,#601,#52,2100.);
+#604=IFCSHAPEREPRESENTATION(#12,'Body','SweptSolid',(#603));
+#605=IFCPRODUCTDEFINITIONSHAPE($,$,(#604));
+#606=IFCLOCALPLACEMENT(#206,#9);
+#607=IFCOPENINGELEMENT('${ifcGuid('opening')}',#5,'Door Opening','Door',$,#606,#605,$);
+#608=IFCRELVOIDSELEMENT('${ifcGuid('void')}',#5,'WallDoorVoid','Subtraction',#207,#607);
 
 /* Spatial containment */
-#900= IFCRELCONTAINEDINSPATIALSTRUCTURE('cont_1', #2, 'Storey Elements', 'Contains', (#100, #200, #300, #400, #500), #40);
+#900=IFCRELCONTAINEDINSPATIALSTRUCTURE('${ifcGuid('containment')}',#5,'StoreyElements','Contains',(#107,#207,#307,#407,#507),#41);
 
 ENDSEC;
 END-ISO-10303-21;`;
 }
+
