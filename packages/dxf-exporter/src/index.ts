@@ -1217,7 +1217,7 @@ function drawTemplate(dxf: any, data: TitleBlockRow) {
     A3: { w: 420, h: 297 }
   };
   
-  const dim = sizes[data.sheetSize] || sizes['A3'];
+  const dim = sizes[data.sheetSize as keyof typeof sizes] || sizes['A3'];
   const margin = 10;
   
   dxf.setActiveLayer('BORDER');
