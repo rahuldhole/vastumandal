@@ -181,9 +181,9 @@ export default function WorkbenchHeader() {
       const { exportToPdf } = await import('@vastumandal/pdf-exporter');
       const blob = await exportToPdf({
         floorPlan: state.geometryResult,
-        columns: [],
+        columns: state.geometryResult?.columns || [],
         boq: state.boqResult,
-        printSetup: state.printSetup,
+        printSetup: { ...state.printSetup, layoutTemplate: 'Dossier' },
         projectMetadata: state.projectMetadata
       });
       const url = URL.createObjectURL(blob);

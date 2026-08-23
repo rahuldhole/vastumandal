@@ -145,12 +145,51 @@ export async function exportToPdf(options: PDFExportOptions): Promise<Blob> {
     drawTitleBlock(page1, '01: ARCHITECTURAL PLAN & OPENINGS');
     page1.drawText('ARCHITECTURAL FLOOR PLAN', { x: 50, y: pageSize[1] - 80, size: 18, font: timesRomanBold });
     
-    // Engineering Line Weight Hierarchy: Thick for walls, thin for dims
-    page1.drawRectangle({ x: 50, y: pageSize[1] - 300, width: 250, height: 180, borderWidth: 3, borderColor: rgb(0, 0, 0) }); // Main walls
-    page1.drawLine({ start: { x: 50, y: pageSize[1] - 120 }, end: { x: 300, y: pageSize[1] - 120 }, thickness: 0.5, color: rgb(0.5, 0.5, 0.5) }); // Dims
-    
-    page1.drawText('Door/Window Schedule:', { x: 50, y: pageSize[1] - 350, size: 12, font: timesRomanBold });
-    page1.drawText('D1: 1.0m x 2.1m | D2: 0.9m x 2.1m | W1: 1.2m x 1.2m', { x: 50, y: pageSize[1] - 370, size: 10, font: timesRomanFont });
+    if (floorPlan) {
+      const plotW = floorPlan.plotW || 30;
+      const plotH = floorPlan.plotH || 40;
+      const drawW = pageSize[0] - 100;
+      const drawH = pageSize[1] - 300;
+      const scale = Math.min((drawW * 0.9) / plotW, (drawH * 0.9) / plotH);
+      const cx = 50 + drawW / 2;
+      const cy = 150 + drawH / 2;
+      
+      const mapX = (x: number) => cx + (x - plotW / 2) * scale;
+      const mapY = (y: number) => cy + (y - plotH / 2) * scale;
+      
+      // Plot boundary
+      page1.drawRectangle({
+        x: mapX(0), y: mapY(0),
+        width: plotW * scale, height: plotH * scale,
+        borderWidth: 1, borderColor: rgb(0.5, 0.5, 0.5), borderDashArray: [5, 5]
+      });
+
+      // Buildable boundary (exterior walls)
+      if (floorPlan.buildable) {
+        page1.drawRectangle({
+          x: mapX(floorPlan.buildable.x), y: mapY(floorPlan.buildable.y),
+          width: floorPlan.buildable.w * scale, height: floorPlan.buildable.h * scale,
+          borderWidth: 3, borderColor: rgb(0, 0, 0)
+        });
+      }
+
+      // Rooms
+      if (floorPlan.rooms && Array.isArray(floorPlan.rooms)) {
+        for (const r of floorPlan.rooms) {
+          page1.drawRectangle({
+            x: mapX(r.x), y: mapY(r.y),
+            width: r.w * scale, height: r.h * scale,
+            borderWidth: 1, borderColor: rgb(0.2, 0.2, 0.2)
+          });
+          const textW = timesRomanBold.widthOfTextAtSize(r.name, 9);
+          page1.drawText(r.name, {
+            x: mapX(r.x + r.w / 2) - textW / 2,
+            y: mapY(r.y + r.h / 2) - 3,
+            size: 9, font: timesRomanBold
+          });
+        }
+      }
+    }
   }
 
   // Sheet 2: Structural Column & Footing
@@ -159,11 +198,64 @@ export async function exportToPdf(options: PDFExportOptions): Promise<Blob> {
     drawTitleBlock(page2, '02: STRUCTURAL COLUMN & FOOTING LAYOUT');
     page2.drawText('CENTERLINE & COLUMN/FOOTING LAYOUT', { x: 50, y: pageSize[1] - 80, size: 18, font: timesRomanBold });
     
-    page2.drawRectangle({ x: 50, y: pageSize[1] - 300, width: 250, height: 180, borderWidth: 1, borderColor: rgb(0.5, 0.5, 0.5), borderDashArray: [5, 5] }); // Grid
-    page2.drawRectangle({ x: 100, y: pageSize[1] - 200, width: 20, height: 20, color: rgb(1, 0, 0), borderWidth: 2, borderColor: rgb(0, 0, 0) }); // Column
-    
-    page2.drawText('Footing Schedule:', { x: 50, y: pageSize[1] - 350, size: 12, font: timesRomanBold });
-    page2.drawText('F1: 1.2m x 1.2m x 0.45m | Rebar: T12 @ 150c/c', { x: 50, y: pageSize[1] - 370, size: 10, font: timesRomanFont });
+    if (floorPlan && columns && columns.length > 0) {
+      const plotW = floorPlan.plotW || 30;
+      const plotH = floorPlan.plotH || 40;
+      const drawW = pageSize[0] - 100;
+      const drawH = pageSize[1] - 300;
+      const scale = Math.min((drawW * 0.9) / plotW, (drawH * 0.9) / plotH);
+      const cx = 50 + drawW / 2;
+      const cy = 150 + drawH / 2;
+      
+      const mapX = (x: number) => cx + (x - plotW / 2) * scale;
+      const mapY = (y: number) => cy + (y - plotH / 2) * scale;
+      
+      // Grid lines
+      const uniqueX = Array.from(new Set(columns.map((c: any) => c.x))).sort((a: any, b: any) => a - b);
+      const uniqueY = Array.from(new Set(columns.map((c: any) => c.y))).sort((a: any, b: any) => a - b);
+      
+      const minX = Math.min(...(uniqueX as number[])) - 1;
+      const maxX = Math.max(...(uniqueX as number[])) + 1;
+      const minY = Math.min(...(uniqueY as number[])) - 1;
+      const maxY = Math.max(...(uniqueY as number[])) + 1;
+      
+      for (const x of uniqueX as number[]) {
+        page2.drawLine({
+          start: { x: mapX(x), y: mapY(minY) },
+          end: { x: mapX(x), y: mapY(maxY) },
+          thickness: 0.5, color: rgb(0.5, 0.5, 0.5), dashArray: [4, 4]
+        });
+      }
+      for (const y of uniqueY as number[]) {
+        page2.drawLine({
+          start: { x: mapX(minX), y: mapY(y) },
+          end: { x: mapX(maxX), y: mapY(y) },
+          thickness: 0.5, color: rgb(0.5, 0.5, 0.5), dashArray: [4, 4]
+        });
+      }
+
+      // Columns and footings
+      for (const c of columns) {
+        const sizeM = (c.size || 300) / 1000;
+        const footSize = 1.2; // 1.2m default
+        
+        // Footing
+        page2.drawRectangle({
+          x: mapX(c.x - footSize / 2), y: mapY(c.y - footSize / 2),
+          width: footSize * scale, height: footSize * scale,
+          borderWidth: 1, borderColor: rgb(0, 0.6, 0), borderDashArray: [2, 2]
+        });
+        
+        // Column
+        page2.drawRectangle({
+          x: mapX(c.x - sizeM / 2), y: mapY(c.y - sizeM / 2),
+          width: sizeM * scale, height: sizeM * scale,
+          color: rgb(0.8, 0, 0), borderWidth: 1, borderColor: rgb(0, 0, 0)
+        });
+      }
+    } else {
+       page2.drawText('No structural data available.', { x: 50, y: pageSize[1] - 300, size: 12, font: timesRomanFont });
+    }
   }
 
   // Sheet 3: BBS
