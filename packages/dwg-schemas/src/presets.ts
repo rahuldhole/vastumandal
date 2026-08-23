@@ -1,36 +1,49 @@
-import { PlotSpec } from './index';
+import { BylawParams, SoilCondition, RateCard } from './index';
 
-export const PLOT_PRESETS: Record<string, PlotSpec> = {
-  '20x30': {
-    width: 20,
-    length: 30,
-    facing: 'E',
-    setbacks: { front: 3, rear: 2, left: 1.5, right: 1.5 },
-    roadWidth: 20,
-    floorCount: 'G',
+export const G_PLUS_1_RESIDENTIAL: { bylaws: BylawParams; soil: SoilCondition; rates: RateCard } = {
+  bylaws: {
+    plotWidth: 9, // 30ft
+    plotDepth: 12, // 40ft
+    frontSetback: 1.5,
+    rearSetback: 1.0,
+    sideSetbacks: [1.0, 1.0],
+    maxFsi: 1.5,
+    roadWidth: 9, // 30ft road
   },
-  '30x40': {
-    width: 30,
-    length: 40,
-    facing: 'E',
-    setbacks: { front: 5, rear: 3, left: 3, right: 3 },
-    roadWidth: 30,
-    floorCount: 'G+1',
+  soil: {
+    safeBearingCapacity: 150, // kN/m2 (Medium soil typical)
+    soilType: 'MEDIUM',
+    waterTableDepth: 3.0,
   },
-  '30x50': {
-    width: 30,
-    length: 50,
-    facing: 'N',
-    setbacks: { front: 5, rear: 3, left: 3, right: 3 },
-    roadWidth: 30,
-    floorCount: 'G+1',
+  rates: {
+    concrete: 6000,
+    steel: 75,
+    formwork: 400,
+    masonry: 800,
+    excavation: 300,
   },
-  '40x60': {
-    width: 40,
-    length: 60,
-    facing: 'E',
-    setbacks: { front: 10, rear: 5, left: 5, right: 5 },
-    roadWidth: 40,
-    floorCount: 'G+1',
-  }
+};
+
+export const G_PLUS_2_APARTMENT: { bylaws: BylawParams; soil: SoilCondition; rates: RateCard } = {
+  bylaws: {
+    plotWidth: 12, // 40ft
+    plotDepth: 18, // 60ft
+    frontSetback: 2.0,
+    rearSetback: 1.5,
+    sideSetbacks: [1.2, 1.2],
+    maxFsi: 2.0,
+    roadWidth: 12, // 40ft road
+  },
+  soil: {
+    safeBearingCapacity: 200, // kN/m2 (Hard soil preferred for G+2)
+    soilType: 'HARD',
+    waterTableDepth: 4.5,
+  },
+  rates: {
+    concrete: 5800,
+    steel: 73,
+    formwork: 380,
+    masonry: 750,
+    excavation: 250,
+  },
 };
