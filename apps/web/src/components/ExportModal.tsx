@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { FileCode, Box, FileText, X, Archive, Copy, Check } from 'lucide-react';
+import { FileCode, Box, FileText, X, Archive, Copy, Check, Eye } from 'lucide-react';
 import { useAppStore } from '../store/useStore';
 import { exportTemplateToDXF, exportTemplateToScript } from '@vastumandal/dxf-exporter';
 import { exportVastumandalIFC } from '@vastumandal/ifc-exporter';
+import { IFCPreview } from './IFCPreview';
 
 export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showIfcPreview, setShowIfcPreview] = useState(false);
+  const [previewData, setPreviewData] = useState<string | null>(null);
   
   if (!isOpen) return null;
 
@@ -93,9 +96,20 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
     }
   };
 
+  const handlePreview = (e: React.MouseEvent, format: string) => {
+    e.stopPropagation();
+    if (format === 'ifc') {
+      const content = getExportData(format);
+      if (content) {
+        setPreviewData(content);
+        setShowIfcPreview(true);
+      }
+    }
+  };
+
   const formats = [
     { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500', canCopy: true },
-    { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500', canCopy: true },
+    { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500', canCopy: true, canPreview: true },
     { id: 'lsp', title: 'AutoLISP Script (.lsp)', desc: 'Direct command-line automation script for AutoCAD.', icon: FileText, color: 'text-amber-500', canCopy: true },
     { id: 'vastu', title: 'Vastumandal Project (.vastu)', desc: 'Native project format containing all specifications and parameters.', icon: FileCode, color: 'text-emerald-500', canCopy: false },
   ];
@@ -134,15 +148,26 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
                   </div>
                 </button>
                 
-                {fmt.canCopy && (
-                  <button 
-                    onClick={(e) => copyToClipboard(e, fmt.id)}
-                    className="absolute top-4 right-4 p-2 rounded-md bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-colors z-10 flex flex-col items-center justify-center"
-                    title={`Copy ${fmt.id.toUpperCase()} to clipboard`}
-                  >
-                    {copiedId === fmt.id ? <Check size={16} /> : <Copy size={16} />}
-                  </button>
-                )}
+                <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
+                  {(fmt as any).canPreview && (
+                    <button 
+                      onClick={(e) => handlePreview(e, fmt.id)}
+                      className="p-2 rounded-md bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-colors flex flex-col items-center justify-center"
+                      title={`Preview ${fmt.id.toUpperCase()}`}
+                    >
+                      <Eye size={16} />
+                    </button>
+                  )}
+                  {fmt.canCopy && (
+                    <button 
+                      onClick={(e) => copyToClipboard(e, fmt.id)}
+                      className="p-2 rounded-md bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-colors flex flex-col items-center justify-center"
+                      title={`Copy ${fmt.id.toUpperCase()} to clipboard`}
+                    >
+                      {copiedId === fmt.id ? <Check size={16} /> : <Copy size={16} />}
+                    </button>
+                  )}
+                </div>
               </div>
             )
           })}
@@ -163,6 +188,12 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
         </div>
 
       </div>
+
+      <IFCPreview 
+        isOpen={showIfcPreview}
+        onClose={() => setShowIfcPreview(false)}
+        ifcData={previewData}
+      />
     </div>
   );
 }
