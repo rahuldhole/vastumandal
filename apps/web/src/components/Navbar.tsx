@@ -4,8 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useAppStore } from "@/store/useStore";
-import { Download, Menu, FileText } from "lucide-react";
+
 import ExportModal from "./ExportModal";
 import WorkbenchHeader from "./WorkbenchHeader";
 
@@ -14,8 +13,7 @@ export default function Navbar() {
   const isWorkbench = pathname === '/workbench';
   
   // Marketing site Navbar state
-  // We can still use these if needed on marketing pages, though right now mostly static.
-  const { leftPanelOpen, setLeftPanelOpen, rightPanelOpen, setRightPanelOpen, activeTab, setActiveTab, isCalculating } = useAppStore();
+  // Marketing site Navbar state
   const [isExportModalOpen, setIsExportModalOpen] = React.useState(false);
 
   if (isWorkbench) {

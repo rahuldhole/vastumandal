@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Info, AlertTriangle, Settings2, Compass, Zap } from 'lucide-react';
+import { ChevronDown, ChevronUp, Info, AlertTriangle, Settings2, Compass } from 'lucide-react';
 import { useAppStore } from '@/store/useStore';
-import { PRESETS } from '@vastumandal/dwg-schemas/src/presets';
 
 type SectionType = 'A' | 'B' | 'C' | 'D' | null;
 
@@ -35,37 +34,7 @@ export default function ControlPanel() {
   const [concreteGrade, setConcreteGrade] = useState('M25');
   const [steelGrade, setSteelGrade] = useState('Fe500');
 
-  // Preset state
-  const [selectedPreset, setSelectedPreset] = useState<string>(PRESETS[1].label); // default: G+1 Residential
-  const activePreset = PRESETS.find(p => p.label === selectedPreset);
 
-  const handlePresetChange = (presetLabel: string) => {
-    const preset = PRESETS.find(p => p.label === presetLabel);
-    if (!preset) return;
-    setSelectedPreset(presetLabel);
-    // Hydrate store
-    setPlotSpec({
-      ...preset.plotSpec,
-      maxFsi: preset.bylaws.maxFsi,
-    });
-    setReqSpec(preset.reqSpec);
-    // Map preset RateCard to UI rates shape
-    setRates({
-      steel: Math.round(preset.rates.steel / 1000), // per-MT → per-kg
-      cement: Math.round(preset.rates.concrete * 0.3),
-      sand: Math.round(preset.rates.concrete * 0.05),
-      aggregate: Math.round(preset.rates.concrete * 0.04),
-      brick: Math.round(preset.rates.masonry / 500),
-      columnSize: '230x380',
-    });
-    // Update local accordion state
-    setSbc(preset.soil.safeBearingCapacity);
-    setFSetback(preset.plotSpec.setbacks.front);
-    setRSetback(preset.plotSpec.setbacks.rear);
-    const fc = preset.plotSpec.floorCount || 'G';
-    const m = fc.match(/G\+(\d+)/i);
-    setStoreys(m ? 1 + parseInt(m[1], 10) : 1);
-  };
 
   // Accordion State
   const [openSection, setOpenSection] = useState<SectionType>('B');
@@ -104,27 +73,6 @@ export default function ControlPanel() {
         <h2 className="font-bold text-lg text-foreground">Workbench Controls</h2>
       </div>
 
-      {/* ── Preset Selector ── */}
-      <div className="p-4 border-b border-border bg-gradient-to-b from-primary/5 to-transparent">
-        <label className="block text-xs font-semibold mb-1.5 text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-          <Zap size={12} className="text-primary" /> Quick Preset
-        </label>
-        <select
-          value={selectedPreset}
-          onChange={e => handlePresetChange(e.target.value)}
-          className="w-full p-2.5 border border-border rounded-lg bg-background focus:ring-2 focus:ring-primary/30 outline-none text-sm font-medium text-foreground transition"
-        >
-          {PRESETS.map(p => (
-            <option key={p.label} value={p.label}>{p.label}</option>
-          ))}
-        </select>
-        {activePreset && (
-          <div className="mt-2 text-[11px] text-muted-foreground bg-muted/40 px-2.5 py-1.5 rounded-md flex items-center gap-1.5">
-            <Info size={12} className="shrink-0 text-primary/70" />
-            {activePreset.description}
-          </div>
-        )}
-      </div>
 
       <div className="flex-1 overflow-auto">
         

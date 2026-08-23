@@ -1,12 +1,13 @@
-"use client";
-
 import React, { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useStore } from "zustand";
 import { useAppStore } from "@/store/useStore";
 import { useProjectImport } from "@/hooks/useProjectImport";
-import { Download, Upload, Check, FolderOpen, Save } from "lucide-react";
+import { Download, Upload, Check, FolderOpen, Save, FilePlus, Undo2, Redo2, LayoutTemplate } from "lucide-react";
 import ExportModal from "./ExportModal";
+import TemplateWarningModal from "./TemplateWarningModal";
+import { PRESETS } from "@vastumandal/dwg-schemas/src/presets";
 
 export default function WorkbenchHeader() {
   const { 
@@ -16,11 +17,21 @@ export default function WorkbenchHeader() {
     setRightPanelOpen, 
     activeTab, 
     setActiveTab, 
-    isCalculating 
+    isCalculating,
+    resetProject,
+    setPlotSpec,
+    setReqSpec,
+    setRates
   } = useAppStore();
+  
+  // Zundo undo/redo state
+  const { undo, redo } = useAppStore.temporal.getState();
+  const pastStates = useStore(useAppStore.temporal, (state) => state.pastStates);
+  const futureStates = useStore(useAppStore.temporal, (state) => state.futureStates);
   
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [pendingTemplate, setPendingTemplate] = useState<typeof PRESETS[0] | null>(null);
   
   // File System Access API handle
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -135,6 +146,27 @@ export default function WorkbenchHeader() {
     }
     setActiveMenu(null);
   };
+  
+  const applyTemplate = (preset: typeof PRESETS[0]) => {
+    setPlotSpec({
+      ...preset.plotSpec,
+      maxFsi: preset.bylaws.maxFsi,
+    });
+    setReqSpec(preset.reqSpec);
+    
+    // Map preset RateCard to UI rates shape
+    setRates({
+      steel: Math.round(preset.rates.steel / 1000), // per-MT → per-kg
+      cement: Math.round(preset.rates.concrete * 0.3),
+      sand: Math.round(preset.rates.concrete * 0.05),
+      aggregate: Math.round(preset.rates.concrete * 0.04),
+      brick: Math.round(preset.rates.masonry / 500),
+      columnSize: "230x380",
+      ...(preset.soil?.safeBearingCapacity ? { sbc: preset.soil.safeBearingCapacity } : {})
+    });
+
+    setActiveMenu(null);
+  };
 
   return (
     <header className="bg-card border-b border-border h-12 flex items-center shrink-0 z-50 text-sm select-none relative">
@@ -166,6 +198,13 @@ export default function WorkbenchHeader() {
             {activeMenu === 'File' && (
               <div className="absolute top-full left-0 mt-1 w-56 bg-card border border-border shadow-lg rounded-md py-1 z-50 flex flex-col">
                 <button 
+                  onClick={() => { resetProject(); setFileHandle(null); setActiveMenu(null); }}
+                  className="flex items-center gap-2 px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors"
+                >
+                  <FilePlus className="w-4 h-4" /> New Project
+                </button>
+                <div className="h-px bg-border my-1 mx-2"></div>
+                <button 
                   onClick={handleOpenProject}
                   className="flex items-center gap-2 px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors"
                 >
@@ -193,6 +232,57 @@ export default function WorkbenchHeader() {
                 <Link href="/" className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors block">
                   Exit Workbench
                 </Link>
+              </div>
+            )}
+          </div>
+          
+          {/* Edit Menu */}
+          <div className="relative">
+            <button 
+              className={`px-3 py-1 rounded-md hover:bg-muted hover:text-foreground transition-colors ${activeMenu === 'Edit' ? 'bg-muted text-foreground' : ''}`}
+              onClick={() => setActiveMenu(activeMenu === 'Edit' ? null : 'Edit')}
+            >
+              Edit
+            </button>
+            {activeMenu === 'Edit' && (
+              <div className="absolute top-full left-0 mt-1 w-56 bg-card border border-border shadow-lg rounded-md py-1 z-50 flex flex-col">
+                <button 
+                  onClick={() => { undo(); setActiveMenu(null); }}
+                  disabled={pastStates.length === 0}
+                  className="flex items-center gap-2 px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Undo2 className="w-4 h-4" /> Undo
+                </button>
+                <button 
+                  onClick={() => { redo(); setActiveMenu(null); }}
+                  disabled={futureStates.length === 0}
+                  className="flex items-center gap-2 px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Redo2 className="w-4 h-4" /> Redo
+                </button>
+              </div>
+            )}
+          </div>
+          
+          {/* Templates Menu */}
+          <div className="relative">
+            <button 
+              className={`px-3 py-1 rounded-md hover:bg-muted hover:text-foreground transition-colors ${activeMenu === 'Templates' ? 'bg-muted text-foreground' : ''}`}
+              onClick={() => setActiveMenu(activeMenu === 'Templates' ? null : 'Templates')}
+            >
+              Templates
+            </button>
+            {activeMenu === 'Templates' && (
+              <div className="absolute top-full left-0 mt-1 w-56 bg-card border border-border shadow-lg rounded-md py-1 z-50 flex flex-col">
+                {PRESETS.map((preset) => (
+                  <button 
+                    key={preset.label}
+                    onClick={() => { setPendingTemplate(preset); setActiveMenu(null); }}
+                    className="flex items-center gap-2 px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors"
+                  >
+                    <LayoutTemplate className="w-4 h-4" /> {preset.label}
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -255,6 +345,13 @@ export default function WorkbenchHeader() {
       />
       
       <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
+      
+      <TemplateWarningModal 
+        isOpen={!!pendingTemplate} 
+        onClose={() => setPendingTemplate(null)} 
+        onConfirm={() => pendingTemplate && applyTemplate(pendingTemplate)} 
+        templateName={pendingTemplate?.label || ''} 
+      />
     </header>
   );
 }

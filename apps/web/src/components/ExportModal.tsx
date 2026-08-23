@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileCode, Box, Database, FileText, X, Archive } from 'lucide-react';
+import { FileCode, Box, FileText, X, Archive } from 'lucide-react';
 import { useAppStore } from '../store/useStore';
 
 export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
@@ -11,7 +11,7 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
       const exportData = {
         schemaVersion: "1.0.0",
         meta: {
-          projectName: state.templateData.projectName,
+          projectName: state.templateData?.projectName || 'Vastumandal',
           createdAt: new Date().toISOString(),
         },
         state: {
@@ -25,7 +25,7 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${state.templateData.projectName.replace(/\s+/g, '_') || 'Vastumandal'}_Project.vastu`;
+      a.download = `${(state.templateData?.projectName || 'Vastumandal').replace(/\s+/g, '_')}_Project.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
