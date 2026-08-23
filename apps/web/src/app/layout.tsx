@@ -43,7 +43,6 @@ export const metadata: Metadata = {
 
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
-import ProjectModal from "@/components/ProjectModal";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -57,7 +56,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
  <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
  <Navbar />
- <ProjectModal />
  <main className="flex-1 pb-10">
  {children}
  </main>

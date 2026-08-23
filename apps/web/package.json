@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
     "@serwist/next": "^9.5.12",
     "@vastumandal/core-estimator": "workspace:*",
     "@vastumandal/core-spatial": "workspace:*",

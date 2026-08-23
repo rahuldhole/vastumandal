@@ -7,7 +7,9 @@ import type {
  SlabScheduleRow, 
  FoundationScheduleRow,
  StairsScheduleRow,
- TitleBlockRow
+ TitleBlockRow,
+ PlotSpec,
+ RequirementSpec
 } from '@vastumandal/dwg-schemas';
 
 type TextNode = {
@@ -56,8 +58,21 @@ interface AppState {
  removeFromProject: (id: string) => void;
  clearProject: () => void;
  
- projectModalData: { type: string; defaultName: string; dxfString: string } | null;
- setProjectModalData: (data: { type: string; defaultName: string; dxfString: string } | null) => void;
+ // Studio state
+ plotSpec: PlotSpec;
+ setPlotSpec: (data: Partial<PlotSpec>) => void;
+ 
+ reqSpec: RequirementSpec;
+ setReqSpec: (data: Partial<RequirementSpec>) => void;
+ 
+ rates: { steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string };
+ setRates: (data: Partial<{ steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string }>) => void;
+ 
+ activeTab: '2D' | '3D';
+ setActiveTab: (tab: '2D' | '3D') => void;
+ 
+ layers: { zones: boolean; grid: boolean; dims: boolean; openings: boolean };
+ setLayers: (layers: Partial<{ zones: boolean; grid: boolean; dims: boolean; openings: boolean }>) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -165,8 +180,33 @@ export const useAppStore = create<AppState>()(
  removeFromProject: (id) => set((state) => ({ projectItems: state.projectItems.filter((i) => i.id !== id) })),
  clearProject: () => set({ projectItems: [] }),
  
- projectModalData: null,
- setProjectModalData: (data) => set({ projectModalData: data }),
+ plotSpec: {
+ width: 30,
+ length: 40,
+ facing: 'E',
+ setbacks: { front: 5, rear: 3, left: 3, right: 3 },
+ roadWidth: 20,
+ floorCount: 'G',
+ },
+ setPlotSpec: (data) => set((state) => ({ plotSpec: { ...state.plotSpec, ...data } })),
+ 
+ reqSpec: {
+ bhk: '2BHK',
+ pujaRoom: true,
+ toilets: { attached: true, common: true, type: 'Western' },
+ parking: true,
+ porch: true,
+ },
+ setReqSpec: (data) => set((state) => ({ reqSpec: { ...state.reqSpec, ...data } })),
+ 
+ rates: { steel: 65, cement: 380, sand: 60, aggregate: 55, brick: 7, columnSize: "230x380" },
+ setRates: (data) => set((state) => ({ rates: { ...state.rates, ...data } })),
+ 
+ activeTab: '2D',
+ setActiveTab: (tab) => set({ activeTab: tab }),
+ 
+ layers: { zones: true, grid: true, dims: true, openings: true },
+ setLayers: (data) => set((state) => ({ layers: { ...state.layers, ...data } })),
  }),
  {
  name: 'vastumandal-storage',
