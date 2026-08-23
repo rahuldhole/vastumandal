@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ControlPanel from "@/components/ControlPanel";
 import LiveBOQPanel from "@/components/LiveBOQPanel";
 import dynamic from "next/dynamic";
@@ -14,28 +14,32 @@ export default function Workbench() {
   const { leftPanelOpen, setLeftPanelOpen, rightPanelOpen, setRightPanelOpen, plotSpec, reqSpec, rates, setBoqResult, setIsCalculating } = useAppStore();
   const { calculate, result, isCalculating: workerCalc } = useEngineWorker();
   const [mounted, setMounted] = useState(false);
+  const didInit = useRef(false);
 
   useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
+
     setTimeout(() => {
       setMounted(true);
-      // Hydrate worker calculation immediately on mount
       calculate(plotSpec, reqSpec, rates);
     }, 0);
-    
-    let wasDesktop = window.innerWidth >= 1024;
+
+    // Set initial panel state based on screen width — only on first mount
+    const isDesktop = window.innerWidth >= 1024;
+    setLeftPanelOpen(isDesktop);
+    setRightPanelOpen(isDesktop);
+
+    // Only reset panels when actually crossing the breakpoint threshold
+    let wasDesktop = isDesktop;
     const handleResize = () => {
-      const isDesktop = window.innerWidth >= 1024;
-      if (isDesktop !== wasDesktop) {
-        setLeftPanelOpen(isDesktop);
-        setRightPanelOpen(isDesktop);
-        wasDesktop = isDesktop;
+      const nowDesktop = window.innerWidth >= 1024;
+      if (nowDesktop !== wasDesktop) {
+        setLeftPanelOpen(nowDesktop);
+        setRightPanelOpen(nowDesktop);
+        wasDesktop = nowDesktop;
       }
     };
-    
-    // Set initial state on mount without triggering a transition if already correct
-    setLeftPanelOpen(wasDesktop);
-    setRightPanelOpen(wasDesktop);
-    
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,11 +54,11 @@ export default function Workbench() {
   }, [workerCalc, result, setIsCalculating, setBoqResult]);
 
   if (!mounted) {
-    return <div className="flex w-full bg-background overflow-hidden relative" style={{ height: "calc(100vh - 64px)" }}></div>;
+    return <div className="flex w-full bg-background overflow-hidden relative" style={{ height: "calc(100vh - 48px)" }}></div>;
   }
 
   return (
-    <div className="flex w-full bg-background overflow-hidden relative" style={{ height: "calc(100vh - 64px)" }}>
+    <div className="flex w-full bg-background overflow-hidden relative" style={{ height: "calc(100vh - 48px)" }}>
       {/* Left Panel */}
       <div 
         className={`transition-all duration-300 flex-shrink-0 h-full border-r border-border bg-card
@@ -96,7 +100,7 @@ export default function Workbench() {
         </div>
       </div>
       
-      {/* Mobile Backdrop */}
+      {/* Mobile Backdrop — only on small screens, doesn't interfere with desktop */}
       {(leftPanelOpen || rightPanelOpen) && (
         <div 
           className="absolute inset-0 bg-black/50 z-20 lg:hidden"
