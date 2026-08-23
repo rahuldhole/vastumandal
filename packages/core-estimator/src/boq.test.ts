@@ -20,18 +20,13 @@ describe('BOQ Generator', () => {
 
     const rateCard: RateCard = {
       steel: 60000,
-      cement: 400,
       cementBag: 400,
       fineAggregate: 1500,
       coarseAggregate: 1400,
       concrete: 5000,
-      sand: 1000,
-      aggregate: 1000,
       masonry: 4000,
       excavation: 300,
       formwork: 400,
-      brick: 8,
-      columnSize: '230x380',
     };
 
     const boq = generateBOQ(quantities, bbsReport, rateCard);
