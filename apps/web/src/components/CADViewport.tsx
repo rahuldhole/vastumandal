@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, MouseEvent, WheelEvent } from 'react';
+import React, { useState, useRef, useMemo, useEffect, MouseEvent } from 'react';
 import { Plus, Minus, Maximize, Compass, Info } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
@@ -45,11 +45,21 @@ export default function CADViewport() {
     setLayers(prev => ({ ...prev, [layer]: !prev[layer] }));
   };
 
-  const handleWheel = (e: WheelEvent) => {
-    e.preventDefault();
-    const delta = -e.deltaY * 0.001;
-    setTransform(prev => ({ ...prev, scale: Math.max(0.2, Math.min(prev.scale + delta, 6)) }));
-  };
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleNativeWheel = (e: globalThis.WheelEvent) => {
+      if (activeTab === '2D') {
+        e.preventDefault();
+        const delta = -e.deltaY * 0.001;
+        setTransform(prev => ({ ...prev, scale: Math.max(0.2, Math.min(prev.scale + delta, 6)) }));
+      }
+    };
+
+    el.addEventListener('wheel', handleNativeWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleNativeWheel);
+  }, [activeTab]);
 
   const handleMouseDown = (e: MouseEvent) => {
     if (e.button === 0 || e.button === 1) {
@@ -94,7 +104,6 @@ export default function CADViewport() {
     <div
       className="relative w-full h-full bg-slate-950 overflow-hidden flex flex-col font-sans select-none"
       ref={containerRef}
-      onWheel={handleWheel}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
