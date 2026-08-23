@@ -24,6 +24,9 @@ importers:
       '@vastumandal/core-estimator':
         specifier: workspace:*
         version: link:../../packages/core-estimator
+      '@vastumandal/core-spatial':
+        specifier: workspace:*
+        version: link:../../packages/core-spatial
       '@vastumandal/core-structural':
         specifier: workspace:*
         version: link:../../packages/core-structural
@@ -33,6 +36,12 @@ importers:
       '@vastumandal/dxf-exporter':
         specifier: workspace:*
         version: link:../../packages/dxf-exporter
+      '@vastumandal/mesh-exporter':
+        specifier: workspace:*
+        version: link:../../packages/mesh-exporter
+      '@vastumandal/pdf-exporter':
+        specifier: workspace:*
+        version: link:../../packages/pdf-exporter
       dxf-viewer:
         specifier: ^1.0.48
         version: 1.0.48
@@ -112,12 +121,6 @@ importers:
 
   packages/core-estimator: {}
 
-  packages/core-math:
-    devDependencies:
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-
   packages/core-spatial:
     dependencies:
       '@vastumandal/dwg-schemas':
@@ -158,9 +161,17 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@20.19.43)(vite@8.2.1(@types/node@20.19.43)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12))
 
-  packages/mesh-exporter: {}
+  packages/mesh-exporter:
+    dependencies:
+      '@vastumandal/dwg-schemas':
+        specifier: workspace:*
+        version: link:../dwg-schemas
 
-  packages/pdf-exporter: {}
+  packages/pdf-exporter:
+    dependencies:
+      '@vastumandal/dwg-schemas':
+        specifier: workspace:*
+        version: link:../dwg-schemas
 
 packages:
 

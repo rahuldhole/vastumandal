@@ -9,11 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@serwist/next": "^9.5.12",
     "@vastumandal/core-estimator": "workspace:*",
+    "@vastumandal/core-spatial": "workspace:*",
     "@vastumandal/core-structural": "workspace:*",
     "@vastumandal/dwg-schemas": "workspace:*",
     "@vastumandal/dxf-exporter": "workspace:*",
-    "@serwist/next": "^9.5.12",
+    "@vastumandal/mesh-exporter": "workspace:*",
+    "@vastumandal/pdf-exporter": "workspace:*",
     "dxf-viewer": "^1.0.48",
     "jszip": "^3.10.1",
     "konva": "^10.3.0",
