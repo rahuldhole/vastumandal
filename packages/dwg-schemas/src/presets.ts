@@ -37,8 +37,7 @@ const ROW_HOUSE_1BHK: PresetConfig = {
     porch: true,
   },
   bylaws: {
-    plotWidth: 6,
-    plotDepth: 9,
+    plotPolygon: [[0, 0], [6, 0], [6, 9], [0, 9]],
     frontSetback: 1.5,
     rearSetback: 1.0,
     sideSetbacks: [0.75, 0.75],
@@ -46,7 +45,7 @@ const ROW_HOUSE_1BHK: PresetConfig = {
     roadWidth: 6,
   },
   soil: { safeBearingCapacity: 120, soilType: 'MEDIUM', waterTableDepth: 2.5 },
-  rates: { concrete: 5500, steel: 70000, formwork: 350, masonry: 700, excavation: 250 },
+  rates: { concrete: 5500, steel: 70000, formwork: 350, masonry: 700, excavation: 250, cementBag: 400, fineAggregate: 1500, coarseAggregate: 1400 },
 };
 
 // ---------------------------------------------------------------------------
@@ -71,8 +70,7 @@ const G_PLUS_1_RES: PresetConfig = {
     porch: true,
   },
   bylaws: {
-    plotWidth: 9,
-    plotDepth: 12,
+    plotPolygon: [[0, 0], [9, 0], [9, 12], [0, 12]],
     frontSetback: 1.5,
     rearSetback: 1.0,
     sideSetbacks: [1.0, 1.0],
@@ -80,7 +78,7 @@ const G_PLUS_1_RES: PresetConfig = {
     roadWidth: 9,
   },
   soil: { safeBearingCapacity: 150, soilType: 'MEDIUM', waterTableDepth: 3.0 },
-  rates: { concrete: 6000, steel: 75000, formwork: 400, masonry: 800, excavation: 300 },
+  rates: { concrete: 6000, steel: 75000, formwork: 400, masonry: 800, excavation: 300, cementBag: 400, fineAggregate: 1500, coarseAggregate: 1400 },
 };
 
 // ---------------------------------------------------------------------------
@@ -112,8 +110,7 @@ const DUPLEX_2BHK: PresetConfig = {
     },
   },
   bylaws: {
-    plotWidth: 9,
-    plotDepth: 12,
+    plotPolygon: [[0, 0], [9, 0], [9, 12], [0, 12]],
     frontSetback: 1.5,
     rearSetback: 1.0,
     sideSetbacks: [1.0, 1.0],
@@ -121,7 +118,7 @@ const DUPLEX_2BHK: PresetConfig = {
     roadWidth: 9,
   },
   soil: { safeBearingCapacity: 150, soilType: 'MEDIUM', waterTableDepth: 3.0 },
-  rates: { concrete: 6000, steel: 75000, formwork: 400, masonry: 800, excavation: 300 },
+  rates: { concrete: 6000, steel: 75000, formwork: 400, masonry: 800, excavation: 300, cementBag: 400, fineAggregate: 1500, coarseAggregate: 1400 },
 };
 
 // ---------------------------------------------------------------------------
@@ -153,8 +150,7 @@ const INDEPENDENT_3BHK: PresetConfig = {
     },
   },
   bylaws: {
-    plotWidth: 12,
-    plotDepth: 15,
+    plotPolygon: [[0, 0], [12, 0], [12, 15], [0, 15]],
     frontSetback: 2.0,
     rearSetback: 1.5,
     sideSetbacks: [1.2, 1.2],
@@ -162,7 +158,7 @@ const INDEPENDENT_3BHK: PresetConfig = {
     roadWidth: 12,
   },
   soil: { safeBearingCapacity: 180, soilType: 'HARD', waterTableDepth: 3.5 },
-  rates: { concrete: 5800, steel: 73000, formwork: 380, masonry: 750, excavation: 280 },
+  rates: { concrete: 5800, steel: 73000, formwork: 380, masonry: 750, excavation: 280, cementBag: 400, fineAggregate: 1500, coarseAggregate: 1400 },
 };
 
 // ---------------------------------------------------------------------------
@@ -187,8 +183,7 @@ const G_PLUS_2_APT: PresetConfig = {
     porch: false,
   },
   bylaws: {
-    plotWidth: 12,
-    plotDepth: 18,
+    plotPolygon: [[0, 0], [12, 0], [12, 18], [0, 18]],
     frontSetback: 2.0,
     rearSetback: 1.5,
     sideSetbacks: [1.2, 1.2],
@@ -196,7 +191,7 @@ const G_PLUS_2_APT: PresetConfig = {
     roadWidth: 12,
   },
   soil: { safeBearingCapacity: 200, soilType: 'HARD', waterTableDepth: 4.5 },
-  rates: { concrete: 5800, steel: 73000, formwork: 380, masonry: 750, excavation: 250 },
+  rates: { concrete: 5800, steel: 73000, formwork: 380, masonry: 750, excavation: 250, cementBag: 400, fineAggregate: 1500, coarseAggregate: 1400 },
 };
 
 // ---------------------------------------------------------------------------
@@ -221,8 +216,7 @@ const G_PLUS_3_WALKUP: PresetConfig = {
     porch: false,
   },
   bylaws: {
-    plotWidth: 12,
-    plotDepth: 18,
+    plotPolygon: [[0, 0], [12, 0], [12, 18], [0, 18]],
     frontSetback: 3.0,
     rearSetback: 2.0,
     sideSetbacks: [1.5, 1.5],
@@ -230,7 +224,7 @@ const G_PLUS_3_WALKUP: PresetConfig = {
     roadWidth: 12,
   },
   soil: { safeBearingCapacity: 220, soilType: 'HARD', waterTableDepth: 5.0 },
-  rates: { concrete: 5600, steel: 72000, formwork: 370, masonry: 720, excavation: 240 },
+  rates: { concrete: 5600, steel: 72000, formwork: 370, masonry: 720, excavation: 240, cementBag: 400, fineAggregate: 1500, coarseAggregate: 1400 },
 };
 
 // ---------------------------------------------------------------------------
@@ -255,8 +249,7 @@ const G_PLUS_4_MIDRISE: PresetConfig = {
     porch: false,
   },
   bylaws: {
-    plotWidth: 15,
-    plotDepth: 24,
+    plotPolygon: [[0, 0], [15, 0], [15, 24], [0, 24]],
     frontSetback: 4.5,
     rearSetback: 3.0,
     sideSetbacks: [2.0, 2.0],
@@ -264,7 +257,7 @@ const G_PLUS_4_MIDRISE: PresetConfig = {
     roadWidth: 18,
   },
   soil: { safeBearingCapacity: 250, soilType: 'HARD', waterTableDepth: 6.0 },
-  rates: { concrete: 5400, steel: 70000, formwork: 360, masonry: 700, excavation: 230 },
+  rates: { concrete: 5400, steel: 70000, formwork: 360, masonry: 700, excavation: 230, cementBag: 400, fineAggregate: 1500, coarseAggregate: 1400 },
 };
 
 // ---------------------------------------------------------------------------
@@ -289,8 +282,7 @@ const COMMERCIAL_SHOP: PresetConfig = {
     porch: false,
   },
   bylaws: {
-    plotWidth: 6,
-    plotDepth: 12,
+    plotPolygon: [[0, 0], [6, 0], [6, 12], [0, 12]],
     frontSetback: 0,
     rearSetback: 1.0,
     sideSetbacks: [0, 0],
@@ -298,7 +290,7 @@ const COMMERCIAL_SHOP: PresetConfig = {
     roadWidth: 12,
   },
   soil: { safeBearingCapacity: 150, soilType: 'MEDIUM', waterTableDepth: 3.0 },
-  rates: { concrete: 5800, steel: 73000, formwork: 390, masonry: 780, excavation: 270 },
+  rates: { concrete: 5800, steel: 73000, formwork: 390, masonry: 780, excavation: 270, cementBag: 400, fineAggregate: 1500, coarseAggregate: 1400 },
 };
 
 // ---------------------------------------------------------------------------
@@ -323,8 +315,7 @@ const MIXED_USE_G2: PresetConfig = {
     porch: false,
   },
   bylaws: {
-    plotWidth: 9,
-    plotDepth: 18,
+    plotPolygon: [[0, 0], [9, 0], [9, 18], [0, 18]],
     frontSetback: 1.5,
     rearSetback: 1.5,
     sideSetbacks: [1.0, 1.0],
@@ -332,7 +323,7 @@ const MIXED_USE_G2: PresetConfig = {
     roadWidth: 12,
   },
   soil: { safeBearingCapacity: 200, soilType: 'HARD', waterTableDepth: 4.0 },
-  rates: { concrete: 5900, steel: 74000, formwork: 400, masonry: 790, excavation: 280 },
+  rates: { concrete: 5900, steel: 74000, formwork: 400, masonry: 790, excavation: 280, cementBag: 400, fineAggregate: 1500, coarseAggregate: 1400 },
 };
 
 // ---------------------------------------------------------------------------
@@ -364,8 +355,7 @@ const FARMHOUSE_VILLA: PresetConfig = {
     },
   },
   bylaws: {
-    plotWidth: 18,
-    plotDepth: 24,
+    plotPolygon: [[0, 0], [18, 0], [18, 24], [0, 24]],
     frontSetback: 6.0,
     rearSetback: 4.5,
     sideSetbacks: [3.0, 3.0],
@@ -373,7 +363,7 @@ const FARMHOUSE_VILLA: PresetConfig = {
     roadWidth: 6,
   },
   soil: { safeBearingCapacity: 160, soilType: 'MEDIUM', waterTableDepth: 3.0 },
-  rates: { concrete: 6200, steel: 76000, formwork: 420, masonry: 850, excavation: 320 },
+  rates: { concrete: 6200, steel: 76000, formwork: 420, masonry: 850, excavation: 320, cementBag: 400, fineAggregate: 1500, coarseAggregate: 1400 },
 };
 
 // ---------------------------------------------------------------------------
