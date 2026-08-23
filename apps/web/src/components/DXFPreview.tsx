@@ -7,9 +7,10 @@ import { RefreshCw, ZoomIn, ZoomOut, Maximize } from "lucide-react";
 interface DXFPreviewProps {
  dxfString: string;
  staticMode?: boolean;
+ toolbarActions?: React.ReactNode;
 }
 
-export default function DXFPreview({ dxfString, staticMode = false }: DXFPreviewProps) {
+export default function DXFPreview({ dxfString, staticMode = false, toolbarActions }: DXFPreviewProps) {
  const containerWrapperRef = useRef<HTMLDivElement>(null);
  const containerRef = useRef<HTMLDivElement>(null);
  // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -143,9 +144,12 @@ export default function DXFPreview({ dxfString, staticMode = false }: DXFPreview
  <button onClick={() => handleZoom(0.8)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors" title="Zoom Out">
  <ZoomOut className="w-4 h-4" />
  </button>
- <button onClick={handleFullscreen} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors ml-auto" title="Full Screen">
- <Maximize className="w-4 h-4" />
- </button>
+ <div className="ml-auto flex items-center gap-2">
+  {toolbarActions}
+  <button onClick={handleFullscreen} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors" title="Full Screen">
+  <Maximize className="w-4 h-4" />
+  </button>
+ </div>
  </div>
  )}
  <div className="flex-1 relative w-full h-full">

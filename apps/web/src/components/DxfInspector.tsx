@@ -3,7 +3,8 @@ import { X, Layers, CheckSquare, Square } from 'lucide-react';
 import { useAppStore } from '@/store/useStore';
 import { exportVastumandalDXF } from '@vastumandal/dxf-exporter';
 import { generateLayout } from '@/utils/generateLayout';
-
+import DxfParser from 'dxf-parser';
+import DXFPreview from './DXFPreview';
 export default function DxfInspector() {
   const { plotSpec, reqSpec } = useAppStore();
   const dxfString = useMemo(() => {
@@ -27,7 +28,6 @@ export default function DxfInspector() {
   useEffect(() => {
     if (dxfString) {
       try {
-        const DxfParser = require('dxf-parser').default || require('dxf-parser');
         const parser = new DxfParser();
         const dxf = parser.parseSync(dxfString);
         setParsedDxf(dxf);
@@ -53,6 +53,8 @@ export default function DxfInspector() {
     setLayers(layers.map(l => l.name === name ? { ...l, visible: !l.visible } : l));
   };
 
+  const [isLayersOpen, setIsLayersOpen] = useState(false);
+
   return (
     <div className="w-full h-full flex flex-col bg-background overflow-hidden text-sm relative">
         <div className="p-3 border-b border-border flex justify-between items-center bg-muted/30">
@@ -62,48 +64,45 @@ export default function DxfInspector() {
           </div>
         </div>
         
-        <div className="flex flex-1 overflow-hidden h-full">
-          {/* Layer Panel */}
-          <div className="w-64 border-r border-border bg-muted/10 p-4 flex flex-col gap-2 overflow-y-auto">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Layers Detected</h3>
-            {layers.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No layers found.</p>
-            ) : (
-              layers.map(l => (
-                <button 
-                  key={l.name}
-                  onClick={() => toggleLayer(l.name)}
-                  className="flex items-center gap-2 text-sm text-left hover:bg-muted p-1.5 rounded transition-colors"
-                >
-                  {l.visible ? <CheckSquare size={16} className="text-primary" /> : <Square size={16} className="text-muted-foreground" />}
-                  <div className="w-3 h-3 rounded-sm border border-border" style={{ backgroundColor: l.color ? `#${Math.floor(Math.random()*16777215).toString(16)}` : '#ccc' }}></div>
-                  <span className={l.visible ? 'text-foreground' : 'text-muted-foreground'}>{l.name}</span>
-                </button>
-              ))
-            )}
-          </div>
-          
+        <div className="flex flex-1 overflow-hidden h-full relative">
           {/* Audit View Panel */}
-          <div className="flex-1 bg-background p-6 flex flex-col relative">
-             {parsedDxf ? (
-               <div className="w-full h-full border border-dashed border-border rounded-lg flex items-center justify-center bg-muted/5 relative overflow-hidden">
-                 {/* In a real implementation, we'd use dxf-viewer to render the canvas here based on visible layers. */}
-                 {/* Since we are auditing, we'll display stats and mock visualization */}
-                 <div className="absolute top-4 left-4 p-3 bg-card border border-border rounded-lg shadow-sm text-xs space-y-1">
-                   <p><span className="font-semibold text-muted-foreground">DXF Version:</span> {parsedDxf.header?.$ACADVER || 'Unknown'}</p>
-                   <p><span className="font-semibold text-muted-foreground">Total Entities:</span> {parsedDxf.entities?.length || 0}</p>
-                   <p><span className="font-semibold text-muted-foreground">Blocks:</span> {Object.keys(parsedDxf.blocks || {}).length}</p>
-                 </div>
-                 
-                 <div className="text-center">
-                   <div className="inline-block p-4 rounded-full bg-primary/10 text-primary mb-3">
-                     <Layers size={48} />
-                   </div>
-                   <h3 className="text-lg font-medium text-foreground">DXF Audit Ready</h3>
-                   <p className="text-sm text-muted-foreground max-w-sm mt-2">
-                     The DXF structural parser is active. Select layers from the left panel to verify exact geometry and text annotations before export.
-                   </p>
-                 </div>
+          <div className="flex-1 bg-background flex flex-col relative overflow-hidden">
+             {dxfString ? (
+               <div className="w-full h-full bg-muted/5 relative overflow-hidden">
+                 <DXFPreview 
+                   dxfString={dxfString} 
+                   toolbarActions={
+                     <div className="relative">
+                       <button 
+                         onClick={() => setIsLayersOpen(!isLayersOpen)}
+                         className={`p-1.5 rounded transition-colors ${isLayersOpen ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+                         title="Toggle Layers"
+                       >
+                         <Layers className="w-4 h-4" />
+                       </button>
+
+                       {isLayersOpen && (
+                         <div className="absolute top-full right-0 mt-2 bg-popover text-popover-foreground border border-border p-3 rounded-lg shadow-xl flex flex-col gap-2 w-48 max-h-64 overflow-y-auto z-50">
+                           <h4 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-1">Layers Detected</h4>
+                           {layers.length === 0 ? (
+                             <p className="text-xs text-muted-foreground">No layers found.</p>
+                           ) : (
+                             layers.map(l => (
+                               <label key={l.name} onClick={() => toggleLayer(l.name)} className="flex items-center gap-3 cursor-pointer group">
+                                 <div className={`relative w-8 h-4 rounded-full transition-colors ${l.visible ? 'bg-primary' : 'bg-muted'}`}>
+                                   <div className={`absolute top-0.5 left-0.5 bg-background w-3 h-3 rounded-full transition-transform ${l.visible ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                                 </div>
+                                 <div className="flex items-center gap-2 flex-1">
+                                   <span className="text-sm truncate group-hover:text-foreground transition-colors text-muted-foreground">{l.name}</span>
+                                 </div>
+                               </label>
+                             ))
+                           )}
+                         </div>
+                       )}
+                     </div>
+                   }
+                 />
                </div>
              ) : (
                <div className="w-full h-full flex items-center justify-center text-muted-foreground">

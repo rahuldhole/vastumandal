@@ -119,49 +119,53 @@ export default function CADViewport() {
       onMouseLeave={handleMouseUp}
       style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
     >
-      {/* ── Layer Visibility Dock ── */}
-      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
-        <button 
-          onClick={() => setIsLayersOpen(!isLayersOpen)}
-          className={`p-2.5 backdrop-blur-md border border-slate-300 dark:border-white/20 text-slate-700 dark:text-white rounded-xl shadow-xl transition-colors ${isLayersOpen ? 'bg-white/80 dark:bg-white/20' : 'bg-white/50 dark:bg-white/10 hover:bg-white/80 dark:hover:bg-white/20'}`}
-          title="Toggle Layers"
-        >
-          <Layers size={20} />
-        </button>
-
-        {isLayersOpen && (
-          <div className="backdrop-blur-md bg-white/80 dark:bg-white/10 border border-slate-300 dark:border-white/20 text-slate-800 dark:text-white p-3 rounded-2xl shadow-xl flex flex-col gap-2 w-40">
-            <h4 className="font-semibold text-xs text-slate-500 dark:text-white/70 uppercase tracking-wider mb-1">Layers</h4>
-            {Object.keys(layers).map(layer => (
-              <label key={layer} onClick={() => toggleLayer(layer as keyof typeof layers)} className="flex items-center gap-3 cursor-pointer group">
-                <div className={`relative w-8 h-4 rounded-full transition-colors ${layers[layer as keyof typeof layers] ? 'bg-primary' : 'bg-white/20'}`}>
-                  <div className={`absolute top-0.5 left-0.5 bg-white w-3 h-3 rounded-full transition-transform ${layers[layer as keyof typeof layers] ? 'translate-x-4' : 'translate-x-0'}`}></div>
-                </div>
-                <div className="flex items-center gap-2 flex-1">
-                  <span className={`w-2 h-2 rounded-full ${layerColors[layer] || 'bg-gray-400'}`}></span>
-                  <span className="text-sm capitalize group-hover:text-slate-900 dark:group-hover:text-white transition-colors text-slate-700 dark:text-white/80">{layer}</span>
-                </div>
-              </label>
-            ))}
+      {activeTab !== 'DXF' && activeTab !== 'IFC' && (
+        <>
+          {/* ── Layer Visibility Dock ── */}
+          <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
+            <button 
+              onClick={() => setIsLayersOpen(!isLayersOpen)}
+              className={`p-2.5 backdrop-blur-md border border-slate-300 dark:border-white/20 text-slate-700 dark:text-white rounded-xl shadow-xl transition-colors ${isLayersOpen ? 'bg-white/80 dark:bg-white/20' : 'bg-white/50 dark:bg-white/10 hover:bg-white/80 dark:hover:bg-white/20'}`}
+              title="Toggle Layers"
+            >
+              <Layers size={20} />
+            </button>
+    
+            {isLayersOpen && (
+              <div className="backdrop-blur-md bg-white/80 dark:bg-white/10 border border-slate-300 dark:border-white/20 text-slate-800 dark:text-white p-3 rounded-2xl shadow-xl flex flex-col gap-2 w-40">
+                <h4 className="font-semibold text-xs text-slate-500 dark:text-white/70 uppercase tracking-wider mb-1">Layers</h4>
+                {Object.keys(layers).map(layer => (
+                  <label key={layer} onClick={() => toggleLayer(layer as keyof typeof layers)} className="flex items-center gap-3 cursor-pointer group">
+                    <div className={`relative w-8 h-4 rounded-full transition-colors ${layers[layer as keyof typeof layers] ? 'bg-primary' : 'bg-white/20'}`}>
+                      <div className={`absolute top-0.5 left-0.5 bg-white w-3 h-3 rounded-full transition-transform ${layers[layer as keyof typeof layers] ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-1">
+                      <span className={`w-2 h-2 rounded-full ${layerColors[layer] || 'bg-gray-400'}`}></span>
+                      <span className="text-sm capitalize group-hover:text-slate-900 dark:group-hover:text-white transition-colors text-slate-700 dark:text-white/80">{layer}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </div>
-
-      {/* ── Navigation HUD ── */}
-      <div className="absolute bottom-6 left-6 z-10 flex flex-col gap-2 backdrop-blur-md bg-white/80 dark:bg-white/10 border border-slate-300 dark:border-white/20 rounded-xl p-1 shadow-xl">
-        <button onClick={zoomIn} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Zoom In (+)"><Plus size={20} /></button>
-        <button onClick={zoomOut} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Zoom Out (-)"><Minus size={20} /></button>
-        <div className="w-full h-px bg-slate-300 dark:bg-white/20 my-1"></div>
-        <button onClick={resetView} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Zoom Extents (Z+E)"><Maximize size={20} /></button>
-        <button onClick={resetView} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Reset North"><Compass size={20} /></button>
-      </div>
-
-      {/* ── Plot Info Badge ── */}
-      <div className="absolute top-4 left-4 z-10 backdrop-blur-md bg-white/80 dark:bg-white/10 border border-slate-300 dark:border-white/20 text-slate-800 dark:text-white px-3 py-2 rounded-xl shadow-xl">
-        <div className="text-[10px] text-slate-500 dark:text-white/50 uppercase tracking-wider">Plot</div>
-        <div className="text-sm font-bold">{plotW}m × {plotH}m</div>
-        <div className="text-[10px] text-slate-600 dark:text-white/60 mt-0.5">{plotSpec.floorCount || 'G'} • {reqSpec.bhk || '2BHK'}</div>
-      </div>
+    
+          {/* ── Navigation HUD ── */}
+          <div className="absolute bottom-6 left-6 z-10 flex flex-col gap-2 backdrop-blur-md bg-white/80 dark:bg-white/10 border border-slate-300 dark:border-white/20 rounded-xl p-1 shadow-xl">
+            <button onClick={zoomIn} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Zoom In (+)"><Plus size={20} /></button>
+            <button onClick={zoomOut} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Zoom Out (-)"><Minus size={20} /></button>
+            <div className="w-full h-px bg-slate-300 dark:bg-white/20 my-1"></div>
+            <button onClick={resetView} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Zoom Extents (Z+E)"><Maximize size={20} /></button>
+            <button onClick={resetView} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Reset North"><Compass size={20} /></button>
+          </div>
+    
+          {/* ── Plot Info Badge ── */}
+          <div className="absolute top-4 left-4 z-10 backdrop-blur-md bg-white/80 dark:bg-white/10 border border-slate-300 dark:border-white/20 text-slate-800 dark:text-white px-3 py-2 rounded-xl shadow-xl">
+            <div className="text-[10px] text-slate-500 dark:text-white/50 uppercase tracking-wider">Plot</div>
+            <div className="text-sm font-bold">{plotW}m × {plotH}m</div>
+            <div className="text-[10px] text-slate-600 dark:text-white/60 mt-0.5">{plotSpec.floorCount || 'G'} • {reqSpec.bhk || '2BHK'}</div>
+          </div>
+        </>
+      )}
 
       {/* ── Tooltip ── */}
       {hoveredElement && (
