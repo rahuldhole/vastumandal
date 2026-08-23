@@ -81,6 +81,12 @@ interface AppState {
  setGeometryResult: (result: any) => void;
  isCalculating: boolean;
  setIsCalculating: (isCalc: boolean) => void;
+ 
+ // UI State
+ leftPanelOpen: boolean;
+ setLeftPanelOpen: (isOpen: boolean) => void;
+ rightPanelOpen: boolean;
+ setRightPanelOpen: (isOpen: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -222,6 +228,11 @@ export const useAppStore = create<AppState>()(
  setGeometryResult: (result) => set({ geometryResult: result }),
  isCalculating: false,
  setIsCalculating: (isCalc) => set({ isCalculating: isCalc }),
+ 
+ leftPanelOpen: false,
+ setLeftPanelOpen: (isOpen) => set({ leftPanelOpen: isOpen }),
+ rightPanelOpen: false,
+ setRightPanelOpen: (isOpen) => set({ rightPanelOpen: isOpen }),
  }),
  {
  name: 'vastumandal-storage',

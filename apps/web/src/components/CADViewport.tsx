@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useAppStore } from "@/store/useStore";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Box } from "@react-three/drei";
-import { ZoomIn, ZoomOut, Maximize } from "lucide-react";
+import { ZoomIn, ZoomOut, Maximize, Layers, X, Moon, Sun } from "lucide-react";
 import { useEngineWorker } from "../hooks/useEngineWorker";
 
 export default function CADViewport() {
@@ -15,6 +15,8 @@ export default function CADViewport() {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isLayersOpen, setIsLayersOpen] = useState(false);
+  const { setLayers } = useAppStore();
   
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -81,21 +83,7 @@ export default function CADViewport() {
 
   return (
     <div className="flex-1 bg-neutral-900 flex flex-col relative overflow-hidden h-full">
-      {/* Viewport Header */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-card/90 backdrop-blur border border-border rounded-lg p-1 flex items-center z-10 shadow-lg">
-        <button 
-          onClick={() => setActiveTab('2D')}
-          className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${activeTab === '2D' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-        >
-          2D Plan
-        </button>
-        <button 
-          onClick={() => setActiveTab('3D')}
-          className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${activeTab === '3D' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-        >
-          3D Isometric
-        </button>
-      </div>
+      {/* Viewport Header removed */}
 
       {isCalculating && (
         <div className="absolute top-4 right-4 bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-medium z-10 flex items-center gap-2">
@@ -103,6 +91,47 @@ export default function CADViewport() {
           Calculating...
         </div>
       )}
+
+      {/* Top Right Controls (Layers) */}
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+        <div className="relative">
+          <button 
+            onClick={() => setIsLayersOpen(!isLayersOpen)}
+            className={`p-2 rounded-md border border-border shadow-md transition ${isLayersOpen ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+          >
+            <Layers className="w-5 h-5" />
+          </button>
+          
+          {isLayersOpen && (
+            <div className="absolute top-full right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+              <div className="p-3 border-b border-border flex items-center justify-between bg-muted/30">
+                <span className="font-semibold text-sm">Visible Layers</span>
+                <button onClick={() => setIsLayersOpen(false)} className="text-muted-foreground hover:text-foreground">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="p-2 flex flex-col gap-1">
+                <label className="flex items-center gap-3 p-2 hover:bg-muted rounded-md cursor-pointer transition">
+                  <input type="checkbox" checked={layers.zones} onChange={() => setLayers({ zones: !layers.zones })} className="rounded bg-muted border-border text-primary focus:ring-primary h-4 w-4" />
+                  <span className="text-sm font-medium">Zones</span>
+                </label>
+                <label className="flex items-center gap-3 p-2 hover:bg-muted rounded-md cursor-pointer transition">
+                  <input type="checkbox" checked={layers.grid} onChange={() => setLayers({ grid: !layers.grid })} className="rounded bg-muted border-border text-primary focus:ring-primary h-4 w-4" />
+                  <span className="text-sm font-medium">Grid</span>
+                </label>
+                <label className="flex items-center gap-3 p-2 hover:bg-muted rounded-md cursor-pointer transition">
+                  <input type="checkbox" checked={layers.dims} onChange={() => setLayers({ dims: !layers.dims })} className="rounded bg-muted border-border text-primary focus:ring-primary h-4 w-4" />
+                  <span className="text-sm font-medium">Dimensions</span>
+                </label>
+                <label className="flex items-center gap-3 p-2 hover:bg-muted rounded-md cursor-pointer transition">
+                  <input type="checkbox" checked={layers.openings} onChange={() => setLayers({ openings: !layers.openings })} className="rounded bg-muted border-border text-primary focus:ring-primary h-4 w-4" />
+                  <span className="text-sm font-medium">Doors & Windows</span>
+                </label>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Floating Controls */}
       <div className="absolute bottom-6 right-6 flex flex-col gap-2 z-10">
