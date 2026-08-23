@@ -34,8 +34,7 @@ export const OpeningSchema = z.object({
 });
 
 export const BylawParamsSchema = z.object({
-  plotWidth: z.number().positive(),
-  plotDepth: z.number().positive(),
+  plotPolygon: z.array(z.tuple([z.number(), z.number()])), // Arbitrary 2D vector loops
   frontSetback: z.number().min(0),
   rearSetback: z.number().min(0),
   sideSetbacks: z.tuple([z.number().min(0), z.number().min(0)]),

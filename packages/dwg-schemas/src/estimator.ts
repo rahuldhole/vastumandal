@@ -2,7 +2,11 @@ import { z } from 'zod';
 
 export const RateCardSchema = z.object({
   concrete: z.number().positive(),
+  cementBag: z.number().positive().default(400),
+  fineAggregate: z.number().positive().default(1500),
+  coarseAggregate: z.number().positive().default(1400),
   steel: z.number().positive(),
+  steelByDia: z.record(z.string(), z.number().positive()).optional(),
   formwork: z.number().positive(),
   masonry: z.number().positive(),
   excavation: z.number().positive(),

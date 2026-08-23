@@ -41,16 +41,33 @@ export function generateBOQ(
   // Excavation
   addItem('EXC-01', 'Earthwork in excavation for foundation', 'EXCAVATION', quantities.excavationVolume, 'cum', rateCard.excavation);
 
-  // Concrete
-  addItem('CON-01', 'RCC Work in structural elements (M20)', 'CONCRETE', quantities.concreteVolume, 'cum', rateCard.concrete);
+  // Concrete Disaggregation (Assume M20 mix ratio 1:1.5:3, total parts = 5.5)
+  // Dry volume factor = 1.54
+  const dryVolume = quantities.concreteVolume * 1.54;
+  const cementVolume = dryVolume * (1 / 5.5); // m3
+  const cementBags = Math.ceil((cementVolume * 1440) / 50); // 1440 kg/m3 density, 50kg bag
+  const fineAggVolume = dryVolume * (1.5 / 5.5); // m3
+  const coarseAggVolume = dryVolume * (3 / 5.5); // m3
   
-  // Formwork (Adding formwork under concrete category or as a separate implied item, using CONCRETE category for simplicity)
+  addItem('MAT-CEM', 'Portland Cement (50kg bags)', 'CONCRETE', cementBags, 'bags', rateCard.cementBag ?? 400);
+  addItem('MAT-SND', 'Fine Aggregate / M-Sand', 'CONCRETE', fineAggVolume, 'cum', rateCard.fineAggregate ?? 1500);
+  addItem('MAT-AGG', 'Coarse Aggregate (20mm & 10mm)', 'CONCRETE', coarseAggVolume, 'cum', rateCard.coarseAggregate ?? 1400);
+
+  // Formwork
   addItem('FRM-01', 'Centering and shuttering (Formwork)', 'CONCRETE', quantities.formworkArea, 'sqm', rateCard.formwork);
 
-  // Steel
-  // We can itemize steel by diameter or as a bulk
-  let totalSteelTonnage = bbsReport.totalTonnage; // MT
-  addItem('STL-01', 'TMT Steel reinforcement bars (Fe500)', 'STEEL', totalSteelTonnage, 'MT', rateCard.steel);
+  // Steel Disaggregation by Diameter
+  if (bbsReport.weightByDiameter && Object.keys(bbsReport.weightByDiameter).length > 0) {
+    for (const [dia, weightKg] of Object.entries(bbsReport.weightByDiameter)) {
+      const weightMT = weightKg / 1000;
+      const rate = (rateCard.steelByDia && rateCard.steelByDia[dia]) ? rateCard.steelByDia[dia] : rateCard.steel;
+      addItem(`STL-${dia}`, `TMT Steel reinforcement bars (Fe500) - Φ${dia}`, 'STEEL', weightMT, 'MT', rate);
+    }
+  } else {
+    // Fallback
+    let totalSteelTonnage = bbsReport.totalTonnage; // MT
+    addItem('STL-01', 'TMT Steel reinforcement bars (Fe500)', 'STEEL', totalSteelTonnage, 'MT', rateCard.steel);
+  }
 
   // Masonry
   addItem('MAS-01', 'Brickwork in superstructure', 'MASONRY', quantities.masonryVolume, 'cum', rateCard.masonry);

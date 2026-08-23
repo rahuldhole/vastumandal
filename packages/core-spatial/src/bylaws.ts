@@ -11,10 +11,12 @@ export interface BylawValidationResult {
   diagnostics: BylawDiagnostic[];
 }
 
-// Assumes coordinates (0,0) is bottom-left of the plot
+import { calculatePolygonArea, isPointInPolygon, offsetPolygon, Point2D } from './polygon';
+
+// Assumes coordinates (0,0) is bottom-left of the plot if standard, or arbitrary for irregular
 export function validateBylaws(
   params: BylawParams,
-  outerWallPolygon: [number, number][], // Array of [x, y] representing outer footprint
+  outerWallPolygon: Point2D[], // Array of [x, y] representing outer footprint
   totalBuiltUpArea: number, // Across all floors
   groundFloorFootprintArea: number,
   staircaseSpecs?: { riser: number; tread: number }
@@ -23,17 +25,17 @@ export function validateBylaws(
   let valid = true;
 
   // 1. Setback Encroachment
-  // Plot boundaries: X [0, plotWidth], Y [0, plotDepth]
-  // Allowed envelope:
-  const minX = params.sideSetbacks[0];
-  const maxX = params.plotWidth - params.sideSetbacks[1];
-  // Assuming front is Y=0
-  const minY = params.frontSetback;
-  const maxY = params.plotDepth - params.rearSetback;
+  // We compute an allowed envelope by offsetting the plot polygon inwards.
+  // For arbitrary polygons, we use the maximum required setback to ensure compliance,
+  // or a more advanced logic would map specific edges to front/rear/sides.
+  const maxSetback = Math.max(params.frontSetback, params.rearSetback, ...params.sideSetbacks);
+  
+  // Negative distance for inward offset
+  const allowedEnvelope = offsetPolygon(params.plotPolygon as Point2D[], -maxSetback);
 
   let setbackViolated = false;
-  for (const [x, y] of outerWallPolygon) {
-    if (x < minX || x > maxX || y < minY || y > maxY) {
+  for (const point of outerWallPolygon) {
+    if (!isPointInPolygon(point, allowedEnvelope)) {
       setbackViolated = true;
       break;
     }
@@ -44,7 +46,7 @@ export function validateBylaws(
     diagnostics.push({
       level: 'ERROR',
       code: 'SETBACK_ENCROACHMENT',
-      message: `Building footprint encroaches on allowable setbacks. Allowed Envelope: X[${minX} to ${maxX}], Y[${minY} to ${maxY}].`
+      message: `Building footprint encroaches on allowable setbacks (checked against max setback of ${maxSetback}mm).`
     });
   } else {
     diagnostics.push({
@@ -55,7 +57,7 @@ export function validateBylaws(
   }
 
   // 2. FAR / FSI Calculation
-  const plotArea = params.plotWidth * params.plotDepth;
+  const plotArea = calculatePolygonArea(params.plotPolygon as Point2D[]); // Need mm^2 or m^2 consistently
   const fsi = totalBuiltUpArea / plotArea;
 
   if (fsi > params.maxFsi) {
