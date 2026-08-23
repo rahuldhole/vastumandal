@@ -47,7 +47,15 @@ export default function WorkbenchHeader() {
 
   return (
     <header className="bg-card border-b border-border h-12 flex items-center shrink-0 z-50 text-sm select-none relative">
-      <div className="flex items-center px-2 w-full gap-2 sm:gap-4">
+      {/* Click outside catcher */}
+      {activeMenu && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setActiveMenu(null)}
+        />
+      )}
+      
+      <div className="flex items-center px-2 w-full gap-2 sm:gap-4 relative z-50">
         
         {/* App Icon */}
         <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity ml-1">
@@ -57,10 +65,9 @@ export default function WorkbenchHeader() {
         {/* Menu Bar */}
         <div className="flex items-center font-medium text-muted-foreground">
           {/* File Menu */}
-          <div className="relative" onMouseLeave={() => activeMenu === 'File' && setActiveMenu(null)}>
+          <div className="relative">
             <button 
               className={`px-3 py-1 rounded-md hover:bg-muted hover:text-foreground transition-colors ${activeMenu === 'File' ? 'bg-muted text-foreground' : ''}`}
-              onMouseEnter={() => activeMenu && setActiveMenu('File')}
               onClick={() => setActiveMenu(activeMenu === 'File' ? null : 'File')}
             >
               File
@@ -88,10 +95,9 @@ export default function WorkbenchHeader() {
           </div>
           
           {/* View Menu */}
-          <div className="relative" onMouseLeave={() => activeMenu === 'View' && setActiveMenu(null)}>
+          <div className="relative">
             <button 
               className={`px-3 py-1 rounded-md hover:bg-muted hover:text-foreground transition-colors ${activeMenu === 'View' ? 'bg-muted text-foreground' : ''}`}
-              onMouseEnter={() => activeMenu && setActiveMenu('View')}
               onClick={() => setActiveMenu(activeMenu === 'View' ? null : 'View')}
             >
               View
@@ -133,23 +139,6 @@ export default function WorkbenchHeader() {
              </div>
              {isCalculating ? 'Computing...' : 'Ready'}
            </div>
-
-           <div className="w-px h-5 bg-border mx-1 hidden sm:block"></div>
-           
-           {/* Direct buttons for common actions */}
-           <button 
-             onClick={handleImportClick}
-             className="flex items-center gap-1 text-xs font-medium bg-secondary hover:bg-secondary/80 text-secondary-foreground px-3 py-1.5 rounded-md transition shadow-sm border border-border"
-           >
-             <Upload className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Import</span>
-           </button>
-           
-           <button 
-             onClick={() => setIsExportModalOpen(true)}
-             className="flex items-center gap-1 text-xs font-medium bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-md transition shadow-sm"
-           >
-             <Download className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Export</span>
-           </button>
         </div>
       </div>
       
