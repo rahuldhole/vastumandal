@@ -15,18 +15,14 @@ export default function Navbar() {
  const toggleMenu = () => setIsOpen(!isOpen);
  const closeMenu = () => setIsOpen(false);
 
- const navLinks = [
- { href: "/bbs", label: "BBS Generator", isSpecial: false },
- { href: "/beam", label: "Beam", isSpecial: false },
- { href: "/column", label: "Column", isSpecial: false },
- { href: "/slab", label: "Slab", isSpecial: false },
- { href: "/foundation", label: "Foundation", isSpecial: false },
- { href: "/tank", label: "Tank", isSpecial: false },
- { href: "/stairs", label: "Stairs", isSpecial: false },
- { href: "/utilities", label: "Grid Utils", isSpecial: false },
- { href: "/library", label: "Library", isSpecial: false, isBeta: true },
- { href: "/templates", label: "Templates", isSpecial: false, isBeta: true },
- ];
+  const navLinks: { href: string; label: string; isSpecial?: boolean; isBeta?: boolean }[] = [
+  { href: "/spatial", label: "Spatial", isSpecial: false },
+  { href: "/structural", label: "Structural", isSpecial: false },
+  { href: "/estimator", label: "Estimator", isSpecial: false },
+  { href: "/dxf-export", label: "DXF Export", isSpecial: false },
+  { href: "/mesh-export", label: "3D Mesh", isSpecial: false },
+  { href: "/pdf-export", label: "PDF Reports", isSpecial: false },
+  ];
 
  return (
  <header className="bg-card border-b border-border px-4 md:px-8 py-4 sticky top-0 z-50">
