@@ -69,8 +69,8 @@ interface AppState {
  rates: { steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string; sbc?: number };
  setRates: (data: Partial<{ steel: number; cement: number; sand: number; aggregate: number; brick: number; columnSize: string; sbc?: number }>) => void;
  
- activeTab: '2D' | '3D';
- setActiveTab: (tab: '2D' | '3D') => void;
+ activeTab: '2D' | '3D' | 'IFC';
+ setActiveTab: (tab: '2D' | '3D' | 'IFC') => void;
  
  layers: { vastu: boolean; zones: boolean; grid: boolean; dims: boolean; openings: boolean };
  setLayers: (layers: Partial<{ vastu: boolean; zones: boolean; grid: boolean; dims: boolean; openings: boolean }>) => void;

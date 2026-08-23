@@ -6,6 +6,9 @@ import { BoxGeometry } from 'three';
 import { useTheme } from 'next-themes';
 import { useAppStore } from '@/store/useStore';
 import { generateLayout, type LayoutRoom, type ColumnPos } from '@/utils/generateLayout';
+import dynamic from 'next/dynamic';
+
+const IFCViewport = dynamic(() => import('./IFCViewport'), { ssr: false });
 
 // Scale factor: 1 metre = SCALE px in SVG
 const SCALE = 28;
@@ -181,7 +184,9 @@ export default function CADViewport() {
 
       {/* ── Canvas ── */}
       <div className="flex-1 w-full h-full relative">
-        {activeTab === '3D' ? (
+        {activeTab === 'IFC' ? (
+          <IFCViewport />
+        ) : activeTab === '3D' ? (
           <ThreeView
             layout={layout}
             layers={layers}

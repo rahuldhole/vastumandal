@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useStore } from "zustand";
 import { useAppStore } from "@/store/useStore";
 import { useProjectImport } from "@/hooks/useProjectImport";
-import { Download, Upload, Check, FolderOpen, Save, FilePlus, Undo2, Redo2, LayoutTemplate } from "lucide-react";
+import { Download, Upload, Check, FolderOpen, Save, FilePlus, Undo2, Redo2, LayoutTemplate, Box } from "lucide-react";
 import ExportModal from "./ExportModal";
 import TemplateWarningModal from "./TemplateWarningModal";
 import { PRESETS } from "@vastumandal/dwg-schemas/src/presets";
@@ -339,6 +339,10 @@ export default function WorkbenchHeader() {
                 <button onClick={() => { setActiveTab('3D'); }} className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between">
                   <span>3D Isometric</span>
                   {activeTab === '3D' && <Check className="w-4 h-4" />}
+                </button>
+                <button onClick={() => { setActiveTab('IFC'); }} className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between">
+                  <span className="flex items-center gap-2"><Box className="w-3.5 h-3.5" /> IFC BIM</span>
+                  {activeTab === 'IFC' && <Check className="w-4 h-4" />}
                 </button>
                 <div className="h-px bg-border my-1 mx-2"></div>
                 <button 
