@@ -91,6 +91,9 @@ interface AppState {
  setLeftPanelOpen: (isOpen: boolean) => void;
  rightPanelOpen: boolean;
  setRightPanelOpen: (isOpen: boolean) => void;
+ 
+ // State restoration
+ restoreState: (state: Partial<AppState>) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -237,6 +240,8 @@ export const useAppStore = create<AppState>()(
  setLeftPanelOpen: (isOpen) => set({ leftPanelOpen: isOpen }),
  rightPanelOpen: false,
  setRightPanelOpen: (isOpen) => set({ rightPanelOpen: isOpen }),
+ 
+ restoreState: (newState) => set((state) => ({ ...state, ...newState })),
  }),
  {
  name: 'vastumandal-storage',

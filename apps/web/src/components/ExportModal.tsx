@@ -1,17 +1,44 @@
 import React from 'react';
 import { FileCode, Box, Database, FileText, X, Archive } from 'lucide-react';
+import { useAppStore } from '../store/useStore';
 
 export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   if (!isOpen) return null;
 
   const downloadFile = (format: string) => {
+    if (format === 'vastu') {
+      const state = useAppStore.getState();
+      const exportData = {
+        schemaVersion: "1.0.0",
+        meta: {
+          projectName: state.templateData.projectName,
+          createdAt: new Date().toISOString(),
+        },
+        state: {
+          ...state,
+          boqResult: null,
+          geometryResult: null,
+          isCalculating: false
+        }
+      };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${state.templateData.projectName.replace(/\s+/g, '_') || 'Vastumandal'}_Project.vastu`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      return;
+    }
     alert(`Downloading model in ${format.toUpperCase()} format...`);
   };
 
   const formats = [
+    { id: 'vastu', title: 'Save Project (.vastu)', desc: 'Full Vastumandal project state for backup and drag-and-drop restore.', icon: Database, color: 'text-emerald-500' },
     { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500' },
     { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500' },
-    { id: 'json', title: 'Data Schema (.json)', desc: 'Full Vastumandal project state for backup and re-import.', icon: Database, color: 'text-emerald-500' },
     { id: 'lsp', title: 'AutoLISP Script (.lsp)', desc: 'Direct command-line automation script for AutoCAD.', icon: FileText, color: 'text-amber-500' },
   ];
 
