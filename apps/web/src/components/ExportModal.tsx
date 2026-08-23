@@ -25,7 +25,7 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${(state.templateData?.projectName || 'Vastumandal').replace(/\s+/g, '_')}_Project.zip`;
+      a.download = `${(state.templateData?.projectName || 'Vastumandal').replace(/\s+/g, '_')}_Project.vastu`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -39,6 +39,7 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
     { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500' },
     { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500' },
     { id: 'lsp', title: 'AutoLISP Script (.lsp)', desc: 'Direct command-line automation script for AutoCAD.', icon: FileText, color: 'text-amber-500' },
+    { id: 'vastu', title: 'Vastumandal Project (.vastu)', desc: 'Native project format containing all specifications and parameters.', icon: FileCode, color: 'text-emerald-500' },
   ];
 
   return (
