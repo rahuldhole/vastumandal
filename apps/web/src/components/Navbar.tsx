@@ -6,7 +6,6 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAppStore } from "@/store/useStore";
 import { Download, Menu, FileText } from "lucide-react";
-import { PLOT_PRESETS } from "@vastumandal/dwg-schemas";
 import ExportModal from "./ExportModal";
 
 export default function Navbar() {
@@ -15,18 +14,6 @@ export default function Navbar() {
   
   const { plotSpec, setPlotSpec, leftPanelOpen, setLeftPanelOpen, rightPanelOpen, setRightPanelOpen, activeTab, setActiveTab, isCalculating } = useAppStore();
   const [isExportModalOpen, setIsExportModalOpen] = React.useState(false);
-
-  const handlePresetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const presetKey = e.target.value;
-    if (presetKey && PLOT_PRESETS[presetKey]) {
-      setPlotSpec(PLOT_PRESETS[presetKey]);
-    }
-  };
-
-  const currentPresetKey = Object.keys(PLOT_PRESETS).find(key => {
-    const p = PLOT_PRESETS[key];
-    return p.width === plotSpec.width && p.length === plotSpec.length && p.facing === plotSpec.facing;
-  }) || "";
 
   return (
     <header className="bg-card border-b border-border h-14 flex items-center shrink-0 z-50">
@@ -68,23 +55,7 @@ export default function Navbar() {
                   3D <span className="hidden lg:inline">Isometric</span>
                 </button>
               </div>
-              
-              <div className="hidden sm:block w-px h-5 bg-border mx-1"></div>
-              
-              <div className="flex items-center gap-1 sm:gap-2 min-w-0 shrink">
-                <span className="hidden lg:inline text-sm text-muted-foreground font-medium">Preset:</span>
-                <select 
-                  value={currentPresetKey}
-                  onChange={handlePresetChange}
-                  className="bg-muted border border-border text-foreground text-[10px] sm:text-xs md:text-sm rounded-md px-1 sm:px-2 py-1 md:px-3 md:py-1.5 w-[70px] sm:w-[100px] md:min-w-[160px] focus:ring-1 focus:ring-primary outline-none cursor-pointer truncate"
-                >
-                  <option value="" disabled>Custom</option>
-                  {Object.keys(PLOT_PRESETS).map(key => (
-                    <option key={key} value={key}>{key}</option>
-                  ))}
-                </select>
               </div>
-            </div>
 
             {/* Right: Actions & Panel Toggle */}
             <div className="flex items-center gap-1 sm:gap-2 md:gap-4 shrink-0">
