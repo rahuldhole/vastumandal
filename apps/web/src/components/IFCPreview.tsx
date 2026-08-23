@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { IfcViewerAPI } from 'web-ifc-viewer';
 import { X, Loader2 } from 'lucide-react';
+import { Color } from 'three';
 
 interface IFCPreviewProps {
   isOpen: boolean;
@@ -28,10 +29,10 @@ export function IFCPreview({ isOpen, onClose, ifcData }: IFCPreviewProps) {
         setError(null);
 
         // Initialize viewer if it doesn't exist
-        if (!viewerRef.current) {
+        if (!viewerRef.current && containerRef.current) {
           const viewer = new IfcViewerAPI({
             container: containerRef.current,
-            backgroundColor: new window.THREE.Color(0xffffff),
+            backgroundColor: new Color(0xffffff),
           });
 
           // Setup WASM path to public directory
@@ -43,16 +44,11 @@ export function IFCPreview({ isOpen, onClose, ifcData }: IFCPreviewProps) {
         }
 
         // Convert string or Uint8Array to Blob
-        let blob: Blob;
-        if (typeof ifcData === 'string') {
-          blob = new Blob([ifcData], { type: 'application/x-step' });
-        } else {
-          blob = new Blob([ifcData], { type: 'application/x-step' });
-        }
+        const blob = new Blob([ifcData as BlobPart], { type: 'application/x-step' });
         
         blobUrl = URL.createObjectURL(blob);
         
-        await viewerRef.current.IFC.loadIfcUrl(blobUrl);
+        await viewerRef.current!.IFC.loadIfcUrl(blobUrl);
 
         if (!isActive) return;
         setLoading(false);

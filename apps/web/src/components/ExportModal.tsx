@@ -149,7 +149,7 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
                 </button>
                 
                 <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
-                  {(fmt as any).canPreview && (
+                  {'canPreview' in fmt && fmt.canPreview && (
                     <button 
                       onClick={(e) => handlePreview(e, fmt.id)}
                       className="p-2 rounded-md bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-colors flex flex-col items-center justify-center"
