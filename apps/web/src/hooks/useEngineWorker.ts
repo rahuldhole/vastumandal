@@ -21,6 +21,12 @@ export function useEngineWorker() {
             setError(error || 'Worker error');
           }
           
+          
+          setIsCalculating(false);
+        };
+        workerRef.current.onerror = (error) => {
+          console.error("Worker error", error);
+          setError("Worker failed to initialize or execute.");
           setIsCalculating(false);
         };
       } catch (err: unknown) {
