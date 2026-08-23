@@ -36,21 +36,21 @@ export class ScriptWriter {
 function drawBeamSection(dxf: any, data: BeamScheduleRow) {
   
 
-  dxf.addLayer('CONCRETE', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('REBAR', DXFWriter.ACI.RED, 'CONTINUOUS');
+  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
+  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
 
   const w = data.width;
   const d = data.depth;
 
   // Concrete outline
-  dxf.setActiveLayer('CONCRETE');
+  dxf.setActiveLayer('S-CONC');
   dxf.drawLine(0, 0, w, 0);
   dxf.drawLine(w, 0, w, d);
   dxf.drawLine(w, d, 0, d);
   dxf.drawLine(0, d, 0, 0);
 
   // Stirrup
-  dxf.setActiveLayer('REBAR');
+  dxf.setActiveLayer('S-REINF');
   const cover = 40; // 40mm cover
   dxf.drawLine(cover, cover, w - cover, cover);
   dxf.drawLine(w - cover, cover, w - cover, d - cover);
@@ -89,19 +89,19 @@ export function exportBeamSectionToScript(data: BeamScheduleRow): string {
 function drawColumnSection(dxf: any, data: ColumnScheduleRow) {
   
   
-  dxf.addLayer('CONCRETE', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('REBAR', DXFWriter.ACI.RED, 'CONTINUOUS');
+  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
+  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
 
   const w = data.width || 400;
   const d = data.depth || 400;
   
-  dxf.setActiveLayer('CONCRETE');
+  dxf.setActiveLayer('S-CONC');
   dxf.drawLine(0, 0, w, 0);
   dxf.drawLine(w, 0, w, d);
   dxf.drawLine(w, d, 0, d);
   dxf.drawLine(0, d, 0, 0);
   
-  dxf.setActiveLayer('REBAR');
+  dxf.setActiveLayer('S-REINF');
   const cover = 40;
   const tw = w - 2 * cover;
   const td = d - 2 * cover;
@@ -156,8 +156,8 @@ export function exportColumnSectionToScript(data: ColumnScheduleRow): string {
 function drawTextNodes(dxf: any, nodes: { id: string, text: string, x: number, y: number }[]) {
   
   
-  dxf.addLayer('TEXT', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
-  dxf.setActiveLayer('TEXT');
+  dxf.addLayer('A-ANNO-TEXT', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  dxf.setActiveLayer('A-ANNO-TEXT');
   
   nodes.forEach(node => {
     // Assuming dxf-writer supports drawText. If not, this is standard API pattern for DXFWriter
@@ -185,16 +185,16 @@ export function exportTextNodesToScript(nodes: { id: string, text: string, x: nu
 
 function drawSlabSection(dxf: any, data: SlabScheduleRow) {
   
-  dxf.addLayer('CONCRETE', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('REBAR', DXFWriter.ACI.RED, 'CONTINUOUS');
+  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
+  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
   
-  dxf.setActiveLayer('CONCRETE');
+  dxf.setActiveLayer('S-CONC');
   dxf.drawLine(0, 0, data.lx, 0);
   dxf.drawLine(data.lx, 0, data.lx, data.depth);
   dxf.drawLine(data.lx, data.depth, 0, data.depth);
   dxf.drawLine(0, data.depth, 0, 0);
   
-  dxf.setActiveLayer('REBAR');
+  dxf.setActiveLayer('S-REINF');
   const cover = 25;
   const lx = data.lx;
   
@@ -229,16 +229,16 @@ export function exportSlabSectionToScript(data: SlabScheduleRow): string {
 
 function drawFoundationSection(dxf: any, data: FoundationScheduleRow) {
   
-  dxf.addLayer('CONCRETE', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('REBAR', DXFWriter.ACI.RED, 'CONTINUOUS');
+  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
+  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
   
-  dxf.setActiveLayer('CONCRETE');
+  dxf.setActiveLayer('S-CONC');
   dxf.drawLine(0, 0, data.lx, 0);
   dxf.drawLine(data.lx, 0, data.lx, data.depth);
   dxf.drawLine(data.lx, data.depth, 0, data.depth);
   dxf.drawLine(0, data.depth, 0, 0);
   
-  dxf.setActiveLayer('REBAR');
+  dxf.setActiveLayer('S-REINF');
   const cover = 50;
   const lx = data.lx;
   
@@ -273,10 +273,10 @@ export function exportFoundationSectionToScript(data: FoundationScheduleRow): st
 
 function drawTankSection(dxf: any, data: TankScheduleRow) {
   
-  dxf.addLayer('CONCRETE', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('REBAR', DXFWriter.ACI.RED, 'CONTINUOUS');
+  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
+  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
   
-  dxf.setActiveLayer('CONCRETE');
+  dxf.setActiveLayer('S-CONC');
   
   const outerW = data.width + (2 * data.wallThickness);
   const outerH = data.height + data.wallThickness; // height is internal height, base slab is wallThickness
@@ -300,7 +300,7 @@ function drawTankSection(dxf: any, data: TankScheduleRow) {
   dxf.drawLine(wt, outerH, 0, outerH);
   dxf.drawLine(0, outerH, 0, 0); // left outer
   
-  dxf.setActiveLayer('REBAR');
+  dxf.setActiveLayer('S-REINF');
   const cover = 40;
   
   // Continuous U-shape rebar at inner face
@@ -380,10 +380,10 @@ export function exportTankSectionToScript(data: TankScheduleRow): string {
 
 function drawStairsSection(dxf: any, data: StairsScheduleRow) {
   
-  dxf.addLayer('CONCRETE', DXFWriter.ACI.WHITE, 'CONTINUOUS');
-  dxf.addLayer('REBAR', DXFWriter.ACI.RED, 'CONTINUOUS');
+  dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
+  dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
   
-  dxf.setActiveLayer('CONCRETE');
+  dxf.setActiveLayer('S-CONC');
   const tread = data.tread || 250;
   const rise = data.rise || 150;
   const steps = data.numberOfSteps || 10;
@@ -420,7 +420,7 @@ function drawStairsSection(dxf: any, data: StairsScheduleRow) {
   dxf.drawLine(currentX, currentY, bottomEndX, bottomEndY + rise); // Connect end (approx)
   
   // Rebar implementation (simplified main and distribution bars)
-  dxf.setActiveLayer('REBAR');
+  dxf.setActiveLayer('S-REINF');
   const cover = 25;
   const mainBarDia = data.mainBarDia || 12;
   const distBarDia = data.distBarDia || 8;
@@ -453,8 +453,8 @@ export function exportStairsSectionToScript(data: StairsScheduleRow): string {
 
 export function exportDoorDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('DOOR', DXFWriter.ACI.CYAN, 'CONTINUOUS');
-  dxf.setActiveLayer('DOOR');
+  dxf.addLayer('A-DOOR', DXFWriter.ACI.CYAN, 'CONTINUOUS');
+  dxf.setActiveLayer('A-DOOR');
   
   // Standard 900mm door
   const width = 900;
@@ -493,8 +493,8 @@ export function exportDoorDXF(): string {
 
 export function exportWindowDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('WINDOW', DXFWriter.ACI.GREEN, 'CONTINUOUS');
-  dxf.setActiveLayer('WINDOW');
+  dxf.addLayer('A-GLAZ', DXFWriter.ACI.GREEN, 'CONTINUOUS');
+  dxf.setActiveLayer('A-GLAZ');
   
   // Standard 1200mm window
   const width = 1200;
@@ -543,8 +543,8 @@ export function exportNorthSymbolDXF(): string {
 
 export function exportDoubleDoorDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('DOOR', DXFWriter.ACI.CYAN, 'CONTINUOUS');
-  dxf.setActiveLayer('DOOR');
+  dxf.addLayer('A-DOOR', DXFWriter.ACI.CYAN, 'CONTINUOUS');
+  dxf.setActiveLayer('A-DOOR');
   
   const width = 1800; // Total width for double doors
   const halfWidth = width / 2;
@@ -598,8 +598,8 @@ export function exportDoubleDoorDXF(): string {
 
 export function exportSlidingDoorDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('DOOR', DXFWriter.ACI.CYAN, 'CONTINUOUS');
-  dxf.setActiveLayer('DOOR');
+  dxf.addLayer('A-DOOR', DXFWriter.ACI.CYAN, 'CONTINUOUS');
+  dxf.setActiveLayer('A-DOOR');
   
   const width = 2000;
   const frameThickness = 50;
@@ -629,8 +629,8 @@ export function exportSlidingDoorDXF(): string {
 
 export function exportGarageDoorDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('DOOR', DXFWriter.ACI.CYAN, 'CONTINUOUS');
-  dxf.setActiveLayer('DOOR');
+  dxf.addLayer('A-DOOR', DXFWriter.ACI.CYAN, 'CONTINUOUS');
+  dxf.setActiveLayer('A-DOOR');
   
   const width = 2400;
   const depth = 200;
@@ -659,8 +659,8 @@ export function exportGarageDoorDXF(): string {
 
 export function exportSectionMarkerDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('ANNOTATION', DXFWriter.ACI.MAGENTA, 'CONTINUOUS');
-  dxf.setActiveLayer('ANNOTATION');
+  dxf.addLayer('A-ANNO', DXFWriter.ACI.MAGENTA, 'CONTINUOUS');
+  dxf.setActiveLayer('A-ANNO');
   
   // Bubble
   const r = 50;
@@ -688,8 +688,8 @@ export function exportSectionMarkerDXF(): string {
 
 export function exportElevationTargetDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('ANNOTATION', DXFWriter.ACI.MAGENTA, 'CONTINUOUS');
-  dxf.setActiveLayer('ANNOTATION');
+  dxf.addLayer('A-ANNO', DXFWriter.ACI.MAGENTA, 'CONTINUOUS');
+  dxf.setActiveLayer('A-ANNO');
   
   const r = 40;
   const steps = 16;
@@ -718,8 +718,8 @@ export function exportElevationTargetDXF(): string {
 
 export function exportRevisionCloudDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('ANNOTATION', DXFWriter.ACI.RED, 'CONTINUOUS');
-  dxf.setActiveLayer('ANNOTATION');
+  dxf.addLayer('A-ANNO', DXFWriter.ACI.RED, 'CONTINUOUS');
+  dxf.setActiveLayer('A-ANNO');
   
   const width = 1000;
   const height = 600;
@@ -747,8 +747,8 @@ export function exportRevisionCloudDXF(): string {
 
 export function exportGridBubbleDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('ANNOTATION', DXFWriter.ACI.CYAN, 'CONTINUOUS');
-  dxf.setActiveLayer('ANNOTATION');
+  dxf.addLayer('A-ANNO', DXFWriter.ACI.CYAN, 'CONTINUOUS');
+  dxf.setActiveLayer('A-ANNO');
   
   const r = 50;
   const steps = 16;
@@ -770,8 +770,8 @@ export function exportGridBubbleDXF(): string {
 
 export function exportDeskDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('FURNITURE', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
-  dxf.setActiveLayer('FURNITURE');
+  dxf.addLayer('I-FURN', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  dxf.setActiveLayer('I-FURN');
   
   const width = 1500;
   const depth = 750;
@@ -801,8 +801,8 @@ export function exportDeskDXF(): string {
 
 export function exportConferenceTableDXF(): string {
   const dxf = new DXFWriter();
-  dxf.addLayer('FURNITURE', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
-  dxf.setActiveLayer('FURNITURE');
+  dxf.addLayer('I-FURN', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  dxf.setActiveLayer('I-FURN');
   
   const width = 3000;
   const depth = 1200;
@@ -1208,7 +1208,7 @@ export function exportHVACVentDXF(): string {
 function drawTemplate(dxf: any, data: TitleBlockRow) {
   
   dxf.addLayer('BORDER', DXFWriter.ACI.CYAN, 'CONTINUOUS');
-  dxf.addLayer('TEXT', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  dxf.addLayer('A-ANNO-TEXT', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
   
   // Sheet sizes (landscape)
   const sizes = {
@@ -1244,7 +1244,7 @@ function drawTemplate(dxf: any, data: TitleBlockRow) {
   }
   
   // Text insertion
-  dxf.setActiveLayer('TEXT');
+  dxf.setActiveLayer('A-ANNO-TEXT');
   const textHeight = 4;
   
   // Try/catch for drawText because dxf-writer text API can be finicky
