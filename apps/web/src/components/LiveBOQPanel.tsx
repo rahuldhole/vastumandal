@@ -17,7 +17,7 @@ const BarShapeIcon = ({ shape }: { shape: string }) => {
 export default function LiveBOQPanel() {
   const { boqResult, isCalculating, reqSpec } = useAppStore();
   const boq = boqResult?.boq;
-  const bbs = boqResult?.bbs;
+  const bbs = boqResult?.bbsReport;
   const diagnostics = boqResult?.diagnostics || [];
   const [tab, setTab] = useState<'BOQ' | 'BBS' | 'SANCTION'>('BOQ');
 
