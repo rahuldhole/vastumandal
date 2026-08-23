@@ -3,6 +3,7 @@ import { Plus, Minus, Maximize, Compass, Info, Layers } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
 import { BoxGeometry } from 'three';
+import { useTheme } from 'next-themes';
 import { useAppStore } from '@/store/useStore';
 import { generateLayout, type LayoutRoom, type ColumnPos } from '@/utils/generateLayout';
 
@@ -13,6 +14,8 @@ const WALL_THICKNESS = 0.23; // 230mm in metres
 
 export default function CADViewport() {
   const { activeTab, plotSpec, reqSpec } = useAppStore();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   // Generate layout from live store data
   const layout = useMemo(() => generateLayout(plotSpec, reqSpec), [plotSpec, reqSpec]);
@@ -103,7 +106,7 @@ export default function CADViewport() {
 
   return (
     <div
-      className="relative w-full h-full bg-slate-950 overflow-hidden flex flex-col font-sans select-none"
+      className="relative w-full h-full bg-slate-100 dark:bg-slate-950 overflow-hidden flex flex-col font-sans select-none"
       ref={containerRef}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
@@ -115,15 +118,15 @@ export default function CADViewport() {
       <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
         <button 
           onClick={() => setIsLayersOpen(!isLayersOpen)}
-          className={`p-2.5 backdrop-blur-md border border-white/20 text-white rounded-xl shadow-xl transition-colors ${isLayersOpen ? 'bg-white/20' : 'bg-white/10 hover:bg-white/20'}`}
+          className={`p-2.5 backdrop-blur-md border border-slate-300 dark:border-white/20 text-slate-700 dark:text-white rounded-xl shadow-xl transition-colors ${isLayersOpen ? 'bg-white/80 dark:bg-white/20' : 'bg-white/50 dark:bg-white/10 hover:bg-white/80 dark:hover:bg-white/20'}`}
           title="Toggle Layers"
         >
           <Layers size={20} />
         </button>
 
         {isLayersOpen && (
-          <div className="backdrop-blur-md bg-white/10 border border-white/20 text-white p-3 rounded-2xl shadow-xl flex flex-col gap-2 w-40">
-            <h4 className="font-semibold text-xs text-white/70 uppercase tracking-wider mb-1">Layers</h4>
+          <div className="backdrop-blur-md bg-white/80 dark:bg-white/10 border border-slate-300 dark:border-white/20 text-slate-800 dark:text-white p-3 rounded-2xl shadow-xl flex flex-col gap-2 w-40">
+            <h4 className="font-semibold text-xs text-slate-500 dark:text-white/70 uppercase tracking-wider mb-1">Layers</h4>
             {Object.keys(layers).map(layer => (
               <label key={layer} onClick={() => toggleLayer(layer as keyof typeof layers)} className="flex items-center gap-3 cursor-pointer group">
                 <div className={`relative w-8 h-4 rounded-full transition-colors ${layers[layer as keyof typeof layers] ? 'bg-primary' : 'bg-white/20'}`}>
@@ -131,7 +134,7 @@ export default function CADViewport() {
                 </div>
                 <div className="flex items-center gap-2 flex-1">
                   <span className={`w-2 h-2 rounded-full ${layerColors[layer] || 'bg-gray-400'}`}></span>
-                  <span className="text-sm capitalize group-hover:text-white transition-colors text-white/80">{layer}</span>
+                  <span className="text-sm capitalize group-hover:text-slate-900 dark:group-hover:text-white transition-colors text-slate-700 dark:text-white/80">{layer}</span>
                 </div>
               </label>
             ))}
@@ -140,36 +143,36 @@ export default function CADViewport() {
       </div>
 
       {/* ── Navigation HUD ── */}
-      <div className="absolute bottom-6 left-6 z-10 flex flex-col gap-2 backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-1 shadow-xl">
-        <button onClick={zoomIn} className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition" title="Zoom In (+)"><Plus size={20} /></button>
-        <button onClick={zoomOut} className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition" title="Zoom Out (-)"><Minus size={20} /></button>
-        <div className="w-full h-px bg-white/20 my-1"></div>
-        <button onClick={resetView} className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition" title="Zoom Extents (Z+E)"><Maximize size={20} /></button>
-        <button onClick={resetView} className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition" title="Reset North"><Compass size={20} /></button>
+      <div className="absolute bottom-6 left-6 z-10 flex flex-col gap-2 backdrop-blur-md bg-white/80 dark:bg-white/10 border border-slate-300 dark:border-white/20 rounded-xl p-1 shadow-xl">
+        <button onClick={zoomIn} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Zoom In (+)"><Plus size={20} /></button>
+        <button onClick={zoomOut} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Zoom Out (-)"><Minus size={20} /></button>
+        <div className="w-full h-px bg-slate-300 dark:bg-white/20 my-1"></div>
+        <button onClick={resetView} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Zoom Extents (Z+E)"><Maximize size={20} /></button>
+        <button onClick={resetView} className="p-2 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition" title="Reset North"><Compass size={20} /></button>
       </div>
 
       {/* ── Plot Info Badge ── */}
-      <div className="absolute top-4 left-4 z-10 backdrop-blur-md bg-white/10 border border-white/20 text-white px-3 py-2 rounded-xl shadow-xl">
-        <div className="text-[10px] text-white/50 uppercase tracking-wider">Plot</div>
+      <div className="absolute top-4 left-4 z-10 backdrop-blur-md bg-white/80 dark:bg-white/10 border border-slate-300 dark:border-white/20 text-slate-800 dark:text-white px-3 py-2 rounded-xl shadow-xl">
+        <div className="text-[10px] text-slate-500 dark:text-white/50 uppercase tracking-wider">Plot</div>
         <div className="text-sm font-bold">{plotW}m × {plotH}m</div>
-        <div className="text-[10px] text-white/60 mt-0.5">{plotSpec.floorCount || 'G'} • {reqSpec.bhk || '2BHK'}</div>
+        <div className="text-[10px] text-slate-600 dark:text-white/60 mt-0.5">{plotSpec.floorCount || 'G'} • {reqSpec.bhk || '2BHK'}</div>
       </div>
 
       {/* ── Tooltip ── */}
       {hoveredElement && (
         <div
-          className="absolute z-20 backdrop-blur-md bg-slate-900/90 border border-slate-700 text-white p-3 rounded-lg shadow-2xl pointer-events-none max-w-[220px]"
+          className="absolute z-20 backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white p-3 rounded-lg shadow-2xl pointer-events-none max-w-[220px]"
           style={{ left: hoveredElement.x + 15, top: hoveredElement.y + 15 }}
         >
-          <div className="flex items-center gap-2 mb-1.5 border-b border-slate-700 pb-1.5">
-            <Info size={14} className="text-blue-400" />
+          <div className="flex items-center gap-2 mb-1.5 border-b border-slate-200 dark:border-slate-700 pb-1.5">
+            <Info size={14} className="text-blue-500 dark:text-blue-400" />
             <strong className="text-sm">{hoveredElement.id}</strong>
-            <span className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded uppercase">{hoveredElement.type}</span>
+            <span className="text-[10px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded uppercase">{hoveredElement.type}</span>
           </div>
           {hoveredElement.details && (
-            <div className="text-xs space-y-0.5 text-slate-300">
+            <div className="text-xs space-y-0.5 text-slate-600 dark:text-slate-300">
               {Object.entries(hoveredElement.details).map(([k, v]) => (
-                <p key={k}>{k}: <span className="text-white font-mono">{v}</span></p>
+                <p key={k}>{k}: <span className="text-slate-900 dark:text-white font-mono">{v}</span></p>
               ))}
             </div>
           )}
@@ -183,6 +186,7 @@ export default function CADViewport() {
             layout={layout}
             layers={layers}
             floorCount={floorCount}
+            isDark={isDark}
           />
         ) : (
           <svg
@@ -199,11 +203,11 @@ export default function CADViewport() {
               <g>
                 {/* Vertical gridlines every 1m */}
                 {Array.from({ length: Math.ceil(plotW) + 1 }, (_, i) => (
-                  <line key={`gx${i}`} x1={mx(i)} y1={my(0)} x2={mx(i)} y2={my(plotH)} stroke="#374151" strokeWidth="0.5" strokeDasharray="4 6" />
+                  <line key={`gx${i}`} x1={mx(i)} y1={my(0)} x2={mx(i)} y2={my(plotH)} stroke={isDark ? "#374151" : "#cbd5e1"} strokeWidth="0.5" strokeDasharray="4 6" />
                 ))}
                 {/* Horizontal gridlines every 1m */}
                 {Array.from({ length: Math.ceil(plotH) + 1 }, (_, i) => (
-                  <line key={`gy${i}`} x1={mx(0)} y1={my(i)} x2={mx(plotW)} y2={my(i)} stroke="#374151" strokeWidth="0.5" strokeDasharray="4 6" />
+                  <line key={`gy${i}`} x1={mx(0)} y1={my(i)} x2={mx(plotW)} y2={my(i)} stroke={isDark ? "#374151" : "#cbd5e1"} strokeWidth="0.5" strokeDasharray="4 6" />
                 ))}
               </g>
             )}
@@ -211,7 +215,7 @@ export default function CADViewport() {
             {/* Plot boundary */}
             <rect
               x={mx(0)} y={my(plotH)} width={plotW * SCALE} height={plotH * SCALE}
-              fill="none" stroke="#6b7280" strokeWidth="2"
+              fill="none" stroke={isDark ? "#6b7280" : "#94a3b8"} strokeWidth="2"
             />
 
             {/* Setback envelope (dashed) */}
@@ -227,7 +231,7 @@ export default function CADViewport() {
                 <rect
                   x={mx(r.x)} y={my(r.y + r.h)}
                   width={r.w * SCALE} height={r.h * SCALE}
-                  fill={r.color} stroke="rgba(255,255,255,0.15)" strokeWidth="1"
+                  fill={r.color} stroke={isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"} strokeWidth="1"
                   className="transition-all duration-150 hover:brightness-125 cursor-pointer"
                   onMouseEnter={(e) => setHoveredElement({
                     id: r.id, type: r.name, x: e.clientX, y: e.clientY,
@@ -238,7 +242,7 @@ export default function CADViewport() {
                 />
                 <text
                   x={mx(r.x + r.w / 2)} y={my(r.y + r.h / 2)}
-                  fill="rgba(255,255,255,0.8)" fontSize="10" textAnchor="middle" dominantBaseline="central"
+                  fill={isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.8)"} fontSize="10" textAnchor="middle" dominantBaseline="central"
                   className="pointer-events-none"
                 >
                   {r.name}
@@ -246,12 +250,11 @@ export default function CADViewport() {
               </g>
             ))}
 
-            {/* Walls — buildable outline */}
             {layers.walls && (
               <rect
                 x={mx(buildable.x)} y={my(buildable.y + buildable.h)}
                 width={buildable.w * SCALE} height={buildable.h * SCALE}
-                fill="none" stroke="white" strokeWidth="3"
+                fill="none" stroke={isDark ? "white" : "#1e293b"} strokeWidth="3"
               />
             )}
 
@@ -373,9 +376,9 @@ export default function CADViewport() {
 
             {/* Direction indicator */}
             <g transform={`translate(${svgW - 30}, ${svgH - 30})`}>
-              <circle cx="0" cy="0" r="14" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
-              <text x="0" y="-3" fill="white" fontSize="8" textAnchor="middle" dominantBaseline="central" fontWeight="bold">N</text>
-              <line x1="0" y1="2" x2="0" y2="10" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+              <circle cx="0" cy="0" r="14" fill={isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"} stroke={isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"} strokeWidth="1" />
+              <text x="0" y="-3" fill={isDark ? "white" : "black"} fontSize="8" textAnchor="middle" dominantBaseline="central" fontWeight="bold">N</text>
+              <line x1="0" y1="2" x2="0" y2="10" stroke={isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)"} strokeWidth="1" />
             </g>
           </svg>
         )}
@@ -411,10 +414,11 @@ function DimLine({ x1, y1, x2, y2, label, vertical, color = '#facc15' }: {
 // ---------------------------------------------------------------------------
 // Three.js 3D View  — data-driven from layout + plotSpec
 // ---------------------------------------------------------------------------
-function ThreeView({ layout, layers, floorCount }: {
+function ThreeView({ layout, layers, floorCount, isDark }: {
   layout: ReturnType<typeof generateLayout>;
   layers: Record<string, boolean>;
   floorCount: number;
+  isDark: boolean;
 }) {
   const { plotW, plotH, buildable, rooms: layoutRooms, columns } = layout;
   const floorH = 3.0; // 3m per floor
@@ -423,18 +427,18 @@ function ThreeView({ layout, layers, floorCount }: {
   const camDist = Math.max(plotW, plotH) * 2.5;
 
   return (
-    <Canvas camera={{ position: [camDist * 0.6, camDist * 0.5, camDist * 0.8], fov: 50 }} className="w-full h-full bg-slate-900">
+    <Canvas camera={{ position: [camDist * 0.6, camDist * 0.5, camDist * 0.8], fov: 50 }} className={`w-full h-full ${isDark ? 'bg-slate-900' : 'bg-slate-100'}`}>
       <ambientLight intensity={0.5} />
       <directionalLight position={[plotW, floorH * floorCount * 2, plotH]} intensity={1} castShadow />
       <hemisphereLight args={['#b1e1ff', '#b97a20', 0.3]} />
       <OrbitControls makeDefault target={[plotW / 2, (floorH * floorCount) / 2, plotH / 2]} />
 
-      {layers.grid && <Grid infiniteGrid fadeDistance={Math.max(plotW, plotH) * 4} sectionColor="#6b7280" cellColor="#374151" />}
+      {layers.grid && <Grid infiniteGrid fadeDistance={Math.max(plotW, plotH) * 4} sectionColor={isDark ? "#6b7280" : "#94a3b8"} cellColor={isDark ? "#374151" : "#cbd5e1"} />}
 
       {/* Ground plane */}
       <mesh position={[plotW / 2, -0.06, plotH / 2]} receiveShadow>
         <boxGeometry args={[plotW, 0.1, plotH]} />
-        <meshStandardMaterial color="#1e293b" />
+        <meshStandardMaterial color={isDark ? "#1e293b" : "#e2e8f0"} />
       </mesh>
 
       {/* Plot boundary outline on ground */}

@@ -342,11 +342,14 @@ export default function WorkbenchHeader() {
                 </button>
                 <div className="h-px bg-border my-1 mx-2"></div>
                 <button 
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  onClick={() => {
+                    if (theme === 'system') setTheme('light');
+                    else if (theme === 'light') setTheme('dark');
+                    else setTheme('system');
+                  }}
                   className="px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors flex items-center justify-between"
                 >
-                  <span>Dark Mode</span>
-                  {theme === 'dark' && <Check className="w-4 h-4" />}
+                  <span>Theme: {theme === 'system' ? 'System' : theme === 'light' ? 'Light' : 'Dark'}</span>
                 </button>
               </div>
             )}
