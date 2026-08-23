@@ -37,6 +37,9 @@
       ],
       "@vastumandal/dxf-exporter": [
         "../../packages/dxf-exporter/src"
+      ],
+      "@vastumandal/ifc-exporter": [
+        "../../packages/ifc-exporter/src"
       ]
     }
   },

@@ -17,6 +17,7 @@
     "@vastumandal/core-structural": "workspace:*",
     "@vastumandal/dwg-schemas": "workspace:*",
     "@vastumandal/dxf-exporter": "workspace:*",
+    "@vastumandal/ifc-exporter": "workspace:*",
     "@vastumandal/mesh-exporter": "workspace:*",
     "@vastumandal/pdf-exporter": "workspace:*",
     "dxf-viewer": "^1.0.48",

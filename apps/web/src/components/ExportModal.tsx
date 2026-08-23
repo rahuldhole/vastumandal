@@ -1,17 +1,23 @@
-import React from 'react';
-import { FileCode, Box, FileText, X, Archive } from 'lucide-react';
+import React, { useState } from 'react';
+import { FileCode, Box, FileText, X, Archive, Copy, Check } from 'lucide-react';
 import { useAppStore } from '../store/useStore';
+import { exportTemplateToDXF, exportTemplateToScript } from '@vastumandal/dxf-exporter';
+import { exportVastumandalIFC } from '@vastumandal/ifc-exporter';
 
 export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  
   if (!isOpen) return null;
 
-  const downloadFile = (format: string) => {
+  const getExportData = (format: string) => {
+    const state = useAppStore.getState();
+    const projectName = state.templateData?.projectName || 'Vastumandal';
+    
     if (format === 'vastu') {
-      const state = useAppStore.getState();
       const exportData = {
         schemaVersion: "1.0.0",
         meta: {
-          projectName: state.templateData?.projectName || 'Vastumandal',
+          projectName,
           createdAt: new Date().toISOString(),
         },
         state: {
@@ -21,25 +27,77 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
           isCalculating: false
         }
       };
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${(state.templateData?.projectName || 'Vastumandal').replace(/\s+/g, '_')}_Project.vastu`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      return JSON.stringify(exportData, null, 2);
+    } else if (format === 'dxf') {
+      return exportTemplateToDXF({
+        sheetSize: 'A1',
+        projectName: projectName,
+        clientName: 'Client',
+        date: new Date().toISOString().split('T')[0],
+        drawnBy: 'Engineer',
+        drawingTitle: 'Project Layout'
+      });
+    } else if (format === 'lsp') {
+      return exportTemplateToScript({
+        sheetSize: 'A1',
+        projectName: projectName,
+        clientName: 'Client',
+        date: new Date().toISOString().split('T')[0],
+        drawnBy: 'Engineer',
+        drawingTitle: 'Project Layout'
+      });
+    } else if (format === 'ifc') {
+      return exportVastumandalIFC({});
+    }
+    return '';
+  };
+
+  const getMimeType = (format: string) => {
+    if (format === 'vastu' || format === 'json') return 'application/json';
+    return 'text/plain';
+  };
+
+  const downloadFile = (format: string) => {
+    if (format === 'zip') {
+      alert('Downloading ZIP not fully implemented yet...');
       return;
     }
-    alert(`Downloading model in ${format.toUpperCase()} format...`);
+    
+    const content = getExportData(format);
+    if (!content) return;
+    
+    const state = useAppStore.getState();
+    const projectName = state.templateData?.projectName || 'Vastumandal';
+    const blob = new Blob([content], { type: getMimeType(format) });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${projectName.replace(/\\s+/g, '_')}_Project.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const copyToClipboard = async (e: React.MouseEvent, format: string) => {
+    e.stopPropagation(); // prevent triggering the download
+    const content = getExportData(format);
+    if (!content) return;
+    
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedId(format);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy to clipboard", err);
+    }
   };
 
   const formats = [
-    { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500' },
-    { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500' },
-    { id: 'lsp', title: 'AutoLISP Script (.lsp)', desc: 'Direct command-line automation script for AutoCAD.', icon: FileText, color: 'text-amber-500' },
-    { id: 'vastu', title: 'Vastumandal Project (.vastu)', desc: 'Native project format containing all specifications and parameters.', icon: FileCode, color: 'text-emerald-500' },
+    { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500', canCopy: true },
+    { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500', canCopy: true },
+    { id: 'lsp', title: 'AutoLISP Script (.lsp)', desc: 'Direct command-line automation script for AutoCAD.', icon: FileText, color: 'text-amber-500', canCopy: true },
+    { id: 'vastu', title: 'Vastumandal Project (.vastu)', desc: 'Native project format containing all specifications and parameters.', icon: FileCode, color: 'text-emerald-500', canCopy: false },
   ];
 
   return (
@@ -62,19 +120,30 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
           {formats.map(fmt => {
             const Icon = fmt.icon;
             return (
-              <button 
-                key={fmt.id} 
-                onClick={() => downloadFile(fmt.id)}
-                className="flex items-start gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/50 transition-all text-left group"
-              >
-                <div className={`p-3 rounded-lg bg-muted group-hover:bg-background transition-colors ${fmt.color}`}>
-                  <Icon size={24} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm text-foreground mb-1 group-hover:text-primary transition-colors">{fmt.title}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{fmt.desc}</p>
-                </div>
-              </button>
+              <div key={fmt.id} className="relative group">
+                <button 
+                  onClick={() => downloadFile(fmt.id)}
+                  className="flex items-start gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/50 transition-all text-left w-full h-full"
+                >
+                  <div className={`p-3 rounded-lg bg-muted group-hover:bg-background transition-colors ${fmt.color}`}>
+                    <Icon size={24} />
+                  </div>
+                  <div className="pr-10">
+                    <h3 className="font-bold text-sm text-foreground mb-1 group-hover:text-primary transition-colors">{fmt.title}</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{fmt.desc}</p>
+                  </div>
+                </button>
+                
+                {fmt.canCopy && (
+                  <button 
+                    onClick={(e) => copyToClipboard(e, fmt.id)}
+                    className="absolute top-4 right-4 p-2 rounded-md bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-colors z-10 flex flex-col items-center justify-center"
+                    title={`Copy ${fmt.id.toUpperCase()} to clipboard`}
+                  >
+                    {copiedId === fmt.id ? <Check size={16} /> : <Copy size={16} />}
+                  </button>
+                )}
+              </div>
             )
           })}
         </div>

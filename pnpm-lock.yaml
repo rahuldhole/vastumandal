@@ -42,6 +42,9 @@ importers:
       '@vastumandal/dxf-exporter':
         specifier: workspace:*
         version: link:../../packages/dxf-exporter
+      '@vastumandal/ifc-exporter':
+        specifier: workspace:*
+        version: link:../../packages/ifc-exporter
       '@vastumandal/mesh-exporter':
         specifier: workspace:*
         version: link:../../packages/mesh-exporter
