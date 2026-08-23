@@ -38,8 +38,20 @@ export interface Slab {
   thickness: number;
 }
 
+export interface Footing {
+  id: string;
+  columnId: string;
+  center: Point2D;
+  length: number;
+  width: number;
+  depth: number;
+  type: 'ISOLATED' | 'COMBINED';
+}
+
 export interface StructuralFraming {
   columns: Column[];
   beams: Beam[];
   slabs: Slab[];
+  footings: Footing[];
 }
+

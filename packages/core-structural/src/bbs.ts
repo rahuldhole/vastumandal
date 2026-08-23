@@ -4,6 +4,17 @@ export function calculateBarWeight(diameterMm: number, lengthMeters: number): nu
   return (Math.pow(diameterMm, 2) / 162.2) * lengthMeters;
 }
 
+export function getDevelopmentLength(dia: number, code: 'IS456' | 'ACI318' = 'IS456'): number {
+  // Approximate Ld for M25/Fe500
+  return code === 'IS456' ? 47 * dia : 40 * dia;
+}
+
+export function getHookAllowance(dia: number, angle: 90 | 135 | 180 = 135): number {
+  if (angle === 90) return 4 * dia;
+  if (angle === 135) return 6 * dia;
+  return 8 * dia;
+}
+
 export function generateBeamBBS(
   beamId: string,
   clearSpan: number, // mm
@@ -20,8 +31,9 @@ export function generateBeamBBS(
   const items: BBSItem[] = [];
 
   // Main Bottom Bars (straight with 90 deg L-bends at ends)
-  // Assuming L-bend is anchored into column width, say 230mm - cover
-  const endAnchorage = 200; 
+  // L_d (Development length) required into the support
+  const Ld = getDevelopmentLength(bottomDia);
+  const endAnchorage = Math.min(Ld, 200 + getHookAllowance(bottomDia, 90)); // simplified anchorage
   const bottomCutLen = clearSpan + 2 * endAnchorage - 2 * (2 * bottomDia); // 90 deg deduction = 2d per bend
   items.push({
     id: `${beamId}-bottom`,
@@ -37,7 +49,9 @@ export function generateBeamBBS(
   });
 
   // Top Anchor Bars
-  const topCutLen = clearSpan + 2 * endAnchorage - 2 * (2 * topDia);
+  const topLd = getDevelopmentLength(topDia);
+  const topEndAnchorage = Math.min(topLd, 200 + getHookAllowance(topDia, 90));
+  const topCutLen = clearSpan + 2 * topEndAnchorage - 2 * (2 * topDia);
   items.push({
     id: `${beamId}-top`,
     memberRef: beamId,
@@ -51,10 +65,25 @@ export function generateBeamBBS(
     totalWeight: calculateBarWeight(topDia, (topCutLen * topCount) / 1000)
   });
 
+  // Top Extra Negative Rebar at supports (curtailed at 0.25L)
+  const extraTopLen = 0.25 * clearSpan + topEndAnchorage;
+  items.push({
+    id: `${beamId}-top-extra`,
+    memberRef: beamId,
+    memberType: 'BEAM',
+    barMark: 'T2_EXTRA',
+    barDiameter: topDia,
+    barShape: 'L_BENT_CURTAILED',
+    cuttingLength: extraTopLen,
+    numberOfBars: topCount, // Assume same count for extra bars as main top bars for now
+    totalLength: (extraTopLen * topCount * 2) / 1000, // 2 supports
+    totalWeight: calculateBarWeight(topDia, (extraTopLen * topCount * 2) / 1000)
+  });
+
   // Stirrups (2-legged closed ties, 135 deg hooks)
   const stirrupA = width - 2 * cover;
   const stirrupB = depth - 2 * cover;
-  const hookLen = 10 * stirrupDia; // 10d hook
+  const hookLen = getHookAllowance(stirrupDia, 135); // standard ductile detailing hook
   // 135 deg bend deduction = 3d
   // A standard stirrup has 3 90-deg bends and 2 135-deg bends
   const stirrupCutLen = 2 * (stirrupA + stirrupB) + 2 * hookLen - 3 * (2 * stirrupDia) - 2 * (3 * stirrupDia);
@@ -88,8 +117,9 @@ export function generateColumnBBS(
 ): BBSItem[] {
   const items: BBSItem[] = [];
 
-  // Longitudinal Bars with lap allowance (say 50d)
-  const lapLength = 50 * mainDia;
+  // Longitudinal Bars with lap allowance
+  // Ductile detailing: lap splices must be in the central 50% of the column height, avoiding beam-column joints.
+  const lapLength = getDevelopmentLength(mainDia);
   const mainCutLen = height + lapLength;
   items.push({
     id: `${colId}-main`,
@@ -107,7 +137,7 @@ export function generateColumnBBS(
   // Lateral Ties
   const tieA = width - 2 * cover;
   const tieB = depth - 2 * cover;
-  const hookLen = 10 * tieDia;
+  const hookLen = getHookAllowance(tieDia, 135);
   const tieCutLen = 2 * (tieA + tieB) + 2 * hookLen - 3 * (2 * tieDia) - 2 * (3 * tieDia);
   const tieCount = Math.floor(height / tieSpacing) + 1;
   items.push({

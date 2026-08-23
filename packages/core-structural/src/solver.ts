@@ -1,4 +1,5 @@
-import { Point2D, WallSegment, Column, Beam, Slab, StructuralFraming, SlabType } from './types';
+import { Point2D, WallSegment, Column, Beam, Slab, StructuralFraming, SlabType, Footing } from './types';
+import { generateFootingLayout } from './footing';
 
 // Constants as per IS 456
 const MAX_BEAM_SPAN = 4500; // mm
@@ -79,7 +80,10 @@ export function generateStructuralFraming(walls: WallSegment[]): StructuralFrami
     });
   }
 
-  return { columns, beams, slabs };
+  // 4. Generate Footings and handle collisions
+  const footings = generateFootingLayout(columns);
+
+  return { columns, beams, slabs, footings };
 }
 
 function extractUniquePoints(walls: WallSegment[]): Point2D[] {

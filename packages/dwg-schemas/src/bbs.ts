@@ -6,7 +6,7 @@ export const BBSItemSchema = z.object({
   memberType: z.enum(['BEAM', 'COLUMN', 'SLAB', 'FOOTING']),
   barMark: z.string(),
   barDiameter: z.number().positive(),
-  barShape: z.enum(['STRAIGHT', 'L_BENT', 'CRANKED', 'RECT_STIRRUP']),
+  barShape: z.enum(['STRAIGHT', 'L_BENT', 'L_BENT_CURTAILED', 'CRANKED', 'RECT_STIRRUP']),
   cuttingLength: z.number().positive(),
   numberOfBars: z.number().positive(),
   totalLength: z.number().positive(),
