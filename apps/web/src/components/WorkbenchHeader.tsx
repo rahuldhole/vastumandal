@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useStore } from "zustand";
 import { useAppStore } from "@/store/useStore";
 import { useProjectImport } from "@/hooks/useProjectImport";
-import { Download, Upload, Check, FolderOpen, Save, FilePlus, Undo2, Redo2, LayoutTemplate, Box } from "lucide-react";
+import { Download, Upload, Check, FolderOpen, Save, FilePlus, Undo2, Redo2, LayoutTemplate, Box, FileText } from "lucide-react";
 import ExportModal from "./ExportModal";
 import TemplateWarningModal from "./TemplateWarningModal";
 import { exportVastumandalDXF } from "@vastumandal/dxf-exporter";
@@ -174,6 +174,33 @@ export default function WorkbenchHeader() {
     setActiveMenu(null);
   };
   
+  const handleExportReport = async () => {
+    try {
+      const state = useAppStore.getState();
+      const projectName = state.templateData?.projectName || 'Vastumandal';
+      const { exportToPdf } = await import('@vastumandal/pdf-exporter');
+      const blob = await exportToPdf({
+        floorPlan: state.geometryResult,
+        columns: [],
+        boq: state.boqResult,
+        printSetup: state.printSetup,
+        projectMetadata: state.projectMetadata
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${projectName.replace(/\\s+/g, '_')}_Drawings.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to generate PDF report", err);
+      alert("Failed to generate PDF report.");
+    }
+    setActiveMenu(null);
+  };
+  
   const applyTemplate = (preset: typeof PRESETS[0]) => {
     setPlotSpec({
       ...preset.plotSpec,
@@ -248,6 +275,12 @@ export default function WorkbenchHeader() {
                   className="flex items-center gap-2 px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors"
                 >
                   <Upload className="w-4 h-4" /> Import Project (.vastu)
+                </button>
+                <button 
+                  onClick={handleExportReport}
+                  className="flex items-center gap-2 px-3 py-1.5 text-left hover:bg-muted hover:text-foreground w-full transition-colors"
+                >
+                  <FileText className="w-4 h-4" /> Report (.pdf)
                 </button>
                 <button 
                   onClick={() => { setIsExportModalOpen(true); setActiveMenu(null); }}

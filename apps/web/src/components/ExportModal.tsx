@@ -69,26 +69,6 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
     const state = useAppStore.getState();
     const projectName = state.templateData?.projectName || 'Vastumandal';
     
-    if (format === 'pdf') {
-      const { exportToPdf } = await import('@vastumandal/pdf-exporter');
-      const blob = await exportToPdf({
-        floorPlan: state.geometryResult,
-        columns: [],
-        boq: state.boqResult,
-        printSetup: state.printSetup,
-        projectMetadata: state.projectMetadata
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${projectName.replace(/\\s+/g, '_')}_Drawings.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      return;
-    }
-    
     const content = getExportData(format);
     if (!content) return;
     
@@ -129,7 +109,6 @@ export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onCl
   };
 
   const formats = [
-    { id: 'pdf', title: 'PDF Sheet Set (.pdf)', desc: 'Direct-to-print vector architectural plans and structural schedules.', icon: FileText, color: 'text-red-500', canCopy: false },
     { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500', canCopy: true },
     { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500', canCopy: true, canPreview: true },
     { id: 'lsp', title: 'AutoLISP Script (.lsp)', desc: 'Direct command-line automation script for AutoCAD.', icon: FileText, color: 'text-amber-500', canCopy: true },
