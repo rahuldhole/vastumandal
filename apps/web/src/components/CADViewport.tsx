@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo, useEffect, MouseEvent } from 'react';
-import { Plus, Minus, Maximize, Compass, Info } from 'lucide-react';
+import { Plus, Minus, Maximize, Compass, Info, Layers } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
 import { BoxGeometry } from 'three';
@@ -27,6 +27,7 @@ export default function CADViewport() {
     beams: true,
     rooms: true,
   });
+  const [isLayersOpen, setIsLayersOpen] = useState(false);
 
   const [transform, setTransform] = useState({ scale: 1, x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -111,19 +112,31 @@ export default function CADViewport() {
       style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
     >
       {/* ── Layer Visibility Dock ── */}
-      <div className="absolute top-4 right-4 z-10 backdrop-blur-md bg-white/10 border border-white/20 text-white p-3 rounded-2xl shadow-xl flex flex-col gap-2 w-40">
-        <h4 className="font-semibold text-xs text-white/70 uppercase tracking-wider mb-1">Layers</h4>
-        {Object.keys(layers).map(layer => (
-          <label key={layer} onClick={() => toggleLayer(layer as keyof typeof layers)} className="flex items-center gap-3 cursor-pointer group">
-            <div className={`relative w-8 h-4 rounded-full transition-colors ${layers[layer as keyof typeof layers] ? 'bg-primary' : 'bg-white/20'}`}>
-              <div className={`absolute top-0.5 left-0.5 bg-white w-3 h-3 rounded-full transition-transform ${layers[layer as keyof typeof layers] ? 'translate-x-4' : 'translate-x-0'}`}></div>
-            </div>
-            <div className="flex items-center gap-2 flex-1">
-              <span className={`w-2 h-2 rounded-full ${layerColors[layer] || 'bg-gray-400'}`}></span>
-              <span className="text-sm capitalize group-hover:text-white transition-colors text-white/80">{layer}</span>
-            </div>
-          </label>
-        ))}
+      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
+        <button 
+          onClick={() => setIsLayersOpen(!isLayersOpen)}
+          className={`p-2.5 backdrop-blur-md border border-white/20 text-white rounded-xl shadow-xl transition-colors ${isLayersOpen ? 'bg-white/20' : 'bg-white/10 hover:bg-white/20'}`}
+          title="Toggle Layers"
+        >
+          <Layers size={20} />
+        </button>
+
+        {isLayersOpen && (
+          <div className="backdrop-blur-md bg-white/10 border border-white/20 text-white p-3 rounded-2xl shadow-xl flex flex-col gap-2 w-40">
+            <h4 className="font-semibold text-xs text-white/70 uppercase tracking-wider mb-1">Layers</h4>
+            {Object.keys(layers).map(layer => (
+              <label key={layer} onClick={() => toggleLayer(layer as keyof typeof layers)} className="flex items-center gap-3 cursor-pointer group">
+                <div className={`relative w-8 h-4 rounded-full transition-colors ${layers[layer as keyof typeof layers] ? 'bg-primary' : 'bg-white/20'}`}>
+                  <div className={`absolute top-0.5 left-0.5 bg-white w-3 h-3 rounded-full transition-transform ${layers[layer as keyof typeof layers] ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                </div>
+                <div className="flex items-center gap-2 flex-1">
+                  <span className={`w-2 h-2 rounded-full ${layerColors[layer] || 'bg-gray-400'}`}></span>
+                  <span className="text-sm capitalize group-hover:text-white transition-colors text-white/80">{layer}</span>
+                </div>
+              </label>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── Navigation HUD ── */}
