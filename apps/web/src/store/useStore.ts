@@ -71,8 +71,8 @@ interface AppState {
  activeTab: '2D' | '3D';
  setActiveTab: (tab: '2D' | '3D') => void;
  
- layers: { zones: boolean; grid: boolean; dims: boolean; openings: boolean };
- setLayers: (layers: Partial<{ zones: boolean; grid: boolean; dims: boolean; openings: boolean }>) => void;
+ layers: { vastu: boolean; zones: boolean; grid: boolean; dims: boolean; openings: boolean };
+ setLayers: (layers: Partial<{ vastu: boolean; zones: boolean; grid: boolean; dims: boolean; openings: boolean }>) => void;
 
  // Worker results
  // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -223,7 +223,7 @@ export const useAppStore = create<AppState>()(
  activeTab: '2D',
  setActiveTab: (tab) => set({ activeTab: tab }),
  
- layers: { zones: true, grid: true, dims: true, openings: true },
+ layers: { vastu: false, zones: true, grid: true, dims: true, openings: true },
  setLayers: (data) => set((state) => ({ layers: { ...state.layers, ...data } })),
 
  boqResult: null,

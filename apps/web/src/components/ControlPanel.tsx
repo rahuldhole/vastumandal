@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Info, AlertTriangle, Settings2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Info, AlertTriangle, Settings2, Compass } from 'lucide-react';
+import { useAppStore } from '@/store/useStore';
 
-const AccordionHeader = ({ title, section, openSection, setOpenSection, icon: Icon }: { title: string, section: 'A' | 'B' | 'C', openSection: 'A' | 'B' | 'C' | null, setOpenSection: (s: 'A' | 'B' | 'C' | null) => void, icon: React.ElementType }) => (
+type SectionType = 'A' | 'B' | 'C' | 'D' | null;
+
+const AccordionHeader = ({ title, section, openSection, setOpenSection, icon: Icon }: { title: string, section: NonNullable<SectionType>, openSection: SectionType, setOpenSection: React.Dispatch<React.SetStateAction<SectionType>>, icon: React.ElementType<{ size?: number; className?: string }> }) => (
   <button 
     onClick={() => setOpenSection(openSection === section ? null : section)}
     className="flex items-center justify-between w-full p-3 font-semibold text-sm bg-muted/50 hover:bg-muted transition-colors border-b border-border text-foreground"
@@ -14,7 +17,12 @@ const AccordionHeader = ({ title, section, openSection, setOpenSection, icon: Ic
   </button>
 );
 
-export default function ControlPanel({ onParamsChange = () => {} }: { onParamsChange?: (params: unknown) => void }) {
+export default function ControlPanel() {
+  const { reqSpec, setReqSpec } = useAppStore();
+  const vastu = reqSpec.vastu || {};
+  const setVastu = (key: string, value: string) => {
+    setReqSpec({ vastu: { ...vastu, [key]: value } });
+  };
   const [sbc, setSbc] = useState(200);
   const [storeys, setStoreys] = useState(2); // G+1
   const [fSetback, setFSetback] = useState(3);
@@ -27,13 +35,13 @@ export default function ControlPanel({ onParamsChange = () => {} }: { onParamsCh
   const [steelGrade, setSteelGrade] = useState('Fe500');
 
   // Accordion State
-  const [openSection, setOpenSection] = useState<'A' | 'B' | 'C' | null>('B');
+  const [openSection, setOpenSection] = useState<SectionType>('B');
 
   const triggerUpdate = () => {
-    onParamsChange({ sbc, storeys, setbacks: { front: fSetback, rear: rSetback }, soilType, depth, concreteGrade, steelGrade });
+    // legacy mock update
   };
 
-  const isLowSBC = sbc < 80;
+  const isLowSBC = Boolean(sbc < 80);
   const isLargeSpan = false; // Mock for span > 7.5m
 
   return (
@@ -164,6 +172,50 @@ export default function ControlPanel({ onParamsChange = () => {} }: { onParamsCh
               <button className="w-full py-2 bg-muted hover:bg-muted/80 text-foreground border border-border rounded text-xs font-medium transition">
                 Configure Regional Rates...
               </button>
+            </div>
+          )}
+        </div>
+
+        {/* SECTION D: Vastu Purusha Mandala */}
+        <div>
+          <AccordionHeader title="Vastu Purusha Mandala" section="D" icon={Compass} openSection={openSection} setOpenSection={setOpenSection} />
+          {openSection === 'D' && (
+            <div className="p-4 space-y-4 text-sm bg-card">
+              <div>
+                <label className="block text-xs font-medium mb-1 text-muted-foreground">Plot Facing</label>
+                <select value={vastu.plotFacing || 'North'} onChange={e => setVastu('plotFacing', e.target.value)} className="w-full p-2 border border-border rounded bg-background outline-none">
+                  <option>North</option><option>East</option><option>South</option><option>West</option>
+                  <option>NE</option><option>NW</option><option>SE</option><option>SW</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Mandir</label>
+                  <select value={vastu.mandirPosition || 'NE (Ishan)'} onChange={e => setVastu('mandirPosition', e.target.value)} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>NE (Ishan)</option><option>East</option><option>Center (Brahmasthan)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Kitchen</label>
+                  <select value={vastu.kitchenPosition || 'SE (Agni)'} onChange={e => setVastu('kitchenPosition', e.target.value)} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>SE (Agni)</option><option>NW (Vayu)</option><option>East</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Master Bed</label>
+                  <select value={vastu.masterBedPosition || 'SW (Nairutya)'} onChange={e => setVastu('masterBedPosition', e.target.value)} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>SW (Nairutya)</option><option>South</option><option>West</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">Main Gate</label>
+                  <select value={vastu.entrancePada || 'Favorable'} onChange={e => setVastu('entrancePada', e.target.value)} className="w-full p-2 border border-border rounded bg-background outline-none">
+                    <option>Favorable</option><option>Neutral</option><option>Unfavorable</option>
+                  </select>
+                </div>
+              </div>
             </div>
           )}
         </div>

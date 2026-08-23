@@ -1,8 +1,13 @@
 import React, { useState, useRef, MouseEvent, WheelEvent } from 'react';
 import { Plus, Minus, Maximize, Compass, Info } from 'lucide-react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Grid } from '@react-three/drei';
+import { useAppStore } from '@/store/useStore';
 
 export default function CADViewport() {
+  const { activeTab } = useAppStore();
   const [layers, setLayers] = useState({
+    vastu: false,
     grid: true,
     walls: true,
     columns: true,
@@ -48,7 +53,7 @@ export default function CADViewport() {
   const zoomIn = () => setTransform(prev => ({ ...prev, scale: Math.min(prev.scale + 0.2, 10) }));
   const zoomOut = () => setTransform(prev => ({ ...prev, scale: Math.max(0.1, prev.scale - 0.2) }));
 
-  const layerColors = { grid: 'bg-gray-500', walls: 'bg-white', columns: 'bg-red-500', footings: 'bg-green-400', dims: 'bg-yellow-400', beams: 'bg-blue-400' };
+  const layerColors = { vastu: 'bg-purple-500', grid: 'bg-gray-500', walls: 'bg-white', columns: 'bg-red-500', footings: 'bg-green-400', dims: 'bg-yellow-400', beams: 'bg-blue-400' };
 
   return (
     <div 
@@ -116,45 +121,104 @@ export default function CADViewport() {
         </div>
       )}
 
-      {/* Canvas */}
-      <div className="flex-1 w-full h-full">
-        <svg 
-          width="100%" height="100%" 
-          style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`, transformOrigin: '0 0' }}
-        >
-          {layers.grid && (
-            <path d="M0 50 L 400 50 M50 0 L 50 400" stroke="gray" strokeWidth="1" strokeDasharray="10 5" />
-          )}
-          {layers.footings && (
-            <rect 
-              x="25" y="25" width="50" height="50" 
-              fill="rgba(74, 222, 128, 0.1)" stroke="#4ade80" strokeDasharray="4" strokeWidth="2" 
-              className="transition-all duration-200 hover:fill-green-400/30 hover:stroke-green-300 cursor-pointer"
-              onMouseEnter={(e) => setHoveredElement({ id: 'F1', type: 'Footing', x: e.clientX, y: e.clientY })}
-              onMouseLeave={() => setHoveredElement(null)}
-              onMouseMove={(e) => hoveredElement && setHoveredElement({ ...hoveredElement, x: e.clientX, y: e.clientY })}
-            />
-          )}
-          {layers.columns && (
-            <rect 
-              x="40" y="40" width="20" height="20" 
-              fill="#ef4444" 
-              className="transition-all duration-200 hover:fill-red-500 hover:shadow-[0_0_15px_rgba(239,68,68,0.8)] cursor-pointer"
-              onMouseEnter={(e) => setHoveredElement({ id: 'C1', type: 'Column', x: e.clientX, y: e.clientY })}
-              onMouseLeave={() => setHoveredElement(null)}
-              onMouseMove={(e) => hoveredElement && setHoveredElement({ ...hoveredElement, x: e.clientX, y: e.clientY })}
-            />
-          )}
-          {layers.walls && (
-            <path d="M50 50 L 350 50 L 350 350 L 50 350 Z" fill="none" stroke="white" strokeWidth="4" />
-          )}
-          {layers.dims && (
-            <text x="200" y="30" fill="#facc15" fontSize="12" textAnchor="middle">3000 mm</text>
-          )}
-          {layers.beams && (
-            <path d="M50 50 L 350 50" fill="none" stroke="#60a5fa" strokeWidth="2" strokeDasharray="6 4" />
-          )}
-        </svg>
+      {/* Canvas / 3D Viewport */}
+      <div className="flex-1 w-full h-full relative">
+        {activeTab === '3D' ? (
+          <Canvas camera={{ position: [200, 200, 400], fov: 60 }} className="w-full h-full bg-slate-900">
+            <ambientLight intensity={0.6} />
+            <directionalLight position={[100, 200, 100]} intensity={1} castShadow />
+            <OrbitControls makeDefault />
+            
+            {layers.grid && <Grid infiniteGrid fadeDistance={1000} sectionColor="#6b7280" cellColor="#374151" />}
+            
+            {/* Base coordinate system translation to match SVG roughly (centered around 200,200) */}
+            <group position={[-200, 0, -200]}>
+              {layers.footings && (
+                <mesh position={[50, -10, 50]}>
+                  <boxGeometry args={[50, 20, 50]} />
+                  <meshStandardMaterial color="#4ade80" opacity={0.6} transparent />
+                </mesh>
+              )}
+              {layers.columns && (
+                <mesh position={[50, 60, 50]}>
+                  <boxGeometry args={[20, 120, 20]} />
+                  <meshStandardMaterial color="#ef4444" />
+                </mesh>
+              )}
+              {layers.walls && (
+                <group>
+                  {/* Outer hollow box mocked by 4 walls */}
+                  <mesh position={[200, 60, 50]}><boxGeometry args={[300, 120, 4]} /><meshStandardMaterial color="white" /></mesh>
+                  <mesh position={[200, 60, 350]}><boxGeometry args={[300, 120, 4]} /><meshStandardMaterial color="white" /></mesh>
+                  <mesh position={[50, 60, 200]}><boxGeometry args={[4, 120, 300]} /><meshStandardMaterial color="white" /></mesh>
+                  <mesh position={[350, 60, 200]}><boxGeometry args={[4, 120, 300]} /><meshStandardMaterial color="white" /></mesh>
+                </group>
+              )}
+              {layers.beams && (
+                <mesh position={[200, 120, 50]}>
+                  <boxGeometry args={[300, 10, 10]} />
+                  <meshStandardMaterial color="#60a5fa" />
+                </mesh>
+              )}
+            </group>
+          </Canvas>
+        ) : (
+          <svg 
+            width="100%" height="100%" 
+            style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`, transformOrigin: '0 0' }}
+          >
+            {layers.grid && (
+              <path d="M0 50 L 400 50 M50 0 L 50 400" stroke="gray" strokeWidth="1" strokeDasharray="10 5" />
+            )}
+            {layers.footings && (
+              <rect 
+                x="25" y="25" width="50" height="50" 
+                fill="rgba(74, 222, 128, 0.1)" stroke="#4ade80" strokeDasharray="4" strokeWidth="2" 
+                className="transition-all duration-200 hover:fill-green-400/30 hover:stroke-green-300 cursor-pointer"
+                onMouseEnter={(e) => setHoveredElement({ id: 'F1', type: 'Footing', x: e.clientX, y: e.clientY })}
+                onMouseLeave={() => setHoveredElement(null)}
+                onMouseMove={(e) => hoveredElement && setHoveredElement({ ...hoveredElement, x: e.clientX, y: e.clientY })}
+              />
+            )}
+            {layers.columns && (
+              <rect 
+                x="40" y="40" width="20" height="20" 
+                fill="#ef4444" 
+                className="transition-all duration-200 hover:fill-red-500 hover:shadow-[0_0_15px_rgba(239,68,68,0.8)] cursor-pointer"
+                onMouseEnter={(e) => setHoveredElement({ id: 'C1', type: 'Column', x: e.clientX, y: e.clientY })}
+                onMouseLeave={() => setHoveredElement(null)}
+                onMouseMove={(e) => hoveredElement && setHoveredElement({ ...hoveredElement, x: e.clientX, y: e.clientY })}
+              />
+            )}
+            {layers.walls && (
+              <path d="M50 50 L 350 50 L 350 350 L 50 350 Z" fill="none" stroke="white" strokeWidth="4" />
+            )}
+            {layers.dims && (
+              <text x="200" y="30" fill="#facc15" fontSize="12" textAnchor="middle">3000 mm</text>
+            )}
+            {layers.beams && (
+              <path d="M50 50 L 350 50" fill="none" stroke="#60a5fa" strokeWidth="2" strokeDasharray="6 4" />
+            )}
+            {layers.vastu && (
+              <g opacity="0.6">
+                {/* Vastu 3x3 Grid Overlay over 300x300 plot */}
+                <rect x="50" y="50" width="300" height="300" fill="none" stroke="#a855f7" strokeWidth="2" />
+                <path d="M150 50 L 150 350 M250 50 L 250 350 M50 150 L 350 150 M50 250 L 350 250" stroke="#a855f7" strokeWidth="1" strokeDasharray="5 5" />
+                <text x="100" y="100" fill="#d8b4fe" fontSize="12" textAnchor="middle" alignmentBaseline="middle">Vayu (NW)</text>
+                <text x="200" y="100" fill="#d8b4fe" fontSize="12" textAnchor="middle" alignmentBaseline="middle">North</text>
+                <text x="300" y="100" fill="#d8b4fe" fontSize="12" textAnchor="middle" alignmentBaseline="middle">Ishan (NE)</text>
+                
+                <text x="100" y="200" fill="#d8b4fe" fontSize="12" textAnchor="middle" alignmentBaseline="middle">West</text>
+                <text x="200" y="200" fill="#d8b4fe" fontSize="12" textAnchor="middle" alignmentBaseline="middle" fontWeight="bold">Brahmasthan</text>
+                <text x="300" y="200" fill="#d8b4fe" fontSize="12" textAnchor="middle" alignmentBaseline="middle">East</text>
+                
+                <text x="100" y="300" fill="#d8b4fe" fontSize="12" textAnchor="middle" alignmentBaseline="middle">Nairutya (SW)</text>
+                <text x="200" y="300" fill="#d8b4fe" fontSize="12" textAnchor="middle" alignmentBaseline="middle">South</text>
+                <text x="300" y="300" fill="#d8b4fe" fontSize="12" textAnchor="middle" alignmentBaseline="middle">Agni (SE)</text>
+              </g>
+            )}
+          </svg>
+        )}
       </div>
     </div>
   );

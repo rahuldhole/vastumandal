@@ -22,6 +22,14 @@ export interface RequirementSpec {
   };
   parking?: boolean;
   porch?: boolean;
+  vastu?: {
+    plotFacing?: string;
+    mandirPosition?: string;
+    kitchenPosition?: string;
+    masterBedPosition?: string;
+    waterTankPosition?: string;
+    entrancePada?: string;
+  };
 }
 
 export interface ArchRoom {

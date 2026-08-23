@@ -8,13 +8,19 @@ import dynamic from "next/dynamic";
 const CADViewport = dynamic(() => import("@/components/CADViewport"), { ssr: false });
 import { X } from "lucide-react";
 import { useAppStore } from "@/store/useStore";
+import { useEngineWorker } from "@/hooks/useEngineWorker";
 
 export default function Workbench() {
-  const { leftPanelOpen, setLeftPanelOpen, rightPanelOpen, setRightPanelOpen } = useAppStore();
+  const { leftPanelOpen, setLeftPanelOpen, rightPanelOpen, setRightPanelOpen, plotSpec, reqSpec, rates, setBoqResult, setIsCalculating } = useAppStore();
+  const { calculate, result, isCalculating: workerCalc } = useEngineWorker();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setMounted(true), 0);
+    setTimeout(() => {
+      setMounted(true);
+      // Hydrate worker calculation immediately on mount
+      calculate(plotSpec, reqSpec, rates);
+    }, 0);
     const handleResize = () => {
       const isDesktop = window.innerWidth >= 1024;
       setLeftPanelOpen(isDesktop);
@@ -23,7 +29,15 @@ export default function Workbench() {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [setLeftPanelOpen, setRightPanelOpen]);
+  }, [setLeftPanelOpen, setRightPanelOpen, calculate, plotSpec, reqSpec, rates]);
+
+  // Sync worker state to global store so panels can react
+  useEffect(() => {
+    setIsCalculating(workerCalc);
+    if (result) {
+      setBoqResult(result);
+    }
+  }, [workerCalc, result, setIsCalculating, setBoqResult]);
 
   if (!mounted) {
     return <div className="flex w-full bg-background overflow-hidden relative" style={{ height: "calc(100vh - 64px)" }}></div>;

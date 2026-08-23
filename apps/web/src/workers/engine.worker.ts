@@ -3,7 +3,6 @@ import { sizeFooting } from '@vastumandal/core-structural/src/footing';
 import { generateFootingBBS, compileBBSReport } from '@vastumandal/core-structural/src/bbs';
 import { generateBOQ } from '@vastumandal/core-estimator/src/boq';
 import type { BylawParams } from '@vastumandal/dwg-schemas/src/spatial';
-import type { SoilCondition } from '@vastumandal/dwg-schemas/src/structural';
 import type { RateCard } from '@vastumandal/dwg-schemas/src/estimator';
 
 export interface EngineWorkerRequest {
@@ -24,7 +23,7 @@ self.onmessage = async (event) => {
   const { type, payload } = event.data;
 
   if (type === 'RUN_PIPELINE') {
-    const { spatialProject, bylawParams, soilCondition, rateCard } = payload;
+    const { bylawParams, rateCard, soilCondition } = payload;
     
     // Boundary Checks
     const diagnostics: unknown[] = [];

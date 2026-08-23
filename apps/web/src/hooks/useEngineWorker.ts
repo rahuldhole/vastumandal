@@ -14,8 +14,7 @@ export function useEngineWorker() {
         workerRef.current = new Worker(new URL('../workers/engine.worker.ts', import.meta.url));
         workerRef.current.onmessage = (event: MessageEvent<EngineWorkerResponse>) => {
           const { type, payload, error } = event.data;
-          
-          if (type === 'RESULT') {
+          if (type === 'PIPELINE_RESULT' || type === 'RESULT') {
             setResult(payload || null);
             setError(null);
           } else if (type === 'ERROR') {
@@ -44,11 +43,12 @@ export function useEngineWorker() {
       
       const request: EngineWorkerRequest = {
         id: crypto.randomUUID(),
-        type: 'CALCULATE',
+        type: 'RUN_PIPELINE',
         payload: {
-          plotSpec,
-          reqSpec,
-          rates
+          spatialProject: { plotSpec, reqSpec },
+          bylawParams: plotSpec,
+          soilCondition: { safeBearingCapacity: 200 },
+          rateCard: rates
         }
       };
       
