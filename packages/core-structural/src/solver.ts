@@ -130,3 +130,49 @@ function snapToGrid(p: Point2D, gridX: number[], gridY: number[], tolerance: num
 
   return { x: snappedX, y: snappedY };
 }
+
+// Preliminary Sizing
+
+export function sizeSlab(lx: number, ly: number, isContinuous: boolean = true): { type: SlabType; thickness: number } {
+  const ratio = Math.max(lx, ly) / Math.min(lx, ly);
+  const type: SlabType = ratio > 2 ? 'ONE_WAY' : 'TWO_WAY';
+  const span = Math.min(lx, ly); // effective span for one-way, short span for two-way
+
+  // IS 456 continuous slab rules of thumb
+  const spanToDepthRatio = type === 'ONE_WAY' ? 28 : 32;
+  const minThickness = Math.max(100, Math.ceil(span / spanToDepthRatio / 5) * 5);
+
+  return { type, thickness: minThickness };
+}
+
+export function sizeBeam(span: number): { width: number; depth: number } {
+  // depth L/12 to L/15, choose L/12 for safety
+  const depth = Math.max(300, Math.ceil(span / 12 / 50) * 50); // multiple of 50
+  // width >= 200, matching typical col width
+  const width = Math.max(200, COL_WIDTH);
+  return { width, depth };
+}
+
+export function sizeColumn(
+  axialLoadFactoredKN: number,
+  fck: number = 20,
+  fy: number = 500,
+  pt: number = 0.01 // 1% steel
+): { width: number; depth: number } {
+  // Pu = 0.4 fck Ac + 0.67 fy Asc
+  // Ac = Ag - Asc
+  // Asc = pt * Ag
+  // Pu = 0.4 fck (Ag - pt*Ag) + 0.67 fy (pt*Ag)
+  // Pu = Ag [ 0.4 fck (1 - pt) + 0.67 fy pt ]
+  
+  const Pu_N = axialLoadFactoredKN * 1000;
+  const stress = 0.4 * fck * (1 - pt) + 0.67 * fy * pt;
+  const Ag_req = Pu_N / stress;
+
+  const width = COL_WIDTH;
+  const depthReq = Ag_req / width;
+  const depth = Math.max(COL_DEPTH, Math.ceil(depthReq / 50) * 50);
+
+  return { width, depth };
+}
+

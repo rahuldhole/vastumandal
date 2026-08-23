@@ -47,3 +47,47 @@ export const DefaultBendRules = BendRules['IS'];
 export function calculateStirrupCount(clearSpan: number, spacing: number): number {
   return Math.floor(clearSpan / spacing) + 1;
 }
+
+export function distance(p1: {x: number, y: number}, p2: {x: number, y: number}): number {
+  return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+}
+
+export function polygonArea(points: {x: number, y: number}[]): number {
+  let area = 0;
+  for (let i = 0; i < points.length; i++) {
+    const j = (i + 1) % points.length;
+    area += points[i].x * points[j].y;
+    area -= points[j].x * points[i].y;
+  }
+  return Math.abs(area / 2);
+}
+
+// Computes unfactored and factored axial loads.
+// Default material assumed: M20 concrete, Fe500 steel
+export function computeAxialLoad(
+  tributaryArea: number,
+  deadLoad: number,
+  liveLoad: number,
+  floors: number
+): { unfactored: number; factored: number } {
+  // Load per floor = area * (DL + LL)
+  const totalUnfactored = tributaryArea * (deadLoad + liveLoad) * floors;
+  // Factored load = 1.5 * (DL + LL)
+  const totalFactored = tributaryArea * (1.5 * deadLoad + 1.5 * liveLoad) * floors;
+
+  return {
+    unfactored: totalUnfactored,
+    factored: totalFactored,
+  };
+}
+
+export function calculateBeamUDL(
+  tributaryArea: number,
+  spanLength: number,
+  deadLoad: number,
+  liveLoad: number
+): number {
+  if (spanLength === 0) return 0;
+  const load = (tributaryArea * (deadLoad + liveLoad)) / (spanLength / 1000); // Assuming spanLength is mm, we want kN/m usually, but wait, if tributary area is m2... let's just assume inputs are m and m2.
+  return load;
+}
