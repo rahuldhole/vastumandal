@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { RefreshCw, ZoomIn, ZoomOut, Maximize } from "lucide-react";
 
+import { useTheme } from "next-themes";
+
 interface DXFPreviewProps {
  dxfString: string;
  staticMode?: boolean;
@@ -11,6 +13,7 @@ interface DXFPreviewProps {
 }
 
 export default function DXFPreview({ dxfString, staticMode = false, toolbarActions }: DXFPreviewProps) {
+ const { resolvedTheme } = useTheme();
  const containerWrapperRef = useRef<HTMLDivElement>(null);
  const containerRef = useRef<HTMLDivElement>(null);
  // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,9 +46,10 @@ export default function DXFPreview({ dxfString, staticMode = false, toolbarActio
  try {
  if (!viewerRef.current) {
  const { DxfViewer } = await import("dxf-viewer");
- const isDark = document.documentElement.classList.contains('dark');
+ const isDark = resolvedTheme === 'dark';
+ // Use a darker background in light mode (#e2e8f0) to make CAD lines (often white/yellow) more visible
  viewerRef.current = new DxfViewer(containerRef.current as HTMLElement, {
- clearColor: new THREE.Color(isDark ? "#0f172a" : "#ffffff"),
+ clearColor: new THREE.Color(isDark ? "#0f172a" : "#e2e8f0"),
  autoResize: true,
  // @ts-expect-error fontUrls is not in the type definition but works at runtime
  fontUrls: ['https://raw.githubusercontent.com/bjnortier/dxf/master/fonts/Roboto-Light.ttf'],
@@ -99,7 +103,7 @@ export default function DXFPreview({ dxfString, staticMode = false, toolbarActio
  viewerRef.current = null;
  }
  };
- }, [dxfString, isVisible]);
+ }, [dxfString, isVisible, resolvedTheme]);
 
  const handleZoom = (factor: number) => {
  if (!viewerRef.current) return;
