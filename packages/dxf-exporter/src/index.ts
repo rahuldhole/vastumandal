@@ -95,7 +95,9 @@ function drawColumnSection(dxf: any, data: ColumnScheduleRow) {
   
   // Begin Block Definition
   const blockName = `C1_${data.width || 400}x${data.depth || 400}`;
-  dxf.addBlock(blockName);
+  if (typeof dxf.addBlock === 'function') {
+    dxf.addBlock(blockName);
+  }
 
 
   const w = data.width || 400;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { exportBeamSectionToDXF, exportBeamSectionToScript, exportColumnSectionToScript, exportSlabSectionToScript, exportFoundationSectionToScript, exportTankSectionToScript, exportStairsSectionToScript, exportSlabSectionToDXF, exportStairsSectionToDXF, exportDoorDXF, exportWindowDXF, exportNorthSymbolDXF, exportTemplateToDXF, exportDoubleDoorDXF, exportSlidingDoorDXF, exportGarageDoorDXF, exportSectionMarkerDXF, exportElevationTargetDXF, exportRevisionCloudDXF, exportGridBubbleDXF, exportDeskDXF, exportConferenceTableDXF, exportToiletDXF, exportSinkDXF, exportTreeDXF, exportShrubDXF, exportParkingBaysDXF, exportVehicleDXF, exportLightFixtureDXF, exportSocketSwitchDXF, exportDistributionBoardDXF, exportHVACVentDXF } from "./index";
+import { exportBeamSectionToDXF, exportBeamSectionToScript, exportColumnSectionToScript, exportSlabSectionToScript, exportFoundationSectionToScript, exportTankSectionToScript, exportStairsSectionToScript, exportSlabSectionToDXF, exportStairsSectionToDXF, exportDoorDXF, exportWindowDXF, exportNorthSymbolDXF, exportTemplateToDXF, exportTemplateToScript, exportDoubleDoorDXF, exportSlidingDoorDXF, exportGarageDoorDXF, exportSectionMarkerDXF, exportElevationTargetDXF, exportRevisionCloudDXF, exportGridBubbleDXF, exportDeskDXF, exportConferenceTableDXF, exportToiletDXF, exportSinkDXF, exportTreeDXF, exportShrubDXF, exportParkingBaysDXF, exportVehicleDXF, exportLightFixtureDXF, exportSocketSwitchDXF, exportDistributionBoardDXF, exportHVACVentDXF } from "./index";
 import DxfParser from "dxf-parser";
 import fs from "fs";
 import path from "path";
@@ -66,8 +66,8 @@ describe("dxf-exporter tests", () => {
     fs.writeFileSync(filePath, scriptString);
 
     // Assert that the script contains valid AutoCAD commands
-    expect(scriptString).toContain("_-LAYER M CONCRETE C 7");
-    expect(scriptString).toContain("_-LAYER M REBAR C 1");
+    expect(scriptString).toContain("_-LAYER M S-CONC C 7");
+    expect(scriptString).toContain("_-LAYER M S-REINF C 1");
     expect(scriptString).toContain("_LINE");
     expect(scriptString).toContain("_CIRCLE");
     expect(scriptString).toContain("_ZOOM E");
@@ -195,6 +195,22 @@ describe("dxf-exporter tests", () => {
     }).not.toThrow();
   });
 
+  it("should generate a valid CAD command script for a title block template", () => {
+    const scriptString = exportTemplateToScript({
+      sheetSize: 'A1',
+      projectName: 'Test Project',
+      clientName: 'Test Client',
+      date: '2026-01-01',
+      drawnBy: 'Engineer',
+      drawingTitle: 'Test Drawing'
+    });
+    const filePath = path.join(tmpDir, "test-template-script.scr");
+    fs.writeFileSync(filePath, scriptString);
+    expect(scriptString).toContain("_-LAYER M BORDER C 4");
+    expect(scriptString).toContain("_LINE");
+    expect(scriptString).toContain("PROJ: Test Project");
+  });
+
 
   it("should generate a valid CAD command script for a column section", () => {
     const scriptString = exportColumnSectionToScript({
@@ -210,7 +226,7 @@ describe("dxf-exporter tests", () => {
     });
     const filePath = path.join(tmpDir, "test-column-output.scr");
     fs.writeFileSync(filePath, scriptString);
-    expect(scriptString).toContain("_-LAYER M CONCRETE C 7");
+    expect(scriptString).toContain("_-LAYER M S-CONC C 7");
     expect(scriptString).toContain("_LINE");
     expect(scriptString).toContain("_ZOOM E");
   });
@@ -228,7 +244,7 @@ describe("dxf-exporter tests", () => {
     });
     const filePath = path.join(tmpDir, "test-slab-output.scr");
     fs.writeFileSync(filePath, scriptString);
-    expect(scriptString).toContain("_-LAYER M CONCRETE C 7");
+    expect(scriptString).toContain("_-LAYER M S-CONC C 7");
     expect(scriptString).toContain("_LINE");
     expect(scriptString).toContain("_ZOOM E");
   });
@@ -246,7 +262,7 @@ describe("dxf-exporter tests", () => {
     });
     const filePath = path.join(tmpDir, "test-foundation-output.scr");
     fs.writeFileSync(filePath, scriptString);
-    expect(scriptString).toContain("_-LAYER M CONCRETE C 7");
+    expect(scriptString).toContain("_-LAYER M S-CONC C 7");
     expect(scriptString).toContain("_LINE");
     expect(scriptString).toContain("_ZOOM E");
   });
@@ -265,7 +281,7 @@ describe("dxf-exporter tests", () => {
     });
     const filePath = path.join(tmpDir, "test-tank-output.scr");
     fs.writeFileSync(filePath, scriptString);
-    expect(scriptString).toContain("_-LAYER M CONCRETE C 7");
+    expect(scriptString).toContain("_-LAYER M S-CONC C 7");
     expect(scriptString).toContain("_LINE");
     expect(scriptString).toContain("_ZOOM E");
   });
@@ -284,7 +300,7 @@ describe("dxf-exporter tests", () => {
     });
     const filePath = path.join(tmpDir, "test-stairs-output.scr");
     fs.writeFileSync(filePath, scriptString);
-    expect(scriptString).toContain("_-LAYER M CONCRETE C 7");
+    expect(scriptString).toContain("_-LAYER M S-CONC C 7");
     expect(scriptString).toContain("_LINE");
     expect(scriptString).toContain("_ZOOM E");
   });
