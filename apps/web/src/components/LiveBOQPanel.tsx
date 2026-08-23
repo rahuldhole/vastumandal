@@ -1,81 +1,143 @@
 import React, { useState } from 'react';
-import type { BOQSummary } from '@vastumandal/dwg-schemas/src/estimator';
-import type { BBSReport } from '@vastumandal/dwg-schemas/src/bbs';
+import { Copy, CheckCircle, AlertCircle, TrendingUp, Cuboid, Layers, Info } from 'lucide-react';
+import type { BOQSummary, BBSReport } from '@vastumandal/dwg-schemas';
 
 interface LiveBOQPanelProps {
-  boq: BOQSummary | null;
-  bbs: BBSReport | null;
-  diagnostics: any[];
+  boq?: BOQSummary | null;
+  bbs?: BBSReport | null;
+  diagnostics?: { level: string; code: string; message: string; }[];
 }
 
-export function LiveBOQPanel({ boq, bbs, diagnostics }: LiveBOQPanelProps) {
+const copyToCSV = () => {
+  // Mock CSV copy implementation
+  alert('Copied to clipboard as CSV');
+};
+
+const BarShapeIcon = ({ shape }: { shape: string }) => {
+  if (shape === 'Straight') return <svg width="40" height="20" viewBox="0 0 40 20"><path d="M5 10 L35 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>;
+  if (shape === 'L-Bent') return <svg width="40" height="20" viewBox="0 0 40 20"><path d="M5 5 L5 15 L35 15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  if (shape === 'Stirrup') return <svg width="40" height="20" viewBox="0 0 40 20"><rect x="10" y="2" width="20" height="16" fill="none" stroke="currentColor" strokeWidth="2" rx="2" /></svg>;
+  return <span className="text-xs">{shape}</span>;
+};
+
+export default function LiveBOQPanel({ boq, bbs, diagnostics }: LiveBOQPanelProps) {
   const [tab, setTab] = useState<'BOQ' | 'BBS' | 'SANCTION'>('BOQ');
 
+  const grandTotal = boq?.grandTotal || 0;
+  const concreteVol = boq?.lineItems.find(i => i.description.includes('Concrete'))?.quantity || 0;
+  const steelTonnage = bbs?.totalTonnage || 0;
+  const hasViolations = diagnostics?.some(d => d.level === 'ERROR');
+
   return (
-    <div className="flex flex-col h-full bg-white shadow rounded p-4">
-      <div className="flex space-x-4 border-b pb-2 mb-4">
-        <button className={`font-bold ${tab === 'BOQ' ? 'text-blue-600' : 'text-gray-500'}`} onClick={() => setTab('BOQ')}>Live BOQ</button>
-        <button className={`font-bold ${tab === 'BBS' ? 'text-blue-600' : 'text-gray-500'}`} onClick={() => setTab('BBS')}>BBS</button>
-        <button className={`font-bold ${tab === 'SANCTION' ? 'text-blue-600' : 'text-gray-500'}`} onClick={() => setTab('SANCTION')}>Sanction</button>
+    <div className="flex flex-col h-full bg-card overflow-hidden">
+      
+      {/* Sticky Metric Cards */}
+      <div className="p-4 grid grid-cols-2 gap-2 bg-muted/30 border-b border-border shrink-0">
+        <div className="bg-background border border-border p-2 rounded-lg shadow-sm">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1"><TrendingUp size={14} className="text-emerald-500" /> Grand Total</div>
+          <div className="font-bold text-lg text-foreground">₹{grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+        </div>
+        <div className="bg-background border border-border p-2 rounded-lg shadow-sm">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1"><Cuboid size={14} className="text-blue-500" /> Concrete</div>
+          <div className="font-bold text-lg text-foreground">{concreteVol.toFixed(1)} <span className="text-xs font-normal">m³</span></div>
+        </div>
+        <div className="bg-background border border-border p-2 rounded-lg shadow-sm">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1"><Layers size={14} className="text-orange-500" /> Steel</div>
+          <div className="font-bold text-lg text-foreground">{steelTonnage.toFixed(2)} <span className="text-xs font-normal">MT</span></div>
+        </div>
+        <div className={`border p-2 rounded-lg shadow-sm flex flex-col justify-center items-center gap-1 ${hasViolations ? 'bg-red-50/50 border-red-200 dark:bg-red-900/20' : 'bg-emerald-50/50 border-emerald-200 dark:bg-emerald-900/20'}`}>
+          <div className="text-xs font-medium text-muted-foreground">Bylaw Status</div>
+          {hasViolations ? (
+             <div className="flex items-center gap-1 text-red-600 font-bold text-sm"><AlertCircle size={16} /> Violations</div>
+          ) : (
+             <div className="flex items-center gap-1 text-emerald-600 font-bold text-sm"><CheckCircle size={16} /> Compliant</div>
+          )}
+        </div>
       </div>
 
-      <div className="flex-1 overflow-auto">
+      {/* Segmented Tab Navigation */}
+      <div className="px-4 pt-2 border-b border-border shrink-0 bg-card flex gap-4">
+        {['BOQ', 'BBS', 'SANCTION'].map((t) => (
+          <button 
+            key={t}
+            onClick={() => setTab(t as 'BOQ' | 'BBS' | 'SANCTION')}
+            className={`pb-2 text-xs font-bold tracking-wide uppercase transition-colors border-b-2 ${tab === t ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex-1 overflow-auto bg-card relative">
         {tab === 'BOQ' && boq && (
-          <table className="w-full text-sm text-left">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="p-2">Item</th>
-                <th className="p-2">Qty</th>
-                <th className="p-2">Unit</th>
-                <th className="p-2">Rate</th>
-                <th className="p-2">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {boq.lineItems.map(item => (
-                <tr key={item.itemCode} className="border-b">
-                  <td className="p-2">{item.description}</td>
-                  <td className="p-2">{item.quantity.toFixed(2)}</td>
-                  <td className="p-2">{item.unit}</td>
-                  <td className="p-2">{item.unitRate.toFixed(2)}</td>
-                  <td className="p-2">{item.totalAmount.toFixed(2)}</td>
+          <div className="p-4">
+            <div className="flex justify-end mb-2">
+              <button onClick={() => copyToCSV()} className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 bg-primary/10 px-2 py-1 rounded transition">
+                <Copy size={14} /> Copy as CSV
+              </button>
+            </div>
+            <table className="w-full text-xs text-left border-collapse" id="boq-table">
+              <thead className="bg-muted/50 sticky top-0">
+                <tr>
+                  <th className="p-2 border-b font-medium text-muted-foreground">Description</th>
+                  <th className="p-2 border-b font-medium text-muted-foreground text-right">Qty</th>
+                  <th className="p-2 border-b font-medium text-muted-foreground">Unit</th>
+                  <th className="p-2 border-b font-medium text-muted-foreground text-right">Rate</th>
+                  <th className="p-2 border-b font-medium text-muted-foreground text-right">Total</th>
                 </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colSpan={4} className="p-2 font-bold text-right">Subtotal</td>
-                <td className="p-2 font-bold">{boq.subTotal.toFixed(2)}</td>
-              </tr>
-              <tr>
-                <td colSpan={4} className="p-2 font-bold text-right">Grand Total (+3%)</td>
-                <td className="p-2 font-bold text-green-600">{boq.grandTotal.toFixed(2)}</td>
-              </tr>
-            </tfoot>
-          </table>
+              </thead>
+              <tbody className="text-foreground">
+                {boq.lineItems.map(item => (
+                  <tr key={item.itemCode} className="border-b border-border hover:bg-muted/20">
+                    <td className="p-2">{item.description}</td>
+                    <td className="p-2 text-right font-mono">{item.quantity.toFixed(2)}</td>
+                    <td className="p-2 text-muted-foreground">{item.unit}</td>
+                    <td className="p-2 text-right font-mono">{item.unitRate.toFixed(2)}</td>
+                    <td className="p-2 text-right font-mono">{item.totalAmount.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot className="bg-muted/30">
+                <tr>
+                  <td colSpan={4} className="p-2 text-right text-muted-foreground">Contingency (3%)</td>
+                  <td className="p-2 text-right font-mono">{(boq.grandTotal - boq.subTotal).toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td colSpan={4} className="p-2 font-bold text-right text-foreground">Grand Total</td>
+                  <td className="p-2 font-bold text-right font-mono text-emerald-600 dark:text-emerald-400">{boq.grandTotal.toFixed(2)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         )}
 
         {tab === 'BBS' && bbs && (
-          <div>
-            <h3 className="font-bold text-lg mb-2">Total Steel: {bbs.totalTonnage.toFixed(2)} MT</h3>
-            <table className="w-full text-sm text-left">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-2">Mark</th>
-                  <th className="p-2">Shape</th>
-                  <th className="p-2">Dia (mm)</th>
-                  <th className="p-2">Count</th>
-                  <th className="p-2">Weight (kg)</th>
+          <div className="p-4">
+             <div className="flex justify-end mb-2">
+              <button onClick={() => copyToCSV()} className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 bg-primary/10 px-2 py-1 rounded transition">
+                <Copy size={14} /> Copy as CSV
+              </button>
+            </div>
+            <table className="w-full text-xs text-left border-collapse" id="bbs-table">
+              <thead className="bg-muted/50 sticky top-0">
+                <tr>
+                  <th className="p-2 border-b font-medium text-muted-foreground">Mark</th>
+                  <th className="p-2 border-b font-medium text-muted-foreground text-center">Shape</th>
+                  <th className="p-2 border-b font-medium text-muted-foreground text-center">Ø (mm)</th>
+                  <th className="p-2 border-b font-medium text-muted-foreground text-right">Cut (m)</th>
+                  <th className="p-2 border-b font-medium text-muted-foreground text-right">Count</th>
+                  <th className="p-2 border-b font-medium text-muted-foreground text-right">Wt (kg)</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="text-foreground">
                 {bbs.items.map(item => (
-                  <tr key={item.id} className="border-b">
-                    <td className="p-2">{item.barMark}</td>
-                    <td className="p-2">{item.barShape}</td>
-                    <td className="p-2">{item.barDiameter}</td>
-                    <td className="p-2">{item.numberOfBars}</td>
-                    <td className="p-2">{item.totalWeight.toFixed(2)}</td>
+                  <tr key={item.id} className="border-b border-border hover:bg-muted/20">
+                    <td className="p-2 font-medium">{item.barMark}</td>
+                    <td className="p-2 text-center text-primary"><BarShapeIcon shape={item.barShape} /></td>
+                    <td className="p-2 text-center">{item.barDiameter}</td>
+                    <td className="p-2 text-right font-mono">-</td>
+                    <td className="p-2 text-right font-mono">{item.numberOfBars}</td>
+                    <td className="p-2 text-right font-mono">{item.totalWeight.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -84,12 +146,18 @@ export function LiveBOQPanel({ boq, bbs, diagnostics }: LiveBOQPanelProps) {
         )}
 
         {tab === 'SANCTION' && (
-          <div className="space-y-2">
-            {diagnostics.map((d, i) => (
-              <div key={i} className={`p-3 rounded border ${d.level === 'ERROR' ? 'bg-red-50 border-red-200 text-red-800' : d.level === 'WARNING' ? 'bg-yellow-50 border-yellow-200 text-yellow-800' : 'bg-blue-50 border-blue-200 text-blue-800'}`}>
-                <strong>[{d.code}]</strong> {d.message}
+          <div className="p-4 space-y-3">
+            {diagnostics?.length ? diagnostics.map((d, i) => (
+              <div key={i} className={`p-3 rounded-lg border flex gap-3 ${d.level === 'ERROR' ? 'bg-red-50/50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800' : d.level === 'WARNING' ? 'bg-amber-50/50 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800' : 'bg-blue-50/50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800'}`}>
+                {d.level === 'ERROR' ? <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-600" /> : <Info className="w-5 h-5 shrink-0 mt-0.5 text-blue-600" />}
+                <div>
+                  <strong className="block text-sm mb-0.5">[{d.code}]</strong> 
+                  <span className="text-xs opacity-90">{d.message}</span>
+                </div>
               </div>
-            ))}
+            )) : (
+              <div className="text-center p-8 text-muted-foreground text-sm">No sanction data available.</div>
+            )}
           </div>
         )}
       </div>

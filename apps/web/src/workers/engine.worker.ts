@@ -6,6 +6,20 @@ import type { BylawParams } from '@vastumandal/dwg-schemas/src/spatial';
 import type { SoilCondition } from '@vastumandal/dwg-schemas/src/structural';
 import type { RateCard } from '@vastumandal/dwg-schemas/src/estimator';
 
+export interface EngineWorkerRequest {
+  id: string;
+  type: 'CALCULATE' | 'RUN_PIPELINE';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload: any;
+}
+
+export interface EngineWorkerResponse {
+  type: 'RESULT' | 'ERROR' | 'PIPELINE_RESULT';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload?: any;
+  error?: string;
+}
+
 self.onmessage = async (event) => {
   const { type, payload } = event.data;
 
@@ -13,7 +27,7 @@ self.onmessage = async (event) => {
     const { spatialProject, bylawParams, soilCondition, rateCard } = payload;
     
     // Boundary Checks
-    const diagnostics: any[] = [];
+    const diagnostics: unknown[] = [];
     
     if (soilCondition.safeBearingCapacity < 80) {
       diagnostics.push({

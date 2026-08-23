@@ -9,7 +9,7 @@ import { PLOT_PRESETS } from "@vastumandal/dwg-schemas";
 import ExportModal from "./ExportModal";
 
 export default function Navbar() {
-  const { plotSpec, setPlotSpec, leftPanelOpen, setLeftPanelOpen, rightPanelOpen, setRightPanelOpen, activeTab, setActiveTab } = useAppStore();
+  const { plotSpec, setPlotSpec, leftPanelOpen, setLeftPanelOpen, rightPanelOpen, setRightPanelOpen, activeTab, setActiveTab, isCalculating } = useAppStore();
   const [isExportModalOpen, setIsExportModalOpen] = React.useState(false);
 
   const handlePresetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -82,6 +82,17 @@ export default function Navbar() {
         {/* Right: Actions & Panel Toggle */}
         <div className="flex items-center gap-1 sm:gap-2 md:gap-4 shrink-0">
           
+          {/* Compute Status Pill */}
+          <div className={`hidden sm:flex items-center gap-1.5 px-2 py-1 md:px-3 md:py-1.5 rounded-full border text-[10px] md:text-xs font-medium shadow-sm transition-all ${isCalculating ? 'bg-amber-50/50 border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-800' : 'bg-emerald-50/50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-800'}`}>
+            <div className="relative flex h-2 w-2">
+              {isCalculating && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>}
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isCalculating ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+            </div>
+            {isCalculating ? 'Computing...' : 'Ready'}
+          </div>
+
+          <div className="hidden sm:block w-px h-5 bg-border mx-0 md:mx-1"></div>
+          
           {/* Export Actions */}
           <div className="flex items-center gap-1 sm:gap-2">
             <button 
@@ -103,7 +114,6 @@ export default function Navbar() {
         </div>
 
       </div>
-      <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
       <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
     </header>
   );

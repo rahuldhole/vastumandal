@@ -1,27 +1,71 @@
 import React from 'react';
+import { FileCode, Box, Database, FileText, X, Archive } from 'lucide-react';
 
-export function ExportModal({ onClose }: { onClose: () => void }) {
+export default function ExportModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+  if (!isOpen) return null;
+
   const downloadFile = (format: string) => {
     alert(`Downloading model in ${format.toUpperCase()} format...`);
-    // In actual implementation, this triggers Blob download
   };
 
+  const formats = [
+    { id: 'dxf', title: 'AutoCAD Drawing (.dxf)', desc: 'Layer-separated CAD file with dimensions, grids, and isolated footing outlines.', icon: FileCode, color: 'text-blue-500' },
+    { id: 'ifc', title: 'BIM Model (.ifc)', desc: 'Standard IFC STEP model with IfcWall, IfcColumn, IfcSlab, and IfcFooting.', icon: Box, color: 'text-purple-500' },
+    { id: 'json', title: 'Data Schema (.json)', desc: 'Full Vastumandal project state for backup and re-import.', icon: Database, color: 'text-emerald-500' },
+    { id: 'lsp', title: 'AutoLISP Script (.lsp)', desc: 'Direct command-line automation script for AutoCAD.', icon: FileText, color: 'text-amber-500' },
+  ];
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full space-y-4">
-        <h2 className="text-xl font-bold">Export Project</h2>
-        <p className="text-sm text-gray-600">Select standard interoperability format for downstream processing:</p>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-card w-full max-w-2xl rounded-2xl shadow-2xl border border-border overflow-hidden flex flex-col">
         
-        <div className="flex flex-col space-y-2">
-          <button onClick={() => downloadFile('dxf')} className="bg-blue-100 text-blue-800 p-2 rounded hover:bg-blue-200">AutoCAD DXF (R12)</button>
-          <button onClick={() => downloadFile('ifc')} className="bg-blue-100 text-blue-800 p-2 rounded hover:bg-blue-200">IFC4 STEP (BIM)</button>
-          <button onClick={() => downloadFile('json')} className="bg-blue-100 text-blue-800 p-2 rounded hover:bg-blue-200">Vastumandal JSON</button>
-          <button onClick={() => downloadFile('csv')} className="bg-blue-100 text-blue-800 p-2 rounded hover:bg-blue-200">BOQ & BBS (CSV)</button>
+        {/* Header */}
+        <div className="p-5 border-b border-border flex justify-between items-center bg-muted/30">
+          <div>
+            <h2 className="text-xl font-bold text-foreground">Export Project</h2>
+            <p className="text-sm text-muted-foreground mt-1">Select standard interoperability format for downstream processing</p>
+          </div>
+          <button onClick={onClose} className="p-2 bg-muted hover:bg-muted/80 rounded-full transition text-muted-foreground hover:text-foreground">
+            <X size={20} />
+          </button>
+        </div>
+        
+        {/* Format Cards */}
+        <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 bg-background">
+          {formats.map(fmt => {
+            const Icon = fmt.icon;
+            return (
+              <button 
+                key={fmt.id} 
+                onClick={() => downloadFile(fmt.id)}
+                className="flex items-start gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/50 transition-all text-left group"
+              >
+                <div className={`p-3 rounded-lg bg-muted group-hover:bg-background transition-colors ${fmt.color}`}>
+                  <Icon size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-foreground mb-1 group-hover:text-primary transition-colors">{fmt.title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{fmt.desc}</p>
+                </div>
+              </button>
+            )
+          })}
         </div>
 
-        <div className="pt-4 border-t text-right">
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">Close</button>
+        {/* Footer Action */}
+        <div className="p-5 border-t border-border bg-muted/30 flex flex-col sm:flex-row gap-3 justify-end items-center">
+          <button onClick={onClose} className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition">
+            Cancel
+          </button>
+          <button 
+            onClick={() => downloadFile('zip')} 
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm rounded-lg shadow-md transition-all active:scale-95"
+          >
+            <Archive size={18} />
+            Download All (.zip)
+          </button>
         </div>
+
       </div>
     </div>
   );

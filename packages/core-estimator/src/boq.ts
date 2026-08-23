@@ -1,5 +1,4 @@
-import type { RateCard, BOQSummary, BOQLineItem } from '@vastumandal/dwg-schemas/src/estimator';
-import type { BBSReport } from '@vastumandal/dwg-schemas/src/bbs';
+import type { RateCard, BOQSummary, BOQLineItem, BBSReport } from '@vastumandal/dwg-schemas';
 
 export interface ProjectQuantities {
   excavationVolume: number; // m3

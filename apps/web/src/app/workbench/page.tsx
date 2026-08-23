@@ -82,6 +82,28 @@ export default function Workbench() {
           }}
         />
       )}
+
+      {/* Mobile Layout Toggle Switch */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 bg-card border border-border shadow-lg rounded-full p-1 flex items-center lg:hidden">
+        <button 
+          onClick={() => { setLeftPanelOpen(true); setRightPanelOpen(false); }}
+          className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${leftPanelOpen && !rightPanelOpen ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
+        >
+          Controls
+        </button>
+        <button 
+          onClick={() => { setLeftPanelOpen(false); setRightPanelOpen(false); }}
+          className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${!leftPanelOpen && !rightPanelOpen ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
+        >
+          Canvas
+        </button>
+        <button 
+          onClick={() => { setLeftPanelOpen(false); setRightPanelOpen(true); }}
+          className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${!leftPanelOpen && rightPanelOpen ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
+        >
+          Deliverables
+        </button>
+      </div>
     </div>
   );
 }
