@@ -118,7 +118,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/core-spatial: {}
+  packages/core-spatial:
+    dependencies:
+      '@vastumandal/dwg-schemas':
+        specifier: workspace:*
+        version: link:../dwg-schemas
 
   packages/core-structural: {}
 
