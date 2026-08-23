@@ -122,3 +122,11 @@ export const BOQReportSchema = z.object({
 
 export type BOQReport = z.infer<typeof BOQReportSchema>;
 export * from './presets';
+
+export interface BeamScheduleRow { elementId?: string; width: number; depth: number; bottomBarDia?: number; bottomBarCount: number; topExtraLeft?: number; topExtraRight?: number; stirrupDia?: number; stirrupSpacing?: number; }
+export interface ColumnScheduleRow { columnId?: string; level?: string; concreteGrade?: string; width?: number; depth?: number; mainBarDia?: number; mainBarCount?: number; tieDia?: number; tieSpacing?: number; }
+export interface SlabScheduleRow { slabId?: string; lx: number; ly?: number; depth: number; distBarDia?: number; mainBarDia?: number; distBarSpacing?: number; mainBarSpacing?: number; }
+export interface FoundationScheduleRow { footingId?: string; lx: number; ly?: number; depth: number; meshBarDiaY?: number; meshBarDiaX?: number; meshBarSpacingY?: number; meshBarSpacingX?: number; }
+export interface TankScheduleRow { tankId?: string; type?: string; capacity?: number; width: number; length?: number; height: number; wallThickness: number; mainBarDia?: number; mainBarSpacing?: number; }
+export interface StairsScheduleRow { stairId?: string; tread?: number; rise?: number; numberOfSteps?: number; waistSlabThickness?: number; mainBarDia?: number; distBarDia?: number; mainBarSpacing?: number; distBarSpacing?: number; }
+export interface TitleBlockRow { [key: string]: any; }

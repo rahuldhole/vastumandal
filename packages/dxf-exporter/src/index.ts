@@ -66,7 +66,7 @@ function drawBeamSection(dxf: any, data: BeamScheduleRow) {
   }
 
   // Top bars
-  const topBars = data.topExtraLeft + data.topExtraRight || 2; 
+  const topBars = (data.topExtraLeft || 0) + (data.topExtraRight || 0) || 2; 
   const topSpacingX = (w - 2 * cover) / (topBars - 1 || 1);
   for (let i = 0; i < topBars; i++) {
     dxf.drawCircle(cover + i * topSpacingX, d - cover, barRadius);

@@ -1,1 +1,1 @@
-{"name":"@vastumandal/core-spatial","version":"0.1.0","main":"dist/index.js","types":"dist/index.d.ts","scripts":{"build":"tsc"},"dependencies":{"@vastumandal/dwg-schemas":"workspace:*"}}
+{"name":"@vastumandal/core-spatial","version":"0.1.0","main":"dist/index.js","types":"dist/index.d.ts","scripts":{"build":"tsc"},"dependencies":{"@vastumandal/dwg-schemas":"workspace:*"},"devDependencies":{"typescript":"^7.0.2"}}
