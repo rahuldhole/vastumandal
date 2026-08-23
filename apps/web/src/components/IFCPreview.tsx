@@ -36,7 +36,7 @@ export function IFCPreview({ isOpen, onClose, ifcData }: IFCPreviewProps) {
           });
 
           // Setup WASM path to public directory
-          viewer.IFC.setWasmPath('/');
+          await viewer.IFC.setWasmPath('/');
           
           viewer.axes.setAxes();
           viewer.grid.setGrid();

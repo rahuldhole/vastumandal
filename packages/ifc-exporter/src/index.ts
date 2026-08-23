@@ -105,7 +105,7 @@ DATA;
 #610= IFCRELVOIDSELEMENT('void_1', #2, 'Wall_Door_Void', 'Subtraction', #200, #600);
 
 /* Spatial containment */
-#900= IFCRELCONTAINEDINSPATIALSTRUCTURE('cont_1', #2, 'Storey Elements', 'Contains', (#100, #200, #300, #400, #500), #400);
+#900= IFCRELCONTAINEDINSPATIALSTRUCTURE('cont_1', #2, 'Storey Elements', 'Contains', (#100, #200, #300, #400, #500), #40);
 
 ENDSEC;
 END-ISO-10303-21;`;
