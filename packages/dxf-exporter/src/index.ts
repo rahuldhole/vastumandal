@@ -52,9 +52,14 @@ export function configureStandardLayersAndStyles(dxf: any) {
   dxf.addLayer('A-ANNO-TEXT', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
   dxf.addLayer('A-ANNO-DIMS', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
   
+  // Interior & Furniture
+  dxf.addLayer('I-FURN', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  dxf.addLayer('I-PLUMB', DXFWriter.ACI.CYAN, 'CONTINUOUS');
+  
   // Structural
   dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
   dxf.addLayer('S-COLS', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  dxf.addLayer('S-FNDN', DXFWriter.ACI.GREEN, 'CONTINUOUS');
   dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
   dxf.addLayer('S-REBAR-BBS', DXFWriter.ACI.RED, 'CONTINUOUS');
 

@@ -1,4 +1,5 @@
 import type { PlotSpec, RequirementSpec } from '@vastumandal/dwg-schemas';
+import { FIXTURE_TEMPLATES, Fixture } from '@vastumandal/dwg-schemas/src/architecture';
 
 // ---------------------------------------------------------------------------
 // Public types returned by generateLayout
@@ -26,6 +27,7 @@ export interface LayoutResult {
   buildable: { x: number; y: number; w: number; h: number };
   plotW: number;
   plotH: number;
+  fixtures: Fixture[];
 }
 
 // ---------------------------------------------------------------------------
@@ -200,5 +202,70 @@ export function generateLayout(plotSpec: PlotSpec, reqSpec: RequirementSpec): La
     }
   }
 
-  return { rooms, columns, buildable, plotW, plotH };
+  // -----------------------------------------------------------------------
+  // Fixture placement
+  // -----------------------------------------------------------------------
+  const fixtures: Fixture[] = [];
+  let fid = 0;
+  
+  for (const r of rooms) {
+    const rx = r.x;
+    const ry = r.y;
+    
+    if (r.name.includes('Bedroom')) {
+      fixtures.push({
+        id: `F-${++fid}`,
+        ...FIXTURE_TEMPLATES.MasterBed,
+        position: { x: rx + r.w / 2, y: ry + FIXTURE_TEMPLATES.MasterBed.boundingBox.length / 2 + 0.1 },
+        rotation: 0
+      });
+      fixtures.push({
+        id: `F-${++fid}`,
+        ...FIXTURE_TEMPLATES.Wardrobe,
+        position: { x: rx + 0.6, y: ry + r.h / 2 },
+        rotation: 90
+      });
+    } else if (r.name === 'Kitchen') {
+      fixtures.push({
+        id: `F-${++fid}`,
+        ...FIXTURE_TEMPLATES.KitchenHob,
+        position: { x: rx + r.w / 2, y: ry + r.h - 0.3 },
+        rotation: 180
+      });
+      fixtures.push({
+        id: `F-${++fid}`,
+        ...FIXTURE_TEMPLATES.KitchenSink,
+        position: { x: rx + r.w - 0.6, y: ry + r.h - 0.3 },
+        rotation: 180
+      });
+    } else if (r.name === 'Toilet') {
+      fixtures.push({
+        id: `F-${++fid}`,
+        ...FIXTURE_TEMPLATES.WaterCloset,
+        position: { x: rx + r.w / 2, y: ry + 0.5 },
+        rotation: 0
+      });
+      fixtures.push({
+        id: `F-${++fid}`,
+        ...FIXTURE_TEMPLATES.WashBasin,
+        position: { x: rx + 0.3, y: ry + r.h - 0.5 },
+        rotation: 90
+      });
+    } else if (r.name === 'Living Room') {
+      fixtures.push({
+        id: `F-${++fid}`,
+        ...FIXTURE_TEMPLATES.SofaSet,
+        position: { x: rx + r.w / 2, y: ry + 1.2 },
+        rotation: 0
+      });
+      fixtures.push({
+        id: `F-${++fid}`,
+        ...FIXTURE_TEMPLATES.DiningTable6Seater,
+        position: { x: rx + r.w - 1.5, y: ry + r.h - 1.5 },
+        rotation: 0
+      });
+    }
+  }
+
+  return { rooms, columns, buildable, plotW, plotH, fixtures };
 }

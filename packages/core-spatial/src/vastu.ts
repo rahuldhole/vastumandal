@@ -2,12 +2,12 @@ import { Point2D, calculatePolygonArea, isPointInPolygon } from './polygon';
 import { Room } from '@vastumandal/dwg-schemas/src/spatial';
 
 export type VastuGridType = '3x3' | '9x9';
-export type VastuZone = 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'N' | 'CENTER';
+export type VastuZone = 'NE' | 'ENE' | 'E' | 'ESE' | 'SE' | 'SSE' | 'S' | 'SSW' | 'SW' | 'WSW' | 'W' | 'WNW' | 'NW' | 'NNW' | 'N' | 'NNE' | 'CENTER' | 'BRAHMASTHANA';
 
 export interface VastuScoreResult {
   roomName: string;
   zone: VastuZone;
-  score: number; // 0 to 10
+  score: number; // 0 to 100
   recommendation: string;
 }
 
@@ -18,11 +18,7 @@ const ZoneMap_3x3: VastuZone[][] = [
   ['SW', 'S', 'SE']
 ];
 
-export function generateVastuGrid(plotPolygon: Point2D[], type: VastuGridType = '3x3'): Point2D[][] {
-  // Simplified bounding box approach for Vastu grid generation on arbitrary polygon.
-  // In a true system, we might map the grid exactly to the non-orthogonal shape using affine transformations,
-  // but bounding box is standard practice for basic Vastu Mandala on irregular plots.
-  
+export function generateVastuGrid(plotPolygon: Point2D[], type: VastuGridType = '9x9'): Point2D[][] {
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   plotPolygon.forEach(p => {
     if (p[0] < minX) minX = p[0];
@@ -49,6 +45,17 @@ export function generateVastuGrid(plotPolygon: Point2D[], type: VastuGridType = 
   return grid;
 }
 
+function getZoneFromAngle(angleDeg: number): VastuZone {
+  // Normalize angle to 0-360
+  const normalized = (angleDeg % 360 + 360) % 360;
+  
+  // 16 zones, each 22.5 degrees wide. N is at 0/360.
+  // 0 N, 22.5 NNE, 45 NE, 67.5 ENE, 90 E, 112.5 ESE, 135 SE, 157.5 SSE, 180 S, 202.5 SSW, 225 SW, 247.5 WSW, 270 W, 292.5 WNW, 315 NW, 337.5 NNW
+  const zones: VastuZone[] = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+  const index = Math.round(normalized / 22.5) % 16;
+  return zones[index];
+}
+
 export function evaluateRoomVastu(room: Room, plotPolygon: Point2D[]): VastuScoreResult {
   // Determine center of the room
   let cx = 0, cy = 0;
@@ -67,47 +74,67 @@ export function evaluateRoomVastu(room: Room, plotPolygon: Point2D[]): VastuScor
     if (p[1] > maxY) maxY = p[1];
   });
 
+  const centerPlotX = (minX + maxX) / 2;
+  const centerPlotY = (minY + maxY) / 2;
+
+  // Brahmasthana check (central 1/9th area -> middle 3x3 of 9x9 grid)
   const normalizedX = (cx - minX) / (maxX - minX);
   const normalizedY = (cy - minY) / (maxY - minY);
+  const isBrahmasthana = normalizedX >= 1/3 && normalizedX <= 2/3 && normalizedY >= 1/3 && normalizedY <= 2/3;
 
-  // Map to 3x3
-  const colIndex = Math.min(2, Math.max(0, Math.floor(normalizedX * 3)));
-  const rowIndex = Math.min(2, Math.max(0, Math.floor(normalizedY * 3)));
+  // Calculate angle from center
+  const dx = cx - centerPlotX;
+  const dy = cy - centerPlotY;
+  // Assume +Y is North, +X is East
+  // Math.atan2(y, x) -> 0 is East, 90 is North. 
+  // We want 0 to be North, 90 to be East.
+  // So we use Math.atan2(dx, dy)
+  let angleDeg = Math.atan2(dx, dy) * (180 / Math.PI);
+  if (angleDeg < 0) angleDeg += 360;
 
-  // Note: rowIndex 0 is bottom (South if assuming North is Up/Y+ or depending on rotation)
-  // Let's assume standard: Y+ is North, X+ is East.
-  // Then rowIndex 2 is North, rowIndex 0 is South.
-  // ZoneMap_3x3 is visually top-down (row 0 is North). We need to flip Y.
-  const visualRow = 2 - rowIndex;
-  const zone = ZoneMap_3x3[visualRow][colIndex];
-
-  let score = 5;
+  let zone: VastuZone = isBrahmasthana ? 'BRAHMASTHANA' : getZoneFromAngle(angleDeg);
+  let score = 50;
   let rec = '';
 
-  switch (room.roomType.toLowerCase()) {
+  const type = room.roomType.toLowerCase();
+
+  if (isBrahmasthana) {
+    if (type === 'toilet' || type === 'kitchen') {
+      score = 0;
+      rec = 'CRITICAL: Wet areas strictly prohibited in Brahmasthana.';
+    } else {
+      score = 20;
+      rec = 'Avoid heavy structures in Brahmasthana. Best kept open.';
+    }
+    return { roomName: room.name, zone, score, recommendation: rec };
+  }
+
+  // 16-zone evaluation
+  switch (type) {
     case 'kitchen':
-      if (zone === 'SE') { score = 10; rec = 'Excellent placement (Agni).'; }
-      else if (zone === 'NW') { score = 7; rec = 'Good alternative placement.'; }
-      else { score = 3; rec = 'Avoid Kitchen here. Move to SE or NW.'; }
+      if (zone === 'SE' || zone === 'SSE' || zone === 'ESE') { score = 100; rec = 'Excellent placement (Agni).'; }
+      else if (zone === 'NW' || zone === 'WNW') { score = 75; rec = 'Good alternative placement (Vayavya).'; }
+      else if (zone === 'NE' || zone === 'NNE' || zone === 'SW' || zone === 'SSW') { score = 10; rec = 'Avoid Kitchen here. Fire clashes with Water/Earth elements.'; }
+      else { score = 40; rec = 'Suboptimal. Move to SE or NW.'; }
       break;
     case 'bedroom':
-      // Master bedroom SW is best
-      if (zone === 'SW') { score = 10; rec = 'Excellent for Master Bedroom (Nairutya).'; }
-      else if (zone === 'S' || zone === 'W') { score = 8; rec = 'Good placement.'; }
-      else if (zone === 'NE') { score = 2; rec = 'Avoid Bedroom in NE (Eesanya).'; }
-      else { score = 5; rec = 'Acceptable placement.'; }
+      if (zone === 'SW' || zone === 'SSW') { score = 100; rec = 'Excellent for Master Bedroom (Nairrutya).'; }
+      else if (zone === 'S' || zone === 'W') { score = 80; rec = 'Good placement.'; }
+      else if (zone === 'NW' || zone === 'WNW') { score = 70; rec = 'Good for guest or children room.'; }
+      else if (zone === 'NE' || zone === 'ENE' || zone === 'NNE') { score = 20; rec = 'Avoid Bedroom in NE (Ishanya).'; }
+      else { score = 50; rec = 'Acceptable placement.'; }
       break;
     case 'toilet':
-      if (zone === 'NW' || zone === 'W' || zone === 'S') { score = 9; rec = 'Good placement.'; }
-      else if (zone === 'NE' || zone === 'SW' || zone === 'CENTER') { score = 1; rec = 'Strictly avoid Toilet here.'; }
-      else { score = 4; rec = 'Suboptimal placement.'; }
+      if (zone === 'NW' || zone === 'WNW' || zone === 'SSW') { score = 100; rec = 'Excellent placement for disposal zones.'; }
+      else if (zone === 'NE' || zone === 'SW' || zone === 'NNE' || zone === 'ENE') { score = 0; rec = 'Strictly avoid Toilet here. Pollutes positive energy zones.'; }
+      else { score = 30; rec = 'Suboptimal placement.'; }
       break;
     case 'living':
-      if (zone === 'NE' || zone === 'E' || zone === 'N') { score = 9; rec = 'Excellent placement for living/drawing.'; }
-      else { score = 6; rec = 'Acceptable placement.'; }
+      if (zone === 'NE' || zone === 'E' || zone === 'N' || zone === 'NNE' || zone === 'ENE') { score = 100; rec = 'Excellent placement for living/drawing.'; }
+      else { score = 60; rec = 'Acceptable placement.'; }
       break;
     default:
-      rec = 'General purpose area. Vastu impact is neutral.';
+      rec = 'General purpose area. Vastu impact is moderate.';
       break;
   }
 

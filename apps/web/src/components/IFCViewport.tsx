@@ -2,51 +2,30 @@
 
 import { useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Box, Grid } from '@react-three/drei';
+import { OrbitControls, Grid, Box } from '@react-three/drei';
 import { useAppStore } from '../store/useStore';
+import { generateLayout } from '@/utils/generateLayout';
 
 export default function IFCViewport() {
-  const boqResult = useAppStore(state => state.boqResult);
-  const geometryResult = useAppStore(state => state.geometryResult);
-  const result = boqResult || geometryResult;
-  const selectedElementId = useAppStore(state => state.selectedElementId);
+  const { plotSpec, reqSpec, selectedElementId } = useAppStore();
 
-  // Parse the geometryBuffer from the worker result
-  const geometries = useMemo(() => {
-    if (!result || !result.geometryBuffer) return [];
-    
-    const buffer = new Float32Array(result.geometryBuffer);
-    const numElements = buffer.length / 7;
-    const items = [];
-    
-    for (let i = 0; i < numElements; i++) {
-      const offset = i * 7;
-      const x = buffer[offset];
-      const y = buffer[offset + 1];
-      const z = buffer[offset + 2];
-      const sx = buffer[offset + 3];
-      const sy = buffer[offset + 4];
-      const sz = buffer[offset + 5];
-      const typeId = buffer[offset + 6];
-      
-      const id = `${typeId === 1 ? 'F' : typeId === 2 ? 'C' : 'S'}${i}`;
-      
-      items.push({
-        id,
-        position: [x / 1000, y / 1000, z / 1000] as [number, number, number],
-        args: [sx / 1000, sy / 1000, sz / 1000] as [number, number, number],
-        typeId
-      });
-    }
-    return items;
-  }, [result]);
+  const layout = useMemo(() => generateLayout(plotSpec, reqSpec), [plotSpec, reqSpec]);
+  const { plotW, plotH, buildable, rooms, columns, fixtures } = layout;
+
+  const floorCount = (() => {
+    const fc = plotSpec.floorCount || 'G';
+    if (fc === 'G') return 1;
+    const match = fc.match(/G\+(\d+)/i);
+    return match ? 1 + parseInt(match[1], 10) : 1;
+  })();
+  const floorH = 3.0;
 
   return (
     <div className="relative w-full h-full bg-neutral-100 dark:bg-neutral-900">
-      <Canvas camera={{ position: [15, 15, 15], fov: 50 }} shadows>
+      <Canvas camera={{ position: [plotW * 1.5, floorH * floorCount * 1.5, plotH * 1.5], fov: 50 }} shadows>
         <ambientLight intensity={0.5} />
         <directionalLight 
-          position={[10, 20, 10]} 
+          position={[plotW, floorH * floorCount * 2, plotH]} 
           intensity={1} 
           castShadow 
           shadow-mapSize-width={1024} 
@@ -54,43 +33,68 @@ export default function IFCViewport() {
         />
         
         <Grid 
-          position={[0, 0, 0]} 
+          position={[plotW / 2, 0, plotH / 2]} 
           infiniteGrid 
-          fadeDistance={50}
+          fadeDistance={Math.max(plotW, plotH) * 2}
           sectionColor={'#a0a0a0'}
           cellColor={'#e0e0e0'}
         />
 
-        <group position={[-5, 0, -5]}>
-          {geometries.map((geom) => {
-            let color = '#ccc'; // default
-            if (geom.typeId === 1) color = '#8B8C89'; // Footing
-            else if (geom.typeId === 2) color = '#A8A9A5'; // Column
-            else if (geom.typeId === 3) color = '#D3D4D0'; // Slab
-            
-            const isSelected = selectedElementId === geom.id;
-            if (isSelected) color = '#a855f7'; // Purple highlight
-            
+        <group>
+          {/* Ground Plane */}
+          <mesh position={[plotW / 2, -0.05, plotH / 2]} receiveShadow>
+            <boxGeometry args={[plotW, 0.1, plotH]} />
+            <meshStandardMaterial color="#e2e8f0" />
+          </mesh>
+
+          {/* Floors */}
+          {Array.from({ length: floorCount }, (_, fi) => {
+            const baseY = fi * floorH;
             return (
-              <Box 
-                key={geom.id} 
-                position={geom.position} 
-                args={geom.args}
-                castShadow 
-                receiveShadow
-              >
-                <meshStandardMaterial 
-                  color={color} 
-                  transparent={geom.typeId === 3} 
-                  opacity={geom.typeId === 3 ? 0.8 : 1}
-                  roughness={0.7}
-                />
+              <group key={`floor-${fi}`} position={[0, baseY, 0]}>
+                {/* Floor slab */}
+                <mesh position={[buildable.x + buildable.w / 2, 0.075, buildable.y + buildable.h / 2]} castShadow receiveShadow>
+                  <boxGeometry args={[buildable.w, 0.15, buildable.h]} />
+                  <meshStandardMaterial color="#94a3b8" />
+                </mesh>
+
+                {/* Columns */}
+                {columns.map(c => {
+                  const s = c.size / 1000;
+                  const isSelected = selectedElementId === c.id;
+                  return (
+                    <Box key={`col-${fi}-${c.id}`} position={[c.x, floorH / 2, c.y]} args={[s, floorH, s]} castShadow>
+                      <meshStandardMaterial color={isSelected ? '#a855f7' : '#ef4444'} />
+                    </Box>
+                  );
+                })}
+
+                {/* Fixtures (only on GF for now) */}
+                {fi === 0 && fixtures?.map(f => {
+                  const { width, length, height } = f.boundingBox;
+                  return (
+                    <Box key={`fix-${f.id}`} position={[f.position.x, height / 2, f.position.y]} args={[width, height, length]} castShadow rotation={[0, -f.rotation * Math.PI / 180, 0]}>
+                      <meshStandardMaterial color="#f97316" />
+                    </Box>
+                  );
+                })}
+              </group>
+            );
+          })}
+
+          {/* Footings */}
+          {columns.map(c => {
+            const footSize = 1.2;
+            const footDepth = 0.45;
+            return (
+              <Box key={`ft-${c.id}`} position={[c.x, -footDepth / 2 - 0.1, c.y]} args={[footSize, footDepth, footSize]} receiveShadow>
+                <meshStandardMaterial color="#4ade80" />
               </Box>
             );
           })}
         </group>
 
-        <OrbitControls makeDefault />
+        <OrbitControls makeDefault target={[plotW / 2, (floorH * floorCount) / 2, plotH / 2]} />
       </Canvas>
 
       {/* Info badge */}
@@ -100,7 +104,7 @@ export default function IFCViewport() {
           <svg className="w-3.5 h-3.5 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
           </svg>
-          3D Preview
+          Procedural IFC Preview
         </div>
       </div>
     </div>

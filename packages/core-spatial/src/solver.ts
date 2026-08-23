@@ -1,5 +1,6 @@
-import { Point2D } from './polygon';
+import { Point2D, calculateSetbackPolygon } from './polygon';
 import type { PlotSpec, RequirementSpec } from '@vastumandal/dwg-schemas';
+import { generateVastuGrid, evaluateRoomVastu } from './vastu';
 
 export interface BoxConstraints {
   minWidth: number;
@@ -85,9 +86,14 @@ export class SpatialSolver {
 }
 
 export function generateFloorPlan(plot: PlotSpec, req: RequirementSpec): any {
+  // Use polygon-based setback calculation
+  const buildablePolygon = calculateSetbackPolygon(plot.width, plot.length, plot.setbacks);
+  
   const buildableEnvelope = {
-    width: plot.width - (plot.setbacks.left || 0) - (plot.setbacks.right || 0),
-    length: plot.length - (plot.setbacks.front || 0) - (plot.setbacks.rear || 0)
+    x: buildablePolygon[0][0],
+    y: buildablePolygon[0][1],
+    width: buildablePolygon[1][0] - buildablePolygon[0][0],
+    length: buildablePolygon[2][1] - buildablePolygon[1][1]
   };
   
   const solver = new SpatialSolver(buildableEnvelope.width, buildableEnvelope.length);

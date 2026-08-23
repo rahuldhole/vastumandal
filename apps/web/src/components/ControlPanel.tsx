@@ -218,6 +218,7 @@ export default function ControlPanel() {
                   <option value="Sheet 2">Sheet 2 (Column & Footing Layout)</option>
                   <option value="Sheet 3">Sheet 3 (BBS Table + Stock)</option>
                   <option value="Sheet 4">Sheet 4 (Live BOQ Cost Sheet)</option>
+                  <option value="Dossier">Master Dossier (5 Sheets)</option>
                 </select>
               </div>
 

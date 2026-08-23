@@ -140,8 +140,18 @@ DATA;
 #706=IFCLOCALPLACEMENT(#40,#9);
 #707=IFCREINFORCINGBAR('${ifcGuid('rebar')}',#5,'MainRebar','T16',$,#706,#705,'C1',$,.MAIN.,$,$,$);
 
+/* Fixture -> IfcFurnishingElement */
+#800=IFCCARTESIANPOINT((1500.,1500.,0.));
+#801=IFCAXIS2PLACEMENT3D(#800,$,$);
+#802=IFCRECTANGLEPROFILEDEF(.AREA.,'FurnProfile',#51,900.,2000.);
+#803=IFCEXTRUDEDAREASOLID(#802,#801,#52,600.);
+#804=IFCSHAPEREPRESENTATION(#12,'Body','SweptSolid',(#803));
+#805=IFCPRODUCTDEFINITIONSHAPE($,$,(#804));
+#806=IFCLOCALPLACEMENT(#40,#9);
+#807=IFCFURNISHINGELEMENT('${ifcGuid('furn')}',#5,'Bed','Master Bed',$,#806,#805,$);
+
 /* Spatial containment */
-#900=IFCRELCONTAINEDINSPATIALSTRUCTURE('${ifcGuid('containment')}',#5,'StoreyElements','Contains',(#107,#207,#307,#407,#507,#707),#41);
+#900=IFCRELCONTAINEDINSPATIALSTRUCTURE('${ifcGuid('containment')}',#5,'StoreyElements','Contains',(#107,#207,#307,#407,#507,#707,#807),#41);
 
 ENDSEC;
 END-ISO-10303-21;`;

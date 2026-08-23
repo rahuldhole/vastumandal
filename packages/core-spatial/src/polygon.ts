@@ -152,3 +152,21 @@ export function offsetPolygon(polygon: Point2D[], distance: number): Point2D[] {
 
   return offsetPoints;
 }
+
+/**
+ * Calculates a buildable envelope polygon by applying differential setbacks.
+ * Specifically for a 4-sided orthogonal plot (bottom-left at 0,0).
+ */
+export function calculateSetbackPolygon(plotWidth: number, plotLength: number, setbacks: {left: number, right: number, front: number, rear: number}): Point2D[] {
+  const left = setbacks.left || 0;
+  const right = setbacks.right || 0;
+  const front = setbacks.front || 0; // typically y=0 side
+  const rear = setbacks.rear || 0;   // typically y=length side
+
+  return [
+    [left, front],
+    [plotWidth - right, front],
+    [plotWidth - right, plotLength - rear],
+    [left, plotLength - rear]
+  ];
+}

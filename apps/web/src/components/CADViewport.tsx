@@ -33,6 +33,7 @@ export default function CADViewport() {
     dims: true,
     beams: true,
     rooms: true,
+    fixtures: true,
   });
   const [isLayersOpen, setIsLayersOpen] = useState(false);
 
@@ -88,11 +89,11 @@ export default function CADViewport() {
   const layerColors: Record<string, string> = {
     vastu: 'bg-purple-500', grid: 'bg-gray-500', walls: 'bg-white',
     columns: 'bg-red-500', footings: 'bg-green-400', dims: 'bg-yellow-400',
-    beams: 'bg-blue-400', rooms: 'bg-cyan-400',
+    beams: 'bg-blue-400', rooms: 'bg-cyan-400', fixtures: 'bg-orange-400',
   };
 
   // Derived SVG values
-  const { plotW, plotH, buildable, rooms, columns } = layout;
+  const { plotW, plotH, buildable, rooms, columns, fixtures } = layout;
   const svgW = plotW * SCALE + SVG_PAD * 2;
   const svgH = plotH * SCALE + SVG_PAD * 2;
 
@@ -353,33 +354,77 @@ export default function CADViewport() {
               </g>
             )}
 
-            {/* Vastu 3×3 grid overlay */}
+            {/* Vastu 9×9 grid overlay (81-Pada) */}
             {layers.vastu && (
               <g opacity="0.55">
                 <rect x={mx(0)} y={my(plotH)} width={plotW * SCALE} height={plotH * SCALE} fill="none" stroke="#a855f7" strokeWidth="2" />
-                {/* 2 vertical + 2 horizontal dividers */}
-                <line x1={mx(plotW / 3)} y1={my(0)} x2={mx(plotW / 3)} y2={my(plotH)} stroke="#a855f7" strokeWidth="1" strokeDasharray="5 5" />
-                <line x1={mx(2 * plotW / 3)} y1={my(0)} x2={mx(2 * plotW / 3)} y2={my(plotH)} stroke="#a855f7" strokeWidth="1" strokeDasharray="5 5" />
-                <line x1={mx(0)} y1={my(plotH / 3)} x2={mx(plotW)} y2={my(plotH / 3)} stroke="#a855f7" strokeWidth="1" strokeDasharray="5 5" />
-                <line x1={mx(0)} y1={my(2 * plotH / 3)} x2={mx(plotW)} y2={my(2 * plotH / 3)} stroke="#a855f7" strokeWidth="1" strokeDasharray="5 5" />
-                {/* Zone labels */}
+                {/* 8 vertical + 8 horizontal dividers */}
+                {Array.from({ length: 8 }, (_, i) => {
+                  const f = (i + 1) / 9;
+                  return (
+                    <React.Fragment key={`vgrid-${i}`}>
+                      <line x1={mx(plotW * f)} y1={my(0)} x2={mx(plotW * f)} y2={my(plotH)} stroke="#a855f7" strokeWidth="1" strokeDasharray="2 4" />
+                      <line x1={mx(0)} y1={my(plotH * f)} x2={mx(plotW)} y2={my(plotH * f)} stroke="#a855f7" strokeWidth="1" strokeDasharray="2 4" />
+                    </React.Fragment>
+                  );
+                })}
+                {/* Highlight Brahmasthana (central 3x3) */}
+                <rect 
+                  x={mx(plotW * 3/9)} y={my(plotH * 6/9)} 
+                  width={plotW * 3/9 * SCALE} height={plotH * 3/9 * SCALE} 
+                  fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" strokeWidth="1.5" 
+                />
+                <text
+                  x={mx(plotW * 4.5/9)} y={my(plotH * 4.5/9)}
+                  fill="#d8b4fe" fontSize="10" textAnchor="middle" dominantBaseline="central" fontWeight="bold"
+                >
+                  Brahmasthana
+                </text>
+                
+                {/* 16-Zone labels (Simplified representation at boundaries) */}
                 {[
-                  ['Vayu (NW)', 1/6, 5/6], ['North', 3/6, 5/6], ['Ishan (NE)', 5/6, 5/6],
-                  ['West', 1/6, 3/6], ['Brahmasthan', 3/6, 3/6], ['East', 5/6, 3/6],
-                  ['Nairutya (SW)', 1/6, 1/6], ['South', 3/6, 1/6], ['Agni (SE)', 5/6, 1/6],
+                  ['N', 4.5/9, 8.5/9], ['NE', 8.5/9, 8.5/9], ['E', 8.5/9, 4.5/9], ['SE', 8.5/9, 0.5/9],
+                  ['S', 4.5/9, 0.5/9], ['SW', 0.5/9, 0.5/9], ['W', 0.5/9, 4.5/9], ['NW', 0.5/9, 8.5/9]
                 ].map(([text, fx, fy]) => (
                   <text
                     key={text as string}
                     x={mx(plotW * (fx as number))}
                     y={my(plotH * (fy as number))}
-                    fill="#d8b4fe" fontSize="10" textAnchor="middle" dominantBaseline="central"
-                    fontWeight={text === 'Brahmasthan' ? 'bold' : 'normal'}
+                    fill="#d8b4fe" fontSize="8" textAnchor="middle" dominantBaseline="central"
                   >
                     {text as string}
                   </text>
                 ))}
               </g>
             )}
+
+            {/* Fixtures overlay */}
+            {layers.fixtures && fixtures?.map((f: any) => {
+              const { width, length } = f.boundingBox;
+              return (
+                <g key={f.id} transform={`translate(${mx(f.position.x)}, ${my(f.position.y)}) rotate(${f.rotation})`}>
+                  <rect
+                    x={-width * SCALE / 2}
+                    y={-length * SCALE / 2}
+                    width={width * SCALE}
+                    height={length * SCALE}
+                    fill="rgba(249, 115, 22, 0.2)" stroke="#f97316" strokeWidth="1.5"
+                  />
+                  {f.clearanceEnvelope && (
+                    <rect
+                      x={-f.clearanceEnvelope.width * SCALE / 2}
+                      y={-f.clearanceEnvelope.length * SCALE / 2}
+                      width={f.clearanceEnvelope.width * SCALE}
+                      height={f.clearanceEnvelope.length * SCALE}
+                      fill="none" stroke="#f97316" strokeWidth="0.5" strokeDasharray="2 2" opacity="0.5"
+                    />
+                  )}
+                  <text fill="#f97316" fontSize="8" textAnchor="middle" dominantBaseline="central" fontWeight="bold">
+                    {f.type}
+                  </text>
+                </g>
+              );
+            })}
 
             {/* Direction indicator */}
             <g transform={`translate(${svgW - 30}, ${svgH - 30})`}>
@@ -542,6 +587,17 @@ function ThreeView({ layout, layers, floorCount, isDark }: {
               });
               return meshes;
             })()}
+
+            {/* Fixtures */}
+            {layers.fixtures && layout.fixtures?.map(f => {
+              const { width, length, height } = f.boundingBox;
+              return (
+                <mesh key={`f3-${fi}-${f.id}`} position={[f.position.x, height / 2, f.position.y]} rotation={[0, -f.rotation * Math.PI / 180, 0]}>
+                  <boxGeometry args={[width, height, length]} />
+                  <meshStandardMaterial color="#f97316" />
+                </mesh>
+              );
+            })}
           </group>
         );
       })}
