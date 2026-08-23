@@ -9,7 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@vastumandal/core-math": "workspace:*",
+    "@vastumandal/core-estimator": "workspace:*",
+    "@vastumandal/core-structural": "workspace:*",
     "@vastumandal/dwg-schemas": "workspace:*",
     "@vastumandal/dxf-exporter": "workspace:*",
     "@serwist/next": "^9.5.12",

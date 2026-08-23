@@ -26,8 +26,11 @@
       "@/*": [
         "./src/*"
       ],
-      "@vastumandal/core-math": [
-        "../../packages/core-math/src"
+      "@vastumandal/core-estimator": [
+        "../../packages/core-estimator/src"
+      ],
+      "@vastumandal/core-structural": [
+        "../../packages/core-structural/src"
       ],
       "@vastumandal/dwg-schemas": [
         "../../packages/dwg-schemas/src"
