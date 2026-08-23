@@ -91,6 +91,12 @@ function drawColumnSection(dxf: any, data: ColumnScheduleRow) {
   
   dxf.addLayer('S-CONC', DXFWriter.ACI.WHITE, 'CONTINUOUS');
   dxf.addLayer('S-REINF', DXFWriter.ACI.RED, 'CONTINUOUS');
+  dxf.addLayer('S-COL', DXFWriter.ACI.YELLOW, 'CONTINUOUS');
+  
+  // Begin Block Definition
+  const blockName = `C1_${data.width || 400}x${data.depth || 400}`;
+  dxf.addBlock(blockName);
+
 
   const w = data.width || 400;
   const d = data.depth || 400;
