@@ -1,8 +1,11 @@
 import { useCallback } from 'react';
 import { useAppStore } from '../store/useStore';
+import DxfParser from 'dxf-parser';
 
 export function useProjectImport() {
   const restoreState = useAppStore(state => state.restoreState);
+  const setPlotSpec = useAppStore(state => state.setPlotSpec);
+  const setRates = useAppStore(state => state.setRates);
 
   const importFile = useCallback((file: File) => {
     return new Promise<void>((resolve, reject) => {
@@ -29,13 +32,69 @@ export function useProjectImport() {
               reject(new Error('Invalid .vastu file format'));
             }
           } else if (extension === 'dxf') {
-            // TODO: Implement boundary polyline extraction
-            console.warn('.dxf import not fully implemented yet');
-            resolve();
+            try {
+              const parser = new DxfParser();
+              const dxf = parser.parseSync(content);
+
+              if (dxf && dxf.entities) {
+                let minX = Infinity, minY = Infinity;
+                let maxX = -Infinity, maxY = -Infinity;
+                let hasBoundary = false;
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                dxf.entities.forEach((entity: any) => {
+                  if (entity.type === 'LWPOLYLINE' && entity.vertices) {
+                    hasBoundary = true;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    entity.vertices.forEach((v: any) => {
+                      if (v.x < minX) minX = v.x;
+                      if (v.x > maxX) maxX = v.x;
+                      if (v.y < minY) minY = v.y;
+                      if (v.y > maxY) maxY = v.y;
+                    });
+                  }
+                });
+
+                if (hasBoundary && minX !== Infinity) {
+                  const width = maxX - minX;
+                  const length = maxY - minY;
+                  setPlotSpec({ width, length });
+                } else {
+                  console.warn('No LWPOLYLINE found in DXF to extract boundary');
+                }
+              }
+              resolve();
+            } catch (err) {
+              console.error('Failed to parse DXF:', err);
+              reject(new Error('Invalid .dxf file format'));
+            }
           } else if (extension === 'csv') {
-            // TODO: Implement rate card or survey points import
-            console.warn('.csv import not fully implemented yet');
-            resolve();
+            try {
+              const lines = content.trim().split('\n');
+              if (lines.length >= 2) {
+                const headers = lines[0].split(',').map(h => h.trim());
+                const values = lines[1].split(',').map(v => v.trim());
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const rates: any = {};
+                headers.forEach((header, i) => {
+                  if (header === 'columnSize') {
+                    rates[header] = values[i];
+                  } else {
+                    const num = Number(values[i]);
+                    if (!isNaN(num)) {
+                      rates[header] = num;
+                    }
+                  }
+                });
+
+                setRates(rates);
+              }
+              resolve();
+            } catch (err) {
+              console.error('Failed to parse CSV:', err);
+              reject(new Error('Invalid .csv file format'));
+            }
           } else {
             reject(new Error(`Unsupported file extension: .${extension}`));
           }
@@ -57,7 +116,7 @@ export function useProjectImport() {
         reject(new Error(`Unsupported file extension: .${extension}`));
       }
     });
-  }, [restoreState]);
+  }, [restoreState, setPlotSpec, setRates]);
 
   return { importFile };
 }
